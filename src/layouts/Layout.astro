@@ -1,4 +1,5 @@
 ---
+import { ViewTransitions, fade } from 'astro:transitions';
 import Navigation from '../components/core/Navigation/Navigation.astro';
 import { styles } from './styles.css';
 import './../styles/reset.css';
@@ -127,9 +128,10 @@ const { title, description, layout, navigationLinks, additionalSeoInfo } =
     />
 
     <title>Azerty Keycaps - {title}</title>
+    <ViewTransitions />
   </head>
   <body>
-    <Navigation layout={layout} navigationLinks={navigationLinks} />
+    <Navigation layout={layout} navigationLinks={navigationLinks} transition:persist/>
     <main class={styles.layout.main}>
       <slot name="main" />
       <slot name="goto" />
