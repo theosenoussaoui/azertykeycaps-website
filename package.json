@@ -28,6 +28,7 @@
     "yoga-wasm-web": "^0.3.3"
   },
   "devDependencies": {
+    "@vite-pwa/astro": "^0.1.2",
     "astro-seo-schema": "^3.0.0",
     "autoprefixer": "^10.4.15",
     "mini-svg-data-uri": "^1.4.4",
