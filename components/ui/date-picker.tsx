@@ -24,7 +24,7 @@ export const DatePicker = forwardRef<
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant={"outline"}
+          variant={"outline-secondary"}
           className={cn(
             "flex w-full xl:w-[400px] justify-start text-left font-normal",
             !date && "text-muted-foreground"

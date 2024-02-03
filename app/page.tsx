@@ -80,12 +80,12 @@ export default async function Home() {
               <Link
                 href={`/profil/${displayedArticles[key][0].profile.slug}`}
                 className={cn(
-                  buttonVariants({ variant: "outline", size: "sm" }),
+                  buttonVariants({ variant: "outline-primary", size: "sm" }),
                   "gap-x-1"
                 )}
               >
                 Voir plus
-                <ArrowRight width={16} height={16} />
+                <ArrowRight width={16} height={16} className="text-primary" />
               </Link>
             </header>
             <div className="flex flex-nowrap lg:grid mt-6 lg:grid-cols-4 gap-x-4 overflow-x-scroll lg:overflow-hidden snap-x">

@@ -187,7 +187,7 @@ export default function SingleArticle({
               href={additionalUrl}
               target="_blank"
               className={cn(
-                buttonVariants({ variant: "outline" }),
+                buttonVariants({ variant: "outline-secondary" }),
                 "flex-1 w-full"
               )}
             >

@@ -31,7 +31,7 @@ export default function SheetMobileMenu({
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button
-          variant="outline"
+          variant="outline-secondary"
           className="flex xl:hidden"
           size="icon"
           aria-label="Open menu"
