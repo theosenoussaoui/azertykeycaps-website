@@ -116,10 +116,15 @@ export const contentfulClient = createClient({
   environment: process.env.CONTENTFUL_ENVIRONMENT,
   space: process.env.CONTENTFUL_SPACE_ID || "",
   accessToken:
-    (process.env.DEV
+    (process.env.VERCEL_ENV === "preview" ||
+    process.env.NODE_ENV === "production"
       ? process.env.CONTENTFUL_PREVIEW_TOKEN
       : process.env.CONTENTFUL_DELIVERY_TOKEN) || "",
-  host: process.env.DEV ? "preview.contentful.com" : "cdn.contentful.com",
+  host:
+    process.env.VERCEL_ENV === "preview" ||
+    process.env.NODE_ENV === "production"
+      ? "preview.contentful.com"
+      : "cdn.contentful.com",
 });
 
 export const contentfulManagementClient = createManagementClient(
