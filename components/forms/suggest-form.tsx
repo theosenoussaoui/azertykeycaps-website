@@ -71,12 +71,12 @@ export function SuggestForm({ className }: { className?: ClassNameValue }) {
 
           url: {
             description:
-              "Le lien principale vers votre keyset, qui doit être valide et accessible.",
+              "Le lien principal vers votre keyset (255 caractères max).",
           },
 
           additionalUrl: {
             description:
-              "Le lien secondaire vers votre keyset (ou vers un sous kit de votre set), qui doit être valide et accessible.",
+              "Le lien secondaire vers votre keyset (ou vers un sous kit de votre set, 255 caractères max).",
           },
 
           warningText: {
