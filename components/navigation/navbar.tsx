@@ -15,10 +15,22 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Button, buttonVariants } from "../ui/button";
-import { ArrowUpRight, Plus } from "lucide-react";
+import {
+  ArrowUpRight,
+  ChevronRightIcon,
+  EllipsisVertical,
+  Moon,
+  Plus,
+  Sun,
+} from "lucide-react";
 import Link from "next/link";
 
 export function Navbar({
@@ -51,31 +63,38 @@ export function Navbar({
         </div>
         <div className="flex grow xl:grow-0 gap-x-3 items-center xl:mx-4">
           <CommandDialogDemo groupedArticles={groupedArticles} />
-          <ModeToggle />
+          <Link
+            className={cn(
+              buttonVariants({ variant: "outline-secondary" }),
+              "gap-x-2"
+            )}
+            href="/suggestion"
+          >
+            Suggestion
+          </Link>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="icon" className="hidden xl:flex">
-                <Plus className="h-[1.2rem] w-[1.2rem] text-foreground" />
+              <Button
+                variant="outline-secondary"
+                size="icon"
+                className="hidden xl:flex"
+              >
+                <EllipsisVertical className="h-[1.2rem] w-[1.2rem] text-foreground" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[200px]">
-              <DropdownMenuItem asChild>
-                <Link className="w-full cursor-pointer" href="/suggestion">
-                  Suggérer un keyset
-                </Link>
-              </DropdownMenuItem>
+            <DropdownMenuContent className="w-[200px]">
               <DropdownMenuItem asChild>
                 <Link className="w-full cursor-pointer" href="/informations">
                   Informations
                 </Link>
               </DropdownMenuItem>
+              <ModeToggle />
               <DropdownMenuItem asChild>
                 <Link
                   className="w-full cursor-pointer flex items-center justify-between"
                   href="https://www.keycaps.info/"
                 >
                   <span>Comparer les profils</span>
-                  <ArrowUpRight className="h-[1.2rem] w-[1.2rem] text-primary" />
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuContent>

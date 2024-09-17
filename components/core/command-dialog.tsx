@@ -46,7 +46,7 @@ export function CommandDialogDemo({
   return (
     <>
       <Button
-        variant="outline"
+        variant="outline-secondary"
         className="font-normal grow xl:grow-0 xl:font-medium"
         onClick={() => setOpen(true)}
       >

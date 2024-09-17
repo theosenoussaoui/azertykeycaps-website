@@ -1,9 +1,9 @@
 import { createClient, type Asset, type Entry } from "contentful";
-import { createClient as createManagementClient } from "contentful-management";
-
+import {
+  createClient as createManagementClient,
+  RichTextCommentDocument,
+} from "contentful-management";
 import { group } from "radash";
-
-import type { Document } from "@contentful/rich-text-types";
 import type {
   TypeApiOgImagesSkeleton,
   TypeArticleSkeleton,
@@ -11,11 +11,12 @@ import type {
   TypeHomepageSkeleton,
   TypeKeycaps__profileSkeleton,
 } from "@/types/content-types";
+
 import dynamicIconImports from "lucide-react/dynamicIconImports";
 
 export interface InformationContentfulInterface {
   title: string;
-  informationRichText: Document;
+  informationRichText: RichTextCommentDocument;
 }
 
 export interface NavigationLinksInterface {
@@ -115,10 +116,15 @@ export const contentfulClient = createClient({
   environment: process.env.CONTENTFUL_ENVIRONMENT,
   space: process.env.CONTENTFUL_SPACE_ID || "",
   accessToken:
-    (process.env.DEV
+    (process.env.VERCEL_ENV === "preview" ||
+    process.env.NODE_ENV === "production"
       ? process.env.CONTENTFUL_PREVIEW_TOKEN
       : process.env.CONTENTFUL_DELIVERY_TOKEN) || "",
-  host: process.env.DEV ? "preview.contentful.com" : "cdn.contentful.com",
+  host:
+    process.env.VERCEL_ENV === "preview" ||
+    process.env.NODE_ENV === "production"
+      ? "preview.contentful.com"
+      : "cdn.contentful.com",
 });
 
 export const contentfulManagementClient = createManagementClient(
@@ -249,59 +255,61 @@ export const getArticles = async (profile?: string) => {
             undefined,
             string
           >
-        ).fields.slug === profile
+        )?.fields.slug === profile
     );
 
-  return articlesEntries.items.map(({ fields }) => {
-    const {
-      title,
-      img,
-      slug,
-      profile,
-      material,
-      description,
-      status,
-      startDate,
-      endDate,
-      url,
-      additionalUrl,
-      warningText,
-      isNew,
-    } = fields;
+  if (articlesEntries.items.length > 0)
+    return articlesEntries.items.map(({ fields }) => {
+      const {
+        title,
+        img,
+        slug,
+        profile,
+        material,
+        description,
+        status,
+        startDate,
+        endDate,
+        url,
+        additionalUrl,
+        warningText,
+        isNew,
+      } = fields;
 
-    return {
-      title,
-      img: (img as Asset).fields.file?.url as string,
-      slug,
-      profile: {
-        title: (
-          profile as Entry<TypeKeycaps__profileSkeleton, undefined, string>
-        ).fields?.title,
-        slug: (
-          profile as Entry<TypeKeycaps__profileSkeleton, undefined, string>
-        ).fields?.slug,
-        description: (
-          profile as Entry<TypeKeycaps__profileSkeleton, undefined, string>
-        ).fields?.description,
-        abbreviation: (
-          profile as Entry<TypeKeycaps__profileSkeleton, undefined, string>
-        ).fields?.abbreviation,
-      },
-      material,
-      description,
-      status,
-      startDate: startDate
-        ? new Date(startDate).toLocaleDateString("fr-FR")
-        : undefined,
-      endDate: endDate
-        ? new Date(endDate).toLocaleDateString("fr-FR")
-        : undefined,
-      url,
-      additionalUrl,
-      warningText,
-      isNew,
-    };
-  });
+      return {
+        title,
+        img: (img as Asset)?.fields?.file?.url as string,
+        slug,
+        profile: {
+          title: (
+            profile as Entry<TypeKeycaps__profileSkeleton, undefined, string>
+          )?.fields?.title,
+          slug: (
+            profile as Entry<TypeKeycaps__profileSkeleton, undefined, string>
+          )?.fields?.slug,
+          description: (
+            profile as Entry<TypeKeycaps__profileSkeleton, undefined, string>
+          )?.fields?.description,
+          abbreviation: (
+            profile as Entry<TypeKeycaps__profileSkeleton, undefined, string>
+          )?.fields?.abbreviation,
+        },
+        material,
+        description,
+        status,
+        startDate: startDate
+          ? new Date(startDate).toLocaleDateString("fr-FR")
+          : undefined,
+        endDate: endDate
+          ? new Date(endDate).toLocaleDateString("fr-FR")
+          : undefined,
+        url,
+        additionalUrl,
+        warningText,
+        isNew,
+      };
+    });
+  else return [];
 };
 
 export const getDropshippingSites = async () => {
@@ -316,7 +324,7 @@ export const getDropshippingSites = async () => {
 
     return {
       title,
-      img: (banner as Asset).fields.file?.url as string,
+      img: (banner as Asset)?.fields.file?.url as string,
       url,
       examples,
       categories,
@@ -335,5 +343,5 @@ export const getRandomOgApiImg = async () => {
   const randomApiOgEntry =
     ogApiEntries.items[Math.floor(Math.random() * ogApiEntries.items.length)];
 
-  return (randomApiOgEntry.fields.img as Asset).fields.file?.url as string;
+  return (randomApiOgEntry.fields.img as Asset)?.fields.file?.url as string;
 };

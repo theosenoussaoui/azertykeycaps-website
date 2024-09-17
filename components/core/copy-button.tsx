@@ -24,7 +24,7 @@ function CopyButton({ url, className }: CopyButtonProps) {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant="outline"
+            variant="outline-secondary"
             size="icon"
             onClick={() => {
               navigator.clipboard.writeText(url);

@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation";
 import { useReCaptcha } from "next-recaptcha-v3";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { Loader } from "lucide-react";
 
 export function SuggestForm({ className }: { className?: ClassNameValue }) {
   const router = useRouter();
@@ -53,7 +52,7 @@ export function SuggestForm({ className }: { className?: ClassNameValue }) {
           status: {
             fieldType: "select",
             description:
-              "Le profil de votre keyset, que nous revérifierons par la suite.",
+              "Le statut de vente de votre keyset, que nous revérifierons par la suite.",
           },
 
           material: {
@@ -72,12 +71,12 @@ export function SuggestForm({ className }: { className?: ClassNameValue }) {
 
           url: {
             description:
-              "Le lien principale vers votre keyset, qui doit être valide et accessible.",
+              "Le lien principal vers votre keyset (255 caractères max).",
           },
 
           additionalUrl: {
             description:
-              "Le lien secondaire vers votre keyset (ou vers un sous kit de votre set), qui doit être valide et accessible.",
+              "Le lien secondaire vers votre keyset (ou vers un sous kit de votre set, 255 caractères max).",
           },
 
           warningText: {

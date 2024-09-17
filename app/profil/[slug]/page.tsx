@@ -1,13 +1,15 @@
 import ArticleList from "@/components/articles/article-list";
 import { TypographyH1 } from "@/components/core/typography/h1";
 import { TypographyP } from "@/components/core/typography/p";
+import { buttonVariants } from "@/components/ui/button";
 import {
   getArticles,
   getProfileSlugs,
   getRandomOgApiImg,
 } from "@/lib/api/contentful";
+import { cn } from "@/lib/utils";
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
+import Link from "next/link";
 
 type Props = {
   params: { slug: string };
@@ -72,34 +74,53 @@ export async function generateMetadata({
 export default async function Page({ params }: { params: { slug: string } }) {
   const { articlesBySlug } = await getData(params.slug);
 
-  if (!(articlesBySlug.length > 0)) {
-    notFound();
-  }
-
   return (
-    <main className="container my-12">
-      <section itemScope itemType="https://schema.org/ProductCollection">
-        <meta itemProp="name" content={articlesBySlug[0].profile.title} />
+    <>
+      {articlesBySlug.length > 0 ? (
+        <main className="container my-12">
+          <section itemScope itemType="https://schema.org/ProductCollection">
+            <meta itemProp="name" content={articlesBySlug[0].profile.title} />
 
-        {articlesBySlug[0].profile.description && (
-          <meta
-            itemProp="description"
-            content={articlesBySlug[0].profile.description}
-          />
-        )}
+            {articlesBySlug[0].profile.description && (
+              <meta
+                itemProp="description"
+                content={articlesBySlug[0].profile.description}
+              />
+            )}
 
-        <TypographyH1 itemProp="name">
-          {articlesBySlug[0].profile.title}
-        </TypographyH1>
+            <TypographyH1 itemProp="name">
+              {articlesBySlug[0].profile.title}
+            </TypographyH1>
 
-        {articlesBySlug[0].profile.description && (
-          <TypographyP itemProp="description">
-            {articlesBySlug[0].profile.description}
-          </TypographyP>
-        )}
+            {articlesBySlug[0].profile.description && (
+              <TypographyP itemProp="description">
+                {articlesBySlug[0].profile.description}
+              </TypographyP>
+            )}
 
-        <ArticleList articles={articlesBySlug} />
-      </section>
-    </main>
+            <ArticleList articles={articlesBySlug} />
+          </section>
+        </main>
+      ) : (
+        <main className="container my-32">
+          <div className="space-y-4">
+            <TypographyH1>
+              <span className="text-primary">Aucun article pour ce profil</span>{" "}
+              actuellement.
+            </TypographyH1>
+            <TypographyP>
+              Nous n&apos;avons pas encore de keysets pour ce profil en
+              particulier, veuillez réessayer plus tard.
+            </TypographyP>
+          </div>
+          <Link
+            href="/"
+            className={cn(buttonVariants({ variant: "secondary" }), "mt-8")}
+          >
+            Retour à la maison
+          </Link>
+        </main>
+      )}
+    </>
   );
 }

@@ -24,14 +24,18 @@ export const DatePicker = forwardRef<
     <Popover>
       <PopoverTrigger asChild>
         <Button
-          variant={"outline"}
+          variant={"outline-secondary"}
           className={cn(
             "flex w-full xl:w-[400px] justify-start text-left font-normal",
             !date && "text-muted-foreground"
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {date ? format(date, "PPP") : <span>Choisissez une date</span>}
+          {date ? (
+            format(date, "PPP", { locale: fr })
+          ) : (
+            <span>Choisissez une date</span>
+          )}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0" ref={ref}>
@@ -39,7 +43,7 @@ export const DatePicker = forwardRef<
           mode="single"
           selected={date}
           onSelect={setDate}
-          initialFocus
+          autoFocus
           locale={fr}
         />
       </PopoverContent>

@@ -35,12 +35,18 @@ export const formSchema = z.object({
     .url({
       message: "Veuillez indiquer un lien valide vers votre keyset.",
     })
+    .max(255, {
+      message: "Le lien ne peut pas faire plus de 255 caractères.",
+    })
     .describe("Lien (URL) :"),
 
   additionalUrl: z
     .string()
     .url({
       message: "Veuillez indiquer un lien valide vers votre keyset.",
+    })
+    .max(255, {
+      message: "Le lien ne peut pas faire plus de 255 caractères.",
     })
     .optional()
     .describe("Lien secondaire (URL) :"),
