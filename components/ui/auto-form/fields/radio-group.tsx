@@ -18,7 +18,7 @@ export default function AutoFormRadioGroup({
   const values = (zodItem as unknown as z.ZodEnum<any>)._def.values;
 
   return (
-    <FormItem className="space-y-3">
+    <FormItem className="flex flex-col gap-3">
       <FormLabel>
         {label}
         {isRequired && <span className="text-destructive"> *</span>}
@@ -27,14 +27,11 @@ export default function AutoFormRadioGroup({
         <RadioGroup
           onValueChange={field.onChange}
           defaultValue={field.value}
-          className="flex flex-col space-y-1"
+          className="flex flex-col gap-1"
           {...fieldProps}
         >
           {values.map((value: any) => (
-            <FormItem
-              className="flex items-center space-x-3 space-y-0"
-              key={value}
-            >
+            <FormItem className="flex items-center gap-x-3 gap-y-0" key={value}>
               <FormControl>
                 <RadioGroupItem value={value} />
               </FormControl>

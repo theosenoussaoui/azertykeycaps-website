@@ -6,6 +6,8 @@ export async function GET(request: NextRequest) {
 
   if (secret && secret === process.env.CONTENTFUL_WEBHOOK_SECRET) {
     revalidatePath("/profil/[slug]", "page");
+    revalidatePath("/", "page");
+
     return Response.json({ revalidated: true, now: Date.now() });
   } else console.log("Missing secret in webhook");
 

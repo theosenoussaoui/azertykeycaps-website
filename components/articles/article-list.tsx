@@ -28,7 +28,7 @@ export default function ArticleList({ articles }: ArticleListProps) {
     return articles.filter(
       (article) =>
         (!status || article.status === status) &&
-        (!material || article.material === material)
+        (!material || article.material === material),
     );
   }, [articles, material, status]);
 
@@ -41,7 +41,7 @@ export default function ArticleList({ articles }: ArticleListProps) {
       articlesDisplay
         .slice()
         .sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)),
-    [articlesDisplay]
+    [articlesDisplay],
   );
 
   const handleStatusChange = React.useCallback((value: string) => {
@@ -55,7 +55,7 @@ export default function ArticleList({ articles }: ArticleListProps) {
   return (
     <>
       <Separator className="my-8" />
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6">
         <span className="scroll-m-20 text-xl font-semibold tracking-tight">
           Filtres :
         </span>
@@ -75,14 +75,14 @@ export default function ArticleList({ articles }: ArticleListProps) {
                     <span className="relative flex h-2 w-2 mr-3">
                       <span
                         className={cn(
-                          "animate-ping absolute inline-flex h-full w-full rounded-full bg-opacity-75",
-                          getStatusColor(s).bg
+                          "animate-ping absolute inline-flex h-full w-full rounded-full",
+                          getStatusColor(s).bg,
                         )}
                       ></span>
                       <span
                         className={cn(
                           "relative inline-flex rounded-full h-2 w-2",
-                          getStatusColor(s).bg
+                          getStatusColor(s).bg,
                         )}
                       ></span>
                     </span>

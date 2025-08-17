@@ -122,15 +122,12 @@ export default function SingleArticle({
           className="border-b -mt-2"
           priority={isHighPriority}
         />
-        <CardTitle
-          className="text-lg px-6 py-2 truncate text-center"
-          title={title}
-        >
+        <CardTitle className="text-lg px-6 py-2 truncate text-center">
           {title}
         </CardTitle>
         <Separator />
       </CardHeader>
-      <CardContent className="text-sm p-0 py-4 space-y-4">
+      <CardContent className="text-sm p-0 py-4 mt-8 flex flex-col gap-4">
         <ArticleDl>
           <ArticleDt>Profil :</ArticleDt>
           <ArticleDd itemProp={"category"}>{profile.title}</ArticleDd>
@@ -146,7 +143,7 @@ export default function SingleArticle({
               className={cn(
                 "uppercase pointer-events-none",
                 bgStatusColor,
-                textStatusColor
+                textStatusColor,
               )}
             >
               {status}
@@ -191,7 +188,7 @@ export default function SingleArticle({
               target="_blank"
               className={cn(
                 buttonVariants({ variant: "outline-secondary" }),
-                "flex-1 w-full"
+                "flex-1 w-full",
               )}
             >
               Kit secondaire
@@ -203,7 +200,7 @@ export default function SingleArticle({
             itemProp="url"
             className={cn(
               buttonVariants({ variant: "default" }),
-              "flex-1 w-full flex items-center gap-x-2"
+              "flex-1 w-full flex items-center gap-x-2",
             )}
           >
             <span>Voir le set</span>

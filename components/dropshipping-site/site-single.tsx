@@ -63,7 +63,7 @@ export default function SingleDropshippingWebsite({
         </CardTitle>
       </CardHeader>
       <Separator />
-      <CardContent className="text-sm p-0 py-4 space-y-4">
+      <CardContent className="text-sm p-0 py-4 flex flex-col gap-4">
         {description && (
           <>
             <section

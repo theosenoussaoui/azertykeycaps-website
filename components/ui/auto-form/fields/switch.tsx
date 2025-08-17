@@ -15,7 +15,7 @@ export default function AutoFormSwitch({
   fieldProps,
 }: AutoFormInputComponentProps) {
   return (
-    <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+    <FormItem className="flex flex-row items-start gap-x-3 gap-y-0 rounded-md border p-4">
       <FormControl>
         <Switch
           checked={field.value}
@@ -23,7 +23,7 @@ export default function AutoFormSwitch({
           {...fieldProps}
         />
       </FormControl>
-      <div className="space-y-1">
+      <div className="flex flex-col gap-1">
         <FormLabel>
           {label}
           {isRequired && <span className="text-destructive"> *</span>}

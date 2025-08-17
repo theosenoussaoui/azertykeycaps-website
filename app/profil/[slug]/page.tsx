@@ -28,7 +28,9 @@ async function getData(slug: string) {
   return { articlesBySlug };
 }
 
-export async function generateMetadata(props: Props): Promise<Metadata | undefined> {
+export async function generateMetadata(
+  props: Props,
+): Promise<Metadata | undefined> {
   const params = await props.params;
   const { articlesBySlug } = await getData(params.slug);
   const randomOgApi = await getRandomOgApiImg();
@@ -70,7 +72,9 @@ export async function generateMetadata(props: Props): Promise<Metadata | undefin
     };
 }
 
-export default async function Page(props: { params: Promise<{ slug: string }> }) {
+export default async function Page(props: {
+  params: Promise<{ slug: string }>;
+}) {
   const params = await props.params;
   const { articlesBySlug } = await getData(params.slug);
 
@@ -103,7 +107,7 @@ export default async function Page(props: { params: Promise<{ slug: string }> })
         </main>
       ) : (
         <main className="container my-32">
-          <div className="space-y-4">
+          <div className="-opacity-">
             <TypographyH1>
               <span className="text-primary">Aucun article pour ce profil</span>{" "}
               actuellement.

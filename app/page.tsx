@@ -20,13 +20,13 @@ async function getData() {
   const remainingHeadingHomepageTitle = rest.join(" ");
 
   const articlesBySlug = (await getArticles()).filter((e) =>
-    homepageContent.profileCards.some((p) => e.profile.title === p.title)
+    homepageContent.profileCards.some((p) => e.profile.title === p.title),
   );
 
   const groupedArticles = group(articlesBySlug, (a) => a.profile.title);
 
   const desiredOrder: string[] = homepageContent.profileCards.map(
-    (e) => e.title
+    (e) => e.title,
   );
 
   const reorderedArticles: Record<string, KeycapArticleContentfulInterface[]> =
@@ -37,14 +37,14 @@ async function getData() {
         }
         return result;
       },
-      {}
+      {},
     );
 
   const displayedArticles: homePageContentType = {};
 
   Object.keys(reorderedArticles).map(
     (key: string) =>
-      (displayedArticles[key] = reorderedArticles[key]?.slice(0, 4) ?? [])
+      (displayedArticles[key] = reorderedArticles[key]?.slice(0, 4) ?? []),
   );
 
   return {
@@ -72,7 +72,7 @@ export default async function Home() {
         {remainingHeadingHomepageTitle}
       </TypographyH1>
       <Description text={homepageContent.description} />
-      <section className="mt-8 space-y-10">
+      <section className="mt-8 flex flex-col gap-10">
         {Object.keys(displayedArticles).map((key, i) => (
           <div key={key}>
             <header className="flex items-center justify-between">
@@ -81,7 +81,7 @@ export default async function Home() {
                 href={`/profil/${displayedArticles[key][0].profile.slug}`}
                 className={cn(
                   buttonVariants({ variant: "outline-primary", size: "sm" }),
-                  "gap-x-1 text-foreground"
+                  "gap-x-1 text-foreground",
                 )}
               >
                 Voir plus

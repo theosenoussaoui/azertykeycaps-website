@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <main className="container my-32">
-      <div className="space-y-4">
+      <div className="flex flex-col gap-4">
         <TypographyH1>
           <span className="text-primary">Quatre cent quatre</span> - pas trouvé.
         </TypographyH1>

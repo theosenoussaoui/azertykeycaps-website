@@ -22,7 +22,7 @@ function DefaultParent({ children }: { children: React.ReactNode }) {
 }
 
 export default function AutoFormObject<
-  SchemaType extends z.ZodObject<any, any>
+  SchemaType extends z.ZodObject<any, any>,
 >({
   schema,
   form,
@@ -37,7 +37,7 @@ export default function AutoFormObject<
   const { shape } = getBaseSchema<SchemaType>(schema);
 
   return (
-    <Accordion type="multiple" className="space-y-5">
+    <Accordion type="multiple" className="flex flex-col gap-5">
       {Object.keys(shape).map((name) => {
         const item = shape[name] as z.ZodAny;
         const zodBaseType = getBaseType(item);
@@ -115,7 +115,7 @@ export default function AutoFormObject<
                       ...field,
                       ...fieldConfigItem.inputProps,
                       value: !fieldConfigItem.inputProps?.defaultValue
-                        ? field.value ?? ""
+                        ? (field.value ?? "")
                         : undefined,
                     }}
                   />

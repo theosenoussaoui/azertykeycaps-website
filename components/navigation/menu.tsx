@@ -31,7 +31,7 @@ const ListItem: React.ForwardRefRenderFunction<
         ref={ref}
         className={cn(
           "block select-none rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-accent/60 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-          className
+          className,
         )}
         {...props}
       >
@@ -46,7 +46,7 @@ const ListItem: React.ForwardRefRenderFunction<
               />
             </div>
           )}
-          <div className="space-y-1.5">
+          <div className="flex flex-col gap-1.5">
             <div className="text-sm font-medium leading-none">{title}</div>
             <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
               {children}
