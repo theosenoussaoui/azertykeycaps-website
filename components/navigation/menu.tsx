@@ -21,41 +21,40 @@ interface ListItemProps extends React.ComponentPropsWithoutRef<"a"> {
   icon?: string;
 }
 
-const ListItem: React.ForwardRefRenderFunction<
-  HTMLAnchorElement,
-  ListItemProps
-> = ({ className, title, children, icon, ...props }, ref) => (
-  <li>
-    <NavigationMenuLink asChild>
-      <a
-        ref={ref}
-        className={cn(
-          "block select-none rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-accent/60 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
-          className,
-        )}
-        {...props}
-      >
-        <div className="flex items-start gap-x-3">
-          {icon && (
-            <div className="shrink-0 bg-secondary p-3 rounded-md">
-              <Image
-                src={`/profiles/${icon}.svg`}
-                alt={title}
-                width={32}
-                height={32}
-              />
-            </div>
+const ListItem = React.forwardRef<HTMLAnchorElement, ListItemProps>(
+  ({ className, title, children, icon, ...props }, ref) => (
+    <li>
+      <NavigationMenuLink asChild>
+        <a
+          ref={ref}
+          className={cn(
+            "block select-none rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-accent/60 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            className,
           )}
-          <div className="flex flex-col gap-1.5">
-            <div className="text-sm font-medium leading-none">{title}</div>
-            <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-              {children}
-            </p>
+          {...props}
+        >
+          <div className="flex items-start gap-x-3">
+            {icon && (
+              <div className="shrink-0 bg-secondary p-3 rounded-md">
+                <Image
+                  src={`/profiles/${icon}.svg`}
+                  alt={title}
+                  width={32}
+                  height={32}
+                />
+              </div>
+            )}
+            <div className="flex flex-col gap-1.5">
+              <div className="text-sm font-medium leading-none">{title}</div>
+              <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                {children}
+              </p>
+            </div>
           </div>
-        </div>
-      </a>
-    </NavigationMenuLink>
-  </li>
+        </a>
+      </NavigationMenuLink>
+    </li>
+  ),
 );
 
 ListItem.displayName = "ListItem";

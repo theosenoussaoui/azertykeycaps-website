@@ -127,7 +127,7 @@ export default function SingleArticle({
         </CardTitle>
         <Separator />
       </CardHeader>
-      <CardContent className="text-sm p-0 py-4 mt-8 flex flex-col gap-4">
+      <CardContent className="text-sm p-0 py-4 flex flex-col gap-4">
         <ArticleDl>
           <ArticleDt>Profil :</ArticleDt>
           <ArticleDd itemProp={"category"}>{profile.title}</ArticleDd>
