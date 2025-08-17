@@ -143,7 +143,7 @@ export default function SingleArticle({
               className={cn(
                 "uppercase pointer-events-none",
                 bgStatusColor,
-                textStatusColor,
+                textStatusColor
               )}
             >
               {status}
@@ -188,7 +188,7 @@ export default function SingleArticle({
               target="_blank"
               className={cn(
                 buttonVariants({ variant: "outline-secondary" }),
-                "flex-1 w-full",
+                "flex-1 w-full"
               )}
             >
               Kit secondaire
@@ -200,7 +200,7 @@ export default function SingleArticle({
             itemProp="url"
             className={cn(
               buttonVariants({ variant: "default" }),
-              "flex-1 w-full flex items-center gap-x-2",
+              "flex-1 w-full flex items-center gap-x-2"
             )}
           >
             <span>Voir le set</span>

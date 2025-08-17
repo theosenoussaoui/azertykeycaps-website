@@ -22,7 +22,7 @@ function DefaultParent({ children }: { children: React.ReactNode }) {
 }
 
 export default function AutoFormObject<
-  SchemaType extends z.ZodObject<any, any>,
+  SchemaType extends z.ZodObject<any, any>
 >({
   schema,
   form,
@@ -115,7 +115,7 @@ export default function AutoFormObject<
                       ...field,
                       ...fieldConfigItem.inputProps,
                       value: !fieldConfigItem.inputProps?.defaultValue
-                        ? (field.value ?? "")
+                        ? field.value ?? ""
                         : undefined,
                     }}
                   />

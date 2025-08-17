@@ -29,7 +29,7 @@ async function getData(slug: string) {
 }
 
 export async function generateMetadata(
-  props: Props,
+  props: Props
 ): Promise<Metadata | undefined> {
   const params = await props.params;
   const { articlesBySlug } = await getData(params.slug);

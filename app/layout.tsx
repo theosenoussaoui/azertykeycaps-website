@@ -117,7 +117,7 @@ export default async function RootLayout({
                 </Link>{" "}
                 &{" "}
                 <Link
-                  href="https://twitter.com/hegoom"
+                  href="https://www.instagram.com/plaketdebeur/"
                   target="_blank"
                   rel="noreferrer"
                   className="font-medium underline underline-offset-4"
@@ -135,7 +135,7 @@ export default async function RootLayout({
                       rel="noreferrer"
                       className={cn(
                         buttonVariants({ variant: "ghost" }),
-                        "gap-x-2 text-sm leading-loose text-muted-foreground"
+                        "gap-x-2 text-sm leading-loose text-muted-foreground",
                       )}
                     >
                       <Icon name={socialLink.iconText} width={16} height={16} />

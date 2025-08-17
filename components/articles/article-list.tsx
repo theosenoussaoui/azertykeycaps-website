@@ -28,7 +28,7 @@ export default function ArticleList({ articles }: ArticleListProps) {
     return articles.filter(
       (article) =>
         (!status || article.status === status) &&
-        (!material || article.material === material),
+        (!material || article.material === material)
     );
   }, [articles, material, status]);
 
@@ -41,7 +41,7 @@ export default function ArticleList({ articles }: ArticleListProps) {
       articlesDisplay
         .slice()
         .sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)),
-    [articlesDisplay],
+    [articlesDisplay]
   );
 
   const handleStatusChange = React.useCallback((value: string) => {
@@ -76,13 +76,13 @@ export default function ArticleList({ articles }: ArticleListProps) {
                       <span
                         className={cn(
                           "animate-ping absolute inline-flex h-full w-full rounded-full",
-                          getStatusColor(s).bg,
+                          getStatusColor(s).bg
                         )}
                       ></span>
                       <span
                         className={cn(
                           "relative inline-flex rounded-full h-2 w-2",
-                          getStatusColor(s).bg,
+                          getStatusColor(s).bg
                         )}
                       ></span>
                     </span>

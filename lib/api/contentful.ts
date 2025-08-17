@@ -11,7 +11,6 @@ import type {
   TypeHomepageSkeleton,
   TypeKeycaps__profileSkeleton,
 } from "@/types/content-types";
-
 import dynamicIconImports from "lucide-react/dynamicIconImports";
 
 export interface InformationContentfulInterface {
