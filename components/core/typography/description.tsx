@@ -1,6 +1,8 @@
 import * as React from "react";
 import { TypographyP } from "./p";
 
+import type { JSX } from "react";
+
 interface DescriptionProps {
   text: string;
 }

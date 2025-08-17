@@ -30,14 +30,14 @@ const ListItem: React.ForwardRefRenderFunction<
       <a
         ref={ref}
         className={cn(
-          "block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent/60 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+          "block select-none rounded-md p-3 leading-none no-underline outline-hidden transition-colors hover:bg-accent/60 hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
           className
         )}
         {...props}
       >
         <div className="flex items-start gap-x-3">
           {icon && (
-            <div className="flex-shrink-0 bg-secondary p-3 rounded-md">
+            <div className="shrink-0 bg-secondary p-3 rounded-md">
               <Image
                 src={`/profiles/${icon}.svg`}
                 alt={title}

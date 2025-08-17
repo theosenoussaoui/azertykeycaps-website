@@ -78,7 +78,7 @@ export default function SingleArticle({
 
       {warningText && <meta itemProp="negativeNotes" content={warningText} />}
 
-      <CardHeader className="relative">
+      <CardHeader className="relative max-w-[20rem]">
         <div className="absolute inset-2 bottom-auto z-10 flex justify-between">
           {isNew && (
             <Badge variant="default" className="flex items-center gap-x-2">
@@ -122,7 +122,10 @@ export default function SingleArticle({
           className="border-b -mt-2"
           priority={isHighPriority}
         />
-        <CardTitle className="text-lg px-6 py-2 truncate text-center">
+        <CardTitle
+          className="text-lg px-6 py-2 truncate text-center"
+          title={title}
+        >
           {title}
         </CardTitle>
         <Separator />

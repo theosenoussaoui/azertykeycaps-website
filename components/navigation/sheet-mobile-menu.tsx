@@ -62,7 +62,7 @@ export default function SheetMobileMenu({
                   className="flex items-center gap-x-2 transition-colors hover:text-foreground/80 text-foreground/60 text-base font-medium"
                 >
                   {subLink.navbarIconName && (
-                    <div className="flex-shrink-0 bg-secondary p-2 rounded-md">
+                    <div className="shrink-0 bg-secondary p-2 rounded-md">
                       <Image
                         src={`/profiles/${subLink.navbarIconName}.svg`}
                         alt={subLink.title}

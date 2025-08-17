@@ -15,7 +15,7 @@ export function TypographyP({
   return (
     <p
       itemProp={itemProp}
-      className={cn("leading-7 [&:not(:first-child)]:mt-6", className)}
+      className={cn("leading-7 not-first:mt-6", className)}
     >
       {children}
     </p>

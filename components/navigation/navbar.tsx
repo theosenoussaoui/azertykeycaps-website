@@ -43,7 +43,7 @@ export function Navbar({
   const groupedArticles = group(articles, (a) => a.profile.title);
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/80">
       <div className="container flex h-14 items-center gap-x-4 justify-between">
         <SheetMobileMenu links={links} />
         <div className="hidden xl:flex xl:gap-x-4 xl:items-center">

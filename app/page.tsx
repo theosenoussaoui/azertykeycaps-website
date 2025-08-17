@@ -66,7 +66,7 @@ export default async function Home() {
   return (
     <main className="container my-12 flex flex-col gap-y-6">
       <TypographyH1>
-        <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-500 dark:via-white to-red-500 dark:to-red-500">
+        <span className="bg-clip-text text-transparent bg-linear-to-r from-blue-500 dark:via-white to-red-500 dark:to-red-500">
           {headingHomepageTitle}
         </span>{" "}
         {remainingHeadingHomepageTitle}
@@ -81,7 +81,7 @@ export default async function Home() {
                 href={`/profil/${displayedArticles[key][0].profile.slug}`}
                 className={cn(
                   buttonVariants({ variant: "outline-primary", size: "sm" }),
-                  "gap-x-1"
+                  "gap-x-1 text-foreground"
                 )}
               >
                 Voir plus

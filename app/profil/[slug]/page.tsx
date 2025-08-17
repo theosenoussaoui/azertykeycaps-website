@@ -12,7 +12,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 
 type Props = {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 };
 
 export async function generateStaticParams() {
@@ -28,9 +28,8 @@ async function getData(slug: string) {
   return { articlesBySlug };
 }
 
-export async function generateMetadata({
-  params,
-}: Props): Promise<Metadata | undefined> {
+export async function generateMetadata(props: Props): Promise<Metadata | undefined> {
+  const params = await props.params;
   const { articlesBySlug } = await getData(params.slug);
   const randomOgApi = await getRandomOgApiImg();
 
@@ -71,7 +70,8 @@ export async function generateMetadata({
     };
 }
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page(props: { params: Promise<{ slug: string }> }) {
+  const params = await props.params;
   const { articlesBySlug } = await getData(params.slug);
 
   return (
