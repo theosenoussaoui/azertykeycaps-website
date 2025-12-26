@@ -2,7 +2,6 @@
 
 Veuillez inclure un résumé du changement et indiquer quel problème est corrigé et/ou quels sets de touches vous avez ajoutés.
 
-
 ## Type de modifications
 
 Veuillez supprimer les options qui ne sont pas pertinentes.
