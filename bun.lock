@@ -5,13 +5,13 @@
     "": {
       "name": "my-better-t-app",
       "dependencies": {
-        "@my-better-t-app/env": "workspace:*",
+        "@azertykeycaps-app/env": "workspace:*",
         "dotenv": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
+        "@azertykeycaps-app/config": "workspace:*",
         "@cloudflare/workers-types": "catalog:",
-        "@my-better-t-app/config": "workspace:*",
         "@types/node": "catalog:",
         "oxfmt": "^0.19.0",
         "oxlint": "^1.34.0",
@@ -22,17 +22,18 @@
     "apps/server": {
       "name": "server",
       "dependencies": {
-        "@my-better-t-app/auth": "workspace:*",
-        "@my-better-t-app/db": "workspace:*",
-        "@my-better-t-app/env": "workspace:*",
+        "@azertykeycaps-app/auth": "workspace:*",
+        "@azertykeycaps-app/db": "workspace:*",
+        "@azertykeycaps-app/env": "workspace:*",
+        "@azertykeycaps-app/rpc": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:",
         "hono": "^4.11.3",
         "zod": "catalog:",
       },
       "devDependencies": {
+        "@azertykeycaps-app/config": "workspace:*",
         "@cloudflare/workers-types": "catalog:",
-        "@my-better-t-app/config": "workspace:*",
         "@types/node": "catalog:",
         "alchemy": "catalog:",
         "tsdown": "^0.18.3",
@@ -43,10 +44,10 @@
     "apps/web": {
       "name": "web",
       "dependencies": {
+        "@azertykeycaps-app/auth": "workspace:*",
+        "@azertykeycaps-app/env": "workspace:*",
         "@base-ui/react": "^1.0.0",
         "@libsql/client": "catalog:",
-        "@my-better-t-app/auth": "workspace:*",
-        "@my-better-t-app/env": "workspace:*",
         "@tailwindcss/vite": "^4.1.18",
         "@tanstack/react-form": "^1.27.6",
         "@tanstack/react-query": "^5.90.12",
@@ -58,11 +59,13 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "dotenv": "catalog:",
+        "hono": "^4.11.3",
         "libsql": "catalog:",
         "lucide-react": "^0.562.0",
         "next-themes": "^0.4.6",
         "react": "19.2.3",
         "react-dom": "19.2.3",
+        "server": "workspace:*",
         "shadcn": "^3.6.2",
         "sonner": "^2.0.7",
         "tailwind-merge": "^3.4.0",
@@ -72,8 +75,8 @@
         "zod": "catalog:",
       },
       "devDependencies": {
+        "@azertykeycaps-app/config": "workspace:*",
         "@cloudflare/vite-plugin": "^1.19.0",
-        "@my-better-t-app/config": "workspace:*",
         "@tanstack/react-query-devtools": "^5.91.1",
         "@tanstack/react-router-devtools": "^1.143.11",
         "@testing-library/dom": "^10.4.1",
@@ -89,41 +92,41 @@
       },
     },
     "packages/auth": {
-      "name": "@my-better-t-app/auth",
+      "name": "@azertykeycaps-app/auth",
       "dependencies": {
-        "@my-better-t-app/db": "workspace:*",
-        "@my-better-t-app/env": "workspace:*",
+        "@azertykeycaps-app/db": "workspace:*",
+        "@azertykeycaps-app/env": "workspace:*",
         "better-auth": "catalog:",
         "dotenv": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
-        "@my-better-t-app/config": "workspace:*",
+        "@azertykeycaps-app/config": "workspace:*",
         "typescript": "catalog:",
       },
     },
     "packages/config": {
-      "name": "@my-better-t-app/config",
+      "name": "@azertykeycaps-app/config",
       "version": "0.0.0",
     },
     "packages/db": {
-      "name": "@my-better-t-app/db",
+      "name": "@azertykeycaps-app/db",
       "dependencies": {
+        "@azertykeycaps-app/env": "workspace:*",
         "@libsql/client": "catalog:",
-        "@my-better-t-app/env": "workspace:*",
         "dotenv": "catalog:",
         "drizzle-orm": "^0.45.1",
         "libsql": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
-        "@my-better-t-app/config": "workspace:*",
+        "@azertykeycaps-app/config": "workspace:*",
         "drizzle-kit": "^0.31.8",
         "typescript": "catalog:",
       },
     },
     "packages/env": {
-      "name": "@my-better-t-app/env",
+      "name": "@azertykeycaps-app/env",
       "version": "0.0.0",
       "dependencies": {
         "@t3-oss/env-core": "^0.13.1",
@@ -131,27 +134,37 @@
         "zod": "catalog:",
       },
       "devDependencies": {
-        "@my-better-t-app/config": "workspace:*",
-        "@my-better-t-app/infra": "workspace:*",
+        "@azertykeycaps-app/config": "workspace:*",
+        "@azertykeycaps-app/infra": "workspace:*",
         "@types/node": "catalog:",
         "typescript": "catalog:",
       },
     },
     "packages/infra": {
-      "name": "@my-better-t-app/infra",
+      "name": "@azertykeycaps-app/infra",
       "dependencies": {
         "dotenv": "catalog:",
         "zod": "catalog:",
       },
       "devDependencies": {
-        "@my-better-t-app/config": "workspace:*",
+        "@azertykeycaps-app/config": "workspace:*",
         "alchemy": "catalog:",
+        "typescript": "catalog:",
+      },
+    },
+    "packages/rpc": {
+      "name": "@azertykeycaps-app/rpc",
+      "version": "0.0.0",
+      "devDependencies": {
+        "@azertykeycaps-app/config": "workspace:*",
+        "@cloudflare/workers-types": "catalog:",
         "typescript": "catalog:",
       },
     },
   },
   "catalog": {
     "@cloudflare/workers-types": "^4.20251213.0",
+    "@hono/zod-validator": "^0.6.3",
     "@libsql/client": "0.15.15",
     "@types/node": "^22.13.11",
     "alchemy": "^0.82.1",
@@ -233,6 +246,18 @@
     "@aws-sdk/xml-builder": ["@aws-sdk/xml-builder@3.957.0", "", { "dependencies": { "@smithy/types": "^4.11.0", "fast-xml-parser": "5.2.5", "tslib": "^2.6.2" } }, "sha512-Ai5iiQqS8kJ5PjzMhWcLKN0G2yasAkvpnPlq2EnqlIMdB48HsizElt62qcktdxp4neRMyGkFq4NzgmDbXnhRiA=="],
 
     "@aws/lambda-invoke-store": ["@aws/lambda-invoke-store@0.2.2", "", {}, "sha512-C0NBLsIqzDIae8HFw9YIrIBsbc0xTiOtt7fAukGPnqQ/+zZNaq+4jhuccltK0QuWHBnNm/a6kLIRA6GFiM10eg=="],
+
+    "@azertykeycaps-app/auth": ["@azertykeycaps-app/auth@workspace:packages/auth"],
+
+    "@azertykeycaps-app/config": ["@azertykeycaps-app/config@workspace:packages/config"],
+
+    "@azertykeycaps-app/db": ["@azertykeycaps-app/db@workspace:packages/db"],
+
+    "@azertykeycaps-app/env": ["@azertykeycaps-app/env@workspace:packages/env"],
+
+    "@azertykeycaps-app/infra": ["@azertykeycaps-app/infra@workspace:packages/infra"],
+
+    "@azertykeycaps-app/rpc": ["@azertykeycaps-app/rpc@workspace:packages/rpc"],
 
     "@babel/code-frame": ["@babel/code-frame@7.27.1", "", { "dependencies": { "@babel/helper-validator-identifier": "^7.27.1", "js-tokens": "^4.0.0", "picocolors": "^1.1.1" } }, "sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg=="],
 
@@ -517,16 +542,6 @@
     "@modelcontextprotocol/sdk": ["@modelcontextprotocol/sdk@1.25.1", "", { "dependencies": { "@hono/node-server": "^1.19.7", "ajv": "^8.17.1", "ajv-formats": "^3.0.1", "content-type": "^1.0.5", "cors": "^2.8.5", "cross-spawn": "^7.0.5", "eventsource": "^3.0.2", "eventsource-parser": "^3.0.0", "express": "^5.0.1", "express-rate-limit": "^7.5.0", "jose": "^6.1.1", "json-schema-typed": "^8.0.2", "pkce-challenge": "^5.0.0", "raw-body": "^3.0.0", "zod": "^3.25 || ^4.0", "zod-to-json-schema": "^3.25.0" }, "peerDependencies": { "@cfworker/json-schema": "^4.1.1" }, "optionalPeers": ["@cfworker/json-schema"] }, "sha512-yO28oVFFC7EBoiKdAn+VqRm+plcfv4v0xp6osG/VsCB0NlPZWi87ajbCZZ8f/RvOFLEu7//rSRmuZZ7lMoe3gQ=="],
 
     "@mswjs/interceptors": ["@mswjs/interceptors@0.40.0", "", { "dependencies": { "@open-draft/deferred-promise": "^2.2.0", "@open-draft/logger": "^0.3.0", "@open-draft/until": "^2.0.0", "is-node-process": "^1.2.0", "outvariant": "^1.4.3", "strict-event-emitter": "^0.5.1" } }, "sha512-EFd6cVbHsgLa6wa4RljGj6Wk75qoHxUSyc5asLyyPSyuhIcdS2Q3Phw6ImS1q+CkALthJRShiYfKANcQMuMqsQ=="],
-
-    "@my-better-t-app/auth": ["@my-better-t-app/auth@workspace:packages/auth"],
-
-    "@my-better-t-app/config": ["@my-better-t-app/config@workspace:packages/config"],
-
-    "@my-better-t-app/db": ["@my-better-t-app/db@workspace:packages/db"],
-
-    "@my-better-t-app/env": ["@my-better-t-app/env@workspace:packages/env"],
-
-    "@my-better-t-app/infra": ["@my-better-t-app/infra@workspace:packages/infra"],
 
     "@napi-rs/wasm-runtime": ["@napi-rs/wasm-runtime@1.1.0", "", { "dependencies": { "@emnapi/core": "^1.7.1", "@emnapi/runtime": "^1.7.1", "@tybys/wasm-util": "^0.10.1" } }, "sha512-Fq6DJW+Bb5jaWE69/qOE0D1TUN9+6uWhCeZpdnSBk14pjLcCWR7Q8n49PTSPHazM37JqrsdpEthXy2xn6jWWiA=="],
 

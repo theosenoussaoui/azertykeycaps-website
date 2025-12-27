@@ -1,5 +1,5 @@
 {
-  "name": "@my-better-t-app/db",
+  "name": "@azertykeycaps-app/db",
   "type": "module",
   "exports": {
     ".": {
@@ -14,15 +14,15 @@
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
+    "@azertykeycaps-app/env": "workspace:*",
     "@libsql/client": "catalog:",
-    "@my-better-t-app/env": "workspace:*",
     "dotenv": "catalog:",
     "drizzle-orm": "^0.45.1",
     "libsql": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@my-better-t-app/config": "workspace:*",
+    "@azertykeycaps-app/config": "workspace:*",
     "drizzle-kit": "^0.31.8",
     "typescript": "catalog:"
   }

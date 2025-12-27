@@ -1,5 +1,5 @@
 {
-  "name": "@my-better-t-app/infra",
+  "name": "@azertykeycaps-app/infra",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,7 @@
     "zod": "catalog:"
   },
   "devDependencies": {
-    "@my-better-t-app/config": "workspace:*",
+    "@azertykeycaps-app/config": "workspace:*",
     "alchemy": "catalog:",
     "typescript": "catalog:"
   }

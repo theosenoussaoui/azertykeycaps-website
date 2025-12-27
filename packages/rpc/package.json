@@ -1,0 +1,17 @@
+{
+  "name": "@azertykeycaps-app/rpc",
+  "version": "0.0.0",
+  "private": true,
+  "author": "theosenoussaoui",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    }
+  },
+  "devDependencies": {
+    "@azertykeycaps-app/config": "workspace:*",
+    "@cloudflare/workers-types": "catalog:",
+    "typescript": "catalog:"
+  }
+}
