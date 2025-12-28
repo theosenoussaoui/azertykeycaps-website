@@ -1,4 +1,4 @@
-import type { D1Database } from "@cloudflare/workers-types";
+import type { D1Database, R2Bucket } from "@cloudflare/workers-types";
 
 /**
  * Cloudflare Worker bindings
@@ -6,7 +6,10 @@ import type { D1Database } from "@cloudflare/workers-types";
  */
 export type Bindings = {
   DB: D1Database;
+  R2?: R2Bucket;
   CORS_ORIGIN: string;
   BETTER_AUTH_SECRET: string;
   BETTER_AUTH_URL: string;
+  PAYLOAD_SECRET?: string;
+  CMS_URL?: string;
 };

@@ -1,0 +1,44 @@
+{
+  "name": "@azertykeycaps-app/cms",
+  "version": "1.0.0",
+  "description": "Payload CMS for azertykeycaps monorepo",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@9.15.4",
+  "scripts": {
+    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" node ./node_modules/.bin/next build",
+    "check-types": "tsc --noEmit",
+    "generate:types": "payload generate:types",
+    "lint": "next lint",
+    "payload": "payload"
+  },
+  "dependencies": {
+    "@azertykeycaps-app/rpc": "workspace:*",
+    "@opennextjs/cloudflare": "^1.11.0",
+    "@payloadcms/db-d1-sqlite": "3.69.0",
+    "@payloadcms/next": "3.69.0",
+    "@payloadcms/richtext-lexical": "3.69.0",
+    "@payloadcms/storage-r2": "3.69.0",
+    "@payloadcms/ui": "3.69.0",
+    "graphql": "^16.8.1",
+    "next": "15.4.10",
+    "payload": "3.69.0",
+    "react": "19.2.1",
+    "react-dom": "19.2.1"
+  },
+  "devDependencies": {
+    "@azertykeycaps-app/config": "workspace:*",
+    "@types/node": "catalog:",
+    "@types/react": "19.2.1",
+    "@types/react-dom": "19.2.1",
+    "cross-env": "^10.1.0",
+    "eslint": "^9.16.0",
+    "eslint-config-next": "15.4.7",
+    "prettier": "^3.4.2",
+    "typescript": "catalog:",
+    "wrangler": "^3.0.0"
+  },
+  "engines": {
+    "node": "^18.20.2 || >=20.9.0"
+  }
+}
