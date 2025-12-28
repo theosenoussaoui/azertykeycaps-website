@@ -1,12 +1,13 @@
+import { trpcServer } from "@hono/trpc-server";
+import { createContext } from "@azertykeycaps-app/api/context";
+import { appRouter } from "@azertykeycaps-app/api/routers/index";
 import { auth } from "@azertykeycaps-app/auth";
 import { env } from "@azertykeycaps-app/env/server";
-import type { Bindings } from "@azertykeycaps-app/rpc";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
-import { routes } from "./routes";
 
-const app = new Hono<{ Bindings: Bindings }>();
+const app = new Hono();
 
 app.use(logger());
 app.use(
@@ -21,11 +22,18 @@ app.use(
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 
-app.route("/api", routes);
+app.use(
+  "/trpc/*",
+  trpcServer({
+    router: appRouter,
+    createContext: (_opts, context) => {
+      return createContext({ context });
+    },
+  }),
+);
 
 app.get("/", (c) => {
   return c.text("OK");
 });
 
 export default app;
-export type { routes as AppType };

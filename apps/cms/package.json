@@ -4,16 +4,14 @@
   "description": "Payload CMS for azertykeycaps monorepo",
   "license": "MIT",
   "type": "module",
-  "packageManager": "pnpm@9.15.4",
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" node ./node_modules/.bin/next build",
+    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
     "check-types": "tsc --noEmit",
     "generate:types": "payload generate:types",
     "lint": "next lint",
     "payload": "payload"
   },
   "dependencies": {
-    "@azertykeycaps-app/rpc": "workspace:*",
     "@opennextjs/cloudflare": "^1.11.0",
     "@payloadcms/db-d1-sqlite": "3.69.0",
     "@payloadcms/next": "3.69.0",

@@ -14,10 +14,12 @@
     "compile": "bun build --compile --minify --sourcemap --bytecode ./src/index.ts --outfile server"
   },
   "dependencies": {
+    "@azertykeycaps-app/api": "workspace:*",
     "@azertykeycaps-app/auth": "workspace:*",
     "@azertykeycaps-app/db": "workspace:*",
     "@azertykeycaps-app/env": "workspace:*",
-    "@azertykeycaps-app/rpc": "workspace:*",
+    "@hono/trpc-server": "^0.4.0",
+    "@trpc/server": "^11.0.0",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
     "hono": "^4.11.3",

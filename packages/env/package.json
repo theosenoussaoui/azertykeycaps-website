@@ -15,6 +15,7 @@
   "devDependencies": {
     "@azertykeycaps-app/config": "workspace:*",
     "@azertykeycaps-app/infra": "workspace:*",
+    "@cloudflare/workers-types": "catalog:",
     "@types/node": "catalog:",
     "typescript": "catalog:"
   }

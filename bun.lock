@@ -23,7 +23,6 @@
       "name": "@azertykeycaps-app/cms",
       "version": "1.0.0",
       "dependencies": {
-        "@azertykeycaps-app/rpc": "workspace:*",
         "@opennextjs/cloudflare": "^1.11.0",
         "@payloadcms/db-d1-sqlite": "3.69.0",
         "@payloadcms/next": "3.69.0",
@@ -52,10 +51,12 @@
     "apps/server": {
       "name": "server",
       "dependencies": {
+        "@azertykeycaps-app/api": "workspace:*",
         "@azertykeycaps-app/auth": "workspace:*",
         "@azertykeycaps-app/db": "workspace:*",
         "@azertykeycaps-app/env": "workspace:*",
-        "@azertykeycaps-app/rpc": "workspace:*",
+        "@hono/trpc-server": "^0.4.0",
+        "@trpc/server": "^11.0.0",
         "better-auth": "catalog:",
         "dotenv": "catalog:",
         "hono": "^4.11.3",
@@ -74,6 +75,7 @@
     "apps/web": {
       "name": "web",
       "dependencies": {
+        "@azertykeycaps-app/api": "workspace:*",
         "@azertykeycaps-app/auth": "workspace:*",
         "@azertykeycaps-app/env": "workspace:*",
         "@base-ui/react": "^1.0.0",
@@ -85,6 +87,7 @@
         "@tanstack/react-router-with-query": "^1.130.17",
         "@tanstack/react-start": "^1.143.11",
         "@tanstack/router-plugin": "^1.143.11",
+        "@trpc/tanstack-react-query": "^11.0.0",
         "better-auth": "catalog:",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
@@ -119,6 +122,23 @@
         "typescript": "catalog:",
         "vite": "^7.3.0",
         "web-vitals": "^5.1.0",
+      },
+    },
+    "packages/api": {
+      "name": "@azertykeycaps-app/api",
+      "dependencies": {
+        "@azertykeycaps-app/auth": "workspace:*",
+        "@azertykeycaps-app/db": "workspace:*",
+        "@azertykeycaps-app/env": "workspace:*",
+        "@trpc/client": "^11.0.0",
+        "@trpc/server": "^11.0.0",
+        "dotenv": "catalog:",
+        "hono": "^4.11.3",
+        "zod": "catalog:",
+      },
+      "devDependencies": {
+        "@azertykeycaps-app/config": "workspace:*",
+        "typescript": "catalog:",
       },
     },
     "packages/auth": {
@@ -166,6 +186,7 @@
       "devDependencies": {
         "@azertykeycaps-app/config": "workspace:*",
         "@azertykeycaps-app/infra": "workspace:*",
+        "@cloudflare/workers-types": "catalog:",
         "@types/node": "catalog:",
         "typescript": "catalog:",
       },
@@ -179,15 +200,6 @@
       "devDependencies": {
         "@azertykeycaps-app/config": "workspace:*",
         "alchemy": "catalog:",
-        "typescript": "catalog:",
-      },
-    },
-    "packages/rpc": {
-      "name": "@azertykeycaps-app/rpc",
-      "version": "0.0.0",
-      "devDependencies": {
-        "@azertykeycaps-app/config": "workspace:*",
-        "@cloudflare/workers-types": "catalog:",
         "typescript": "catalog:",
       },
     },
@@ -351,6 +363,8 @@
 
     "@aws/lambda-invoke-store": ["@aws/lambda-invoke-store@0.2.2", "", {}, "sha512-C0NBLsIqzDIae8HFw9YIrIBsbc0xTiOtt7fAukGPnqQ/+zZNaq+4jhuccltK0QuWHBnNm/a6kLIRA6GFiM10eg=="],
 
+    "@azertykeycaps-app/api": ["@azertykeycaps-app/api@workspace:packages/api"],
+
     "@azertykeycaps-app/auth": ["@azertykeycaps-app/auth@workspace:packages/auth"],
 
     "@azertykeycaps-app/cms": ["@azertykeycaps-app/cms@workspace:apps/cms"],
@@ -362,8 +376,6 @@
     "@azertykeycaps-app/env": ["@azertykeycaps-app/env@workspace:packages/env"],
 
     "@azertykeycaps-app/infra": ["@azertykeycaps-app/infra@workspace:packages/infra"],
-
-    "@azertykeycaps-app/rpc": ["@azertykeycaps-app/rpc@workspace:packages/rpc"],
 
     "@babel/code-frame": ["@babel/code-frame@7.27.1", "", { "dependencies": { "@babel/helper-validator-identifier": "^7.27.1", "js-tokens": "^4.0.0", "picocolors": "^1.1.1" } }, "sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg=="],
 
@@ -620,6 +632,8 @@
     "@floating-ui/utils": ["@floating-ui/utils@0.2.10", "", {}, "sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ=="],
 
     "@hono/node-server": ["@hono/node-server@1.19.7", "", { "peerDependencies": { "hono": "^4" } }, "sha512-vUcD0uauS7EU2caukW8z5lJKtoGMokxNbJtBiwHgpqxEXokaHCBkQUmCHhjFB1VUTWdqj25QoMkMKzgjq+uhrw=="],
+
+    "@hono/trpc-server": ["@hono/trpc-server@0.4.1", "", { "peerDependencies": { "@trpc/server": "^10.10.0 || >11.0.0-rc", "hono": ">=4.0.0" } }, "sha512-5D4gA+MpJxUzqCEDgZMlhxz1G8BkoneR+N+bD7Kt28LPJ0jAhXp1GA3ucpV6KxMBBLvFXIAFAfzdBeRmz12Pkw=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 
@@ -1228,6 +1242,12 @@
     "@testing-library/react": ["@testing-library/react@16.3.1", "", { "dependencies": { "@babel/runtime": "^7.12.5" }, "peerDependencies": { "@testing-library/dom": "^10.0.0", "@types/react": "^18.0.0 || ^19.0.0", "@types/react-dom": "^18.0.0 || ^19.0.0", "react": "^18.0.0 || ^19.0.0", "react-dom": "^18.0.0 || ^19.0.0" }, "optionalPeers": ["@types/react", "@types/react-dom"] }, "sha512-gr4KtAWqIOQoucWYD/f6ki+j5chXfcPc74Col/6poTyqTmn7zRmodWahWRCp8tYd+GMqBonw6hstNzqjbs6gjw=="],
 
     "@tokenizer/token": ["@tokenizer/token@0.3.0", "", {}, "sha512-OvjF+z51L3ov0OyAU0duzsYuvO01PH7x4t6DJx+guahgTnBHkhJdG7soQeTSFLWN3efnHyibZ4Z8l2EuWwJN3A=="],
+
+    "@trpc/client": ["@trpc/client@11.8.1", "", { "peerDependencies": { "@trpc/server": "11.8.1", "typescript": ">=5.7.2" } }, "sha512-L/SJFGanr9xGABmuDoeXR4xAdHJmsXsiF9OuH+apecJ+8sUITzVT1EPeqp0ebqA6lBhEl5pPfg3rngVhi/h60Q=="],
+
+    "@trpc/server": ["@trpc/server@11.8.1", "", { "peerDependencies": { "typescript": ">=5.7.2" } }, "sha512-P4rzZRpEL7zDFgjxK65IdyH0e41FMFfTkQkuq0BA5tKcr7E6v9/v38DEklCpoDN6sPiB1Sigy/PUEzHENhswDA=="],
+
+    "@trpc/tanstack-react-query": ["@trpc/tanstack-react-query@11.8.1", "", { "peerDependencies": { "@tanstack/react-query": "^5.80.3", "@trpc/client": "11.8.1", "@trpc/server": "11.8.1", "react": ">=18.2.0", "react-dom": ">=18.2.0", "typescript": ">=5.7.2" } }, "sha512-0gBbRmRuU9/IVZgNFJuzY7k6ktnkmqjyP78PtcUBO7EgPlBu1y2MA2TdI5GT/VtNNOOhzkVeQpJqtt+0xQ8TOQ=="],
 
     "@ts-morph/common": ["@ts-morph/common@0.27.0", "", { "dependencies": { "fast-glob": "^3.3.3", "minimatch": "^10.0.1", "path-browserify": "^1.0.1" } }, "sha512-Wf29UqxWDpc+i61k3oIOzcUfQt79PIT9y/MWfAGlrkjg6lBC1hwDECLXPVJAhWjiGbfBCxZd65F/LIZF3+jeJQ=="],
 

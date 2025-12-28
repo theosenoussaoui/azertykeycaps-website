@@ -24,15 +24,15 @@ const mediaBucket = await R2Bucket("media-storage", {
   name: "azertykeycaps-media",
 });
 
-export const web = await TanStackStart("web", {
-  cwd: "../../apps/web",
+export const cms = await Nextjs("cms", {
+  cwd: "../../apps/cms",
+  adopt: true,
   bindings: {
-    VITE_SERVER_URL: alchemy.env.VITE_SERVER_URL!,
-    DB: db,
-    CORS_ORIGIN: alchemy.env.CORS_ORIGIN!,
-    BETTER_AUTH_SECRET: alchemy.env.BETTER_AUTH_SECRET!,
-    BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL!,
+    DB: cmsDb,
+    R2: mediaBucket,
+    PAYLOAD_SECRET: alchemy.env.PAYLOAD_SECRET!,
   },
+  compatibility: "node",
 });
 
 export const server = await Worker("server", {
@@ -45,22 +45,16 @@ export const server = await Worker("server", {
     BETTER_AUTH_SECRET: alchemy.env.BETTER_AUTH_SECRET!,
     BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL!,
   },
-  dev: {
-    port: 3000,
-  },
 });
 
-// CMS Next.js app using Nextjs resource
-export const cms = await Nextjs("cms", {
-  cwd: "../../apps/cms",
-  adopt: true,
+export const web = await TanStackStart("web", {
+  cwd: "../../apps/web",
   bindings: {
-    DB: cmsDb,
-    R2: mediaBucket,
-    PAYLOAD_SECRET: alchemy.env.PAYLOAD_SECRET!,
-  },
-  dev: {
-    port: 3002,
+    VITE_SERVER_URL: alchemy.env.VITE_SERVER_URL!,
+    DB: db,
+    CORS_ORIGIN: alchemy.env.CORS_ORIGIN!,
+    BETTER_AUTH_SECRET: alchemy.env.BETTER_AUTH_SECRET!,
+    BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL!,
   },
 });
 
