@@ -2,13 +2,7 @@ import { Link } from "@tanstack/react-router";
 import type { Article } from "@azertykeycaps-app/schemas";
 
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { t } from "@/i18n";
 import { STATUS_VARIANTS } from "@/lib/article-utils";
 
@@ -40,15 +34,11 @@ export function ArticleCard({ article }: ArticleCardProps) {
         </CardHeader>
         <CardContent className="flex-1">
           {article.profile && (
-            <p className="text-muted-foreground text-xs">
-              {article.profile.title}
-            </p>
+            <p className="text-muted-foreground text-xs">{article.profile.title}</p>
           )}
         </CardContent>
         <CardFooter className="justify-between">
-          <Badge variant={STATUS_VARIANTS[article.status]}>
-            {i18n.status[article.status]}
-          </Badge>
+          <Badge variant={STATUS_VARIANTS[article.status]}>{i18n.status[article.status]}</Badge>
         </CardFooter>
       </Card>
     </Link>

@@ -8,97 +8,97 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
+import { Route as rootRouteImport } from "./routes/__root";
+import { Route as LoginRouteImport } from "./routes/login";
+import { Route as DashboardRouteImport } from "./routes/dashboard";
+import { Route as IndexRouteImport } from "./routes/index";
+import { Route as ArticlesSlugRouteImport } from "./routes/articles.$slug";
 
 const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+  id: "/login",
+  path: "/login",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
+  id: "/dashboard",
+  path: "/dashboard",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
-  id: '/articles/$slug',
-  path: '/articles/$slug',
+  id: "/articles/$slug",
+  path: "/articles/$slug",
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
-  '/articles/$slug': typeof ArticlesSlugRoute
+  "/": typeof IndexRoute;
+  "/dashboard": typeof DashboardRoute;
+  "/login": typeof LoginRoute;
+  "/articles/$slug": typeof ArticlesSlugRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
-  '/articles/$slug': typeof ArticlesSlugRoute
+  "/": typeof IndexRoute;
+  "/dashboard": typeof DashboardRoute;
+  "/login": typeof LoginRoute;
+  "/articles/$slug": typeof ArticlesSlugRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
-  '/articles/$slug': typeof ArticlesSlugRoute
+  __root__: typeof rootRouteImport;
+  "/": typeof IndexRoute;
+  "/dashboard": typeof DashboardRoute;
+  "/login": typeof LoginRoute;
+  "/articles/$slug": typeof ArticlesSlugRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login' | '/articles/$slug'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login' | '/articles/$slug'
-  id: '__root__' | '/' | '/dashboard' | '/login' | '/articles/$slug'
-  fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath;
+  fullPaths: "/" | "/dashboard" | "/login" | "/articles/$slug";
+  fileRoutesByTo: FileRoutesByTo;
+  to: "/" | "/dashboard" | "/login" | "/articles/$slug";
+  id: "__root__" | "/" | "/dashboard" | "/login" | "/articles/$slug";
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  DashboardRoute: typeof DashboardRoute
-  LoginRoute: typeof LoginRoute
-  ArticlesSlugRoute: typeof ArticlesSlugRoute
+  IndexRoute: typeof IndexRoute;
+  DashboardRoute: typeof DashboardRoute;
+  LoginRoute: typeof LoginRoute;
+  ArticlesSlugRoute: typeof ArticlesSlugRoute;
 }
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/articles/$slug': {
-      id: '/articles/$slug'
-      path: '/articles/$slug'
-      fullPath: '/articles/$slug'
-      preLoaderRoute: typeof ArticlesSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+    "/login": {
+      id: "/login";
+      path: "/login";
+      fullPath: "/login";
+      preLoaderRoute: typeof LoginRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/dashboard": {
+      id: "/dashboard";
+      path: "/dashboard";
+      fullPath: "/dashboard";
+      preLoaderRoute: typeof DashboardRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/articles/$slug": {
+      id: "/articles/$slug";
+      path: "/articles/$slug";
+      fullPath: "/articles/$slug";
+      preLoaderRoute: typeof ArticlesSlugRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
@@ -107,16 +107,16 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
 
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
+import type { getRouter } from "./router.tsx";
+import type { createStart } from "@tanstack/react-start";
+declare module "@tanstack/react-start" {
   interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
+    ssr: true;
+    router: Awaited<ReturnType<typeof getRouter>>;
   }
 }

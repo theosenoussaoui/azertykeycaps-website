@@ -19,10 +19,7 @@ import { publicProcedure, router } from "../index";
 function transformMediaUrls<T>(data: T, serverUrl: string): T {
   const json = JSON.stringify(data);
   // Replace relative /api/media/ URLs with absolute server URLs
-  const transformed = json.replace(
-    /"\/api\/media\//g,
-    `"${serverUrl}/api/media/`
-  );
+  const transformed = json.replace(/"\/api\/media\//g, `"${serverUrl}/api/media/`);
   return JSON.parse(transformed);
 }
 
@@ -66,7 +63,7 @@ export const articlesRouter = router({
             sort: "-createdAt",
             ...(Object.keys(where).length > 0 && { where }),
           },
-          { addQueryPrefix: true }
+          { addQueryPrefix: true },
         );
 
         const response = await fetch(`${ctx.env.CMS_API_URL}/api/articles${queryString}`);
@@ -97,7 +94,10 @@ export const articlesRouter = router({
         // Validate before returning to catch schema mismatches
         const validation = articleListResponseSchema.safeParse(output);
         if (!validation.success) {
-          console.error("[articles.list] Output validation failed:", JSON.stringify(validation.error.issues, null, 2));
+          console.error(
+            "[articles.list] Output validation failed:",
+            JSON.stringify(validation.error.issues, null, 2),
+          );
         }
 
         return output;
@@ -134,7 +134,7 @@ export const articlesRouter = router({
             depth: 1,
             limit: 1,
           },
-          { addQueryPrefix: true }
+          { addQueryPrefix: true },
         );
 
         const response = await fetch(`${ctx.env.CMS_API_URL}/api/articles${queryString}`);
@@ -177,12 +177,10 @@ export const articlesRouter = router({
             limit: input.limit,
             sort: "title",
           },
-          { addQueryPrefix: true }
+          { addQueryPrefix: true },
         );
 
-        const response = await fetch(
-          `${ctx.env.CMS_API_URL}/api/keycap-profiles${queryString}`,
-        );
+        const response = await fetch(`${ctx.env.CMS_API_URL}/api/keycap-profiles${queryString}`);
 
         if (!response.ok) {
           console.error(`CMS API error: ${response.status}`);
@@ -194,7 +192,10 @@ export const articlesRouter = router({
         // Validate before returning to catch schema mismatches
         const validation = profileListResponseSchema.safeParse(data.docs);
         if (!validation.success) {
-          console.error("[articles.profiles] Output validation failed:", JSON.stringify(validation.error.issues, null, 2));
+          console.error(
+            "[articles.profiles] Output validation failed:",
+            JSON.stringify(validation.error.issues, null, 2),
+          );
         }
 
         return data.docs;

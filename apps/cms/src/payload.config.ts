@@ -49,15 +49,12 @@ export default buildConfig({
     },
   }),
   sharp,
-  plugins: [
-    // Only enable Vercel Blob storage in production when token is available
-    ...(process.env.BLOB_READ_WRITE_TOKEN
-      ? [
-          vercelBlobStorage({
-            collections: { media: true },
-            token: process.env.BLOB_READ_WRITE_TOKEN,
-          }),
-        ]
-      : []),
-  ],
+  plugins: process.env.BLOB_READ_WRITE_TOKEN
+    ? [
+        vercelBlobStorage({
+          collections: { media: true },
+          token: process.env.BLOB_READ_WRITE_TOKEN,
+        }),
+      ]
+    : [],
 });

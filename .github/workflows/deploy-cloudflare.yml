@@ -37,6 +37,7 @@ jobs:
           ALCHEMY_PASSWORD: ${{ secrets.ALCHEMY_PASSWORD }}
           ALCHEMY_STATE_TOKEN: ${{ secrets.ALCHEMY_STATE_TOKEN }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
           PULL_REQUEST: ${{ github.event.number }}
           GITHUB_SHA: ${{ github.sha }}
@@ -47,6 +48,8 @@ jobs:
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
           VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
+          CMS_API_URL: ${{ secrets.CMS_API_URL }}
+          SERVER_URL: ${{ secrets.SERVER_URL }}
 
   cleanup:
     runs-on: ubuntu-latest
