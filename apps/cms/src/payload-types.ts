@@ -13,53 +13,53 @@
  * via the `definition` "supportedTimezones".
  */
 export type SupportedTimezones =
-  | "Pacific/Midway"
-  | "Pacific/Niue"
-  | "Pacific/Honolulu"
-  | "Pacific/Rarotonga"
-  | "America/Anchorage"
-  | "Pacific/Gambier"
-  | "America/Los_Angeles"
-  | "America/Tijuana"
-  | "America/Denver"
-  | "America/Phoenix"
-  | "America/Chicago"
-  | "America/Guatemala"
-  | "America/New_York"
-  | "America/Bogota"
-  | "America/Caracas"
-  | "America/Santiago"
-  | "America/Buenos_Aires"
-  | "America/Sao_Paulo"
-  | "Atlantic/South_Georgia"
-  | "Atlantic/Azores"
-  | "Atlantic/Cape_Verde"
-  | "Europe/London"
-  | "Europe/Berlin"
-  | "Africa/Lagos"
-  | "Europe/Athens"
-  | "Africa/Cairo"
-  | "Europe/Moscow"
-  | "Asia/Riyadh"
-  | "Asia/Dubai"
-  | "Asia/Baku"
-  | "Asia/Karachi"
-  | "Asia/Tashkent"
-  | "Asia/Calcutta"
-  | "Asia/Dhaka"
-  | "Asia/Almaty"
-  | "Asia/Jakarta"
-  | "Asia/Bangkok"
-  | "Asia/Shanghai"
-  | "Asia/Singapore"
-  | "Asia/Tokyo"
-  | "Asia/Seoul"
-  | "Australia/Brisbane"
-  | "Australia/Sydney"
-  | "Pacific/Guam"
-  | "Pacific/Noumea"
-  | "Pacific/Auckland"
-  | "Pacific/Fiji";
+  | 'Pacific/Midway'
+  | 'Pacific/Niue'
+  | 'Pacific/Honolulu'
+  | 'Pacific/Rarotonga'
+  | 'America/Anchorage'
+  | 'Pacific/Gambier'
+  | 'America/Los_Angeles'
+  | 'America/Tijuana'
+  | 'America/Denver'
+  | 'America/Phoenix'
+  | 'America/Chicago'
+  | 'America/Guatemala'
+  | 'America/New_York'
+  | 'America/Bogota'
+  | 'America/Caracas'
+  | 'America/Santiago'
+  | 'America/Buenos_Aires'
+  | 'America/Sao_Paulo'
+  | 'Atlantic/South_Georgia'
+  | 'Atlantic/Azores'
+  | 'Atlantic/Cape_Verde'
+  | 'Europe/London'
+  | 'Europe/Berlin'
+  | 'Africa/Lagos'
+  | 'Europe/Athens'
+  | 'Africa/Cairo'
+  | 'Europe/Moscow'
+  | 'Asia/Riyadh'
+  | 'Asia/Dubai'
+  | 'Asia/Baku'
+  | 'Asia/Karachi'
+  | 'Asia/Tashkent'
+  | 'Asia/Calcutta'
+  | 'Asia/Dhaka'
+  | 'Asia/Almaty'
+  | 'Asia/Jakarta'
+  | 'Asia/Bangkok'
+  | 'Asia/Shanghai'
+  | 'Asia/Singapore'
+  | 'Asia/Tokyo'
+  | 'Asia/Seoul'
+  | 'Australia/Brisbane'
+  | 'Australia/Sydney'
+  | 'Pacific/Guam'
+  | 'Pacific/Noumea'
+  | 'Pacific/Auckland'
+  | 'Pacific/Fiji';
 
 export interface Config {
   auth: {
@@ -69,31 +69,45 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
-    "payload-kv": PayloadKv;
-    "payload-locked-documents": PayloadLockedDocument;
-    "payload-preferences": PayloadPreference;
-    "payload-migrations": PayloadMigration;
+    articles: Article;
+    'keycap-profiles': KeycapProfile;
+    'dropshipping-websites': DropshippingWebsite;
+    'payload-kv': PayloadKv;
+    'payload-locked-documents': PayloadLockedDocument;
+    'payload-preferences': PayloadPreference;
+    'payload-migrations': PayloadMigration;
   };
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    "payload-kv": PayloadKvSelect<false> | PayloadKvSelect<true>;
-    "payload-locked-documents":
-      | PayloadLockedDocumentsSelect<false>
-      | PayloadLockedDocumentsSelect<true>;
-    "payload-preferences": PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
-    "payload-migrations": PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
+    articles: ArticlesSelect<false> | ArticlesSelect<true>;
+    'keycap-profiles': KeycapProfilesSelect<false> | KeycapProfilesSelect<true>;
+    'dropshipping-websites': DropshippingWebsitesSelect<false> | DropshippingWebsitesSelect<true>;
+    'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
+    'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
+    'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
+    'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    homepage: Homepage;
+    'social-networks': SocialNetwork;
+    'dropshipping-info-page': DropshippingInfoPage;
+    'dropshipping-sites-page': DropshippingSitesPage;
+  };
+  globalsSelect: {
+    homepage: HomepageSelect<false> | HomepageSelect<true>;
+    'social-networks': SocialNetworksSelect<false> | SocialNetworksSelect<true>;
+    'dropshipping-info-page': DropshippingInfoPageSelect<false> | DropshippingInfoPageSelect<true>;
+    'dropshipping-sites-page': DropshippingSitesPageSelect<false> | DropshippingSitesPageSelect<true>;
+  };
   locale: null;
   user: User & {
-    collection: "users";
+    collection: 'users';
   };
   jobs: {
     tasks: unknown;
@@ -158,6 +172,109 @@ export interface Media {
   filesize?: number | null;
   width?: number | null;
   height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles".
+ */
+export interface Article {
+  id: number;
+  title: string;
+  /**
+   * Unique URL identifier for the article
+   */
+  slug: string;
+  img: number | Media;
+  profile: number | KeycapProfile;
+  material?:
+    | (
+        | 'abs_double_shot'
+        | 'abs_pad_printed'
+        | 'abs_simple'
+        | 'aluminium'
+        | 'pbt_double_shot'
+        | 'pbt_dye_sub'
+        | 'pbt_laser_printed'
+      )
+    | null;
+  description?: string | null;
+  status: 'in_stock' | 'extras_gb' | 'extras_in_stock' | 'gb_running' | 'gb_ended' | 'interest_check' | 'out_of_stock';
+  /**
+   * Group Buy start date
+   */
+  startDate?: string | null;
+  /**
+   * Group Buy end date
+   */
+  endDate?: string | null;
+  /**
+   * Link to the product
+   */
+  url: string;
+  additionalUrl?: string | null;
+  affiliateUrl?: string | null;
+  /**
+   * Warning message displayed on the card
+   */
+  warningText?: string | null;
+  /**
+   * Displays a 'New' badge on the article
+   */
+  isNew?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "keycap-profiles".
+ */
+export interface KeycapProfile {
+  id: number;
+  title: string;
+  /**
+   * Unique URL identifier for the profile
+   */
+  slug: string;
+  description?: string | null;
+  /**
+   * E.g.: SA, DSA, Cherry, etc.
+   */
+  abbreviation: string;
+  /**
+   * Short description for the navigation menu
+   */
+  navbarDescription: string;
+  thumbnail?: (number | null) | Media;
+  shape: 'sculpted' | 'uniform';
+  /**
+   * Lucide icon name for the menu
+   */
+  navbarIconName?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dropshipping-websites".
+ */
+export interface DropshippingWebsite {
+  id: number;
+  title: string;
+  slug: string;
+  banner?: (number | null) | Media;
+  description?: string | null;
+  /**
+   * Examples of products available on this site
+   */
+  examples?: string | null;
+  categories?:
+    | ('accessories' | 'artisans' | 'keyboards' | 'cables' | 'keycaps' | 'pcb' | 'plates' | 'switches')[]
+    | null;
+  url: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -184,16 +301,28 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: "users";
+        relationTo: 'users';
         value: number | User;
       } | null)
     | ({
-        relationTo: "media";
+        relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'articles';
+        value: number | Article;
+      } | null)
+    | ({
+        relationTo: 'keycap-profiles';
+        value: number | KeycapProfile;
+      } | null)
+    | ({
+        relationTo: 'dropshipping-websites';
+        value: number | DropshippingWebsite;
       } | null);
   globalSlug?: string | null;
   user: {
-    relationTo: "users";
+    relationTo: 'users';
     value: number | User;
   };
   updatedAt: string;
@@ -206,7 +335,7 @@ export interface PayloadLockedDocument {
 export interface PayloadPreference {
   id: number;
   user: {
-    relationTo: "users";
+    relationTo: 'users';
     value: number | User;
   };
   key?: string | null;
@@ -270,6 +399,61 @@ export interface MediaSelect<T extends boolean = true> {
   filesize?: T;
   width?: T;
   height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "articles_select".
+ */
+export interface ArticlesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  img?: T;
+  profile?: T;
+  material?: T;
+  description?: T;
+  status?: T;
+  startDate?: T;
+  endDate?: T;
+  url?: T;
+  additionalUrl?: T;
+  affiliateUrl?: T;
+  warningText?: T;
+  isNew?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "keycap-profiles_select".
+ */
+export interface KeycapProfilesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  description?: T;
+  abbreviation?: T;
+  navbarDescription?: T;
+  thumbnail?: T;
+  shape?: T;
+  navbarIconName?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dropshipping-websites_select".
+ */
+export interface DropshippingWebsitesSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  banner?: T;
+  description?: T;
+  examples?: T;
+  categories?: T;
+  url?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -313,12 +497,126 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage".
+ */
+export interface Homepage {
+  id: number;
+  title: string;
+  description: string;
+  /**
+   * Profiles displayed on the homepage
+   */
+  profileCards?: (number | KeycapProfile)[] | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "social-networks".
+ */
+export interface SocialNetwork {
+  id: number;
+  networks?:
+    | {
+        title: string;
+        url: string;
+        /**
+         * Lucide icon name
+         */
+        iconText?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dropshipping-info-page".
+ */
+export interface DropshippingInfoPage {
+  id: number;
+  title: string;
+  description: string;
+  /**
+   * Link to an explanatory video
+   */
+  youtubeUrl?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dropshipping-sites-page".
+ */
+export interface DropshippingSitesPage {
+  id: number;
+  title: string;
+  description: string;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homepage_select".
+ */
+export interface HomepageSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  profileCards?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "social-networks_select".
+ */
+export interface SocialNetworksSelect<T extends boolean = true> {
+  networks?:
+    | T
+    | {
+        title?: T;
+        url?: T;
+        iconText?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dropshipping-info-page_select".
+ */
+export interface DropshippingInfoPageSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  youtubeUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "dropshipping-sites-page_select".
+ */
+export interface DropshippingSitesPageSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "auth".
  */
 export interface Auth {
   [k: string]: unknown;
 }
 
-declare module "payload" {
+
+declare module 'payload' {
   export interface GeneratedTypes extends Config {}
 }

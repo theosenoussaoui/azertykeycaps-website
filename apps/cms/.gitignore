@@ -42,14 +42,8 @@ next-env.d.ts
 
 /media
 
-# Playwright
-node_modules/
-/test-results/
-/playwright-report/
-/blob-report/
-/playwright/.cache/
-
-# OpenNext
-.open-next
-.wrangler
-wrangler.jsonc
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+payload.db*

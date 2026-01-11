@@ -1,38 +1,28 @@
-import { sqliteD1Adapter } from "@payloadcms/db-d1-sqlite";
+import { sqliteAdapter } from "@payloadcms/db-sqlite";
+import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { fr } from "@payloadcms/translations/languages/fr";
+import { en } from "@payloadcms/translations/languages/en";
 import path from "path";
 import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { r2Storage } from "@payloadcms/storage-r2";
+import sharp from "sharp";
 
+// Collections
 import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
+import { Articles } from "./collections/Articles";
+import { KeycapProfiles } from "./collections/KeycapProfiles";
+import { DropshippingWebsites } from "./collections/DropshippingWebsites";
+
+// Globals
+import { Homepage } from "./globals/Homepage";
+import { SocialNetworks } from "./globals/SocialNetworks";
+import { DropshippingInfoPage } from "./globals/DropshippingInfoPage";
+import { DropshippingSitesPage } from "./globals/DropshippingSitesPage";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
-
-// Define expected Cloudflare bindings type
-type CloudflareBindings = {
-  DB: any;
-  R2: any;
-  PAYLOAD_SECRET: string;
-};
-
-// Detect build mode - use mock bindings since real bindings only exist at runtime
-const isBuild =
-  process.argv.includes("build") || process.env.NEXT_PHASE === "phase-production-build";
-
-const cloudflare: { env: CloudflareBindings } = isBuild
-  ? {
-      // Mock bindings for build - real bindings injected by Cloudflare Workers at runtime
-      env: {
-        DB: {} as any,
-        R2: {} as any,
-        PAYLOAD_SECRET: process.env.PAYLOAD_SECRET || "",
-      },
-    }
-  : ((await getCloudflareContext({ async: true })) as any);
 
 export default buildConfig({
   admin: {
@@ -41,17 +31,33 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  i18n: {
+    supportedLanguages: { fr, en },
+    fallbackLanguage: "fr",
+  },
+  collections: [Users, Media, Articles, KeycapProfiles, DropshippingWebsites],
+  globals: [Homepage, SocialNetworks, DropshippingInfoPage, DropshippingSitesPage],
   editor: lexicalEditor(),
-  secret: cloudflare.env.PAYLOAD_SECRET || process.env.PAYLOAD_SECRET || "",
+  secret: process.env.PAYLOAD_SECRET || "",
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
-  db: sqliteD1Adapter({ binding: cloudflare.env.DB }),
+  db: sqliteAdapter({
+    client: {
+      url: process.env.DATABASE_URL || "file:./payload.db",
+      authToken: process.env.DATABASE_AUTH_TOKEN,
+    },
+  }),
+  sharp,
   plugins: [
-    r2Storage({
-      bucket: cloudflare.env.R2,
-      collections: { media: true },
-    }),
+    // Only enable Vercel Blob storage in production when token is available
+    ...(process.env.BLOB_READ_WRITE_TOKEN
+      ? [
+          vercelBlobStorage({
+            collections: { media: true },
+            token: process.env.BLOB_READ_WRITE_TOKEN,
+          }),
+        ]
+      : []),
   ],
 });

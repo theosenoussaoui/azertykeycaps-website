@@ -18,6 +18,7 @@
     "@azertykeycaps-app/auth": "workspace:*",
     "@azertykeycaps-app/db": "workspace:*",
     "@azertykeycaps-app/env": "workspace:*",
+    "@azertykeycaps-app/schemas": "workspace:*",
     "@hono/trpc-server": "^0.4.0",
     "@trpc/server": "^11.0.0",
     "better-auth": "catalog:",

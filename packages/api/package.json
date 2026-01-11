@@ -14,10 +14,12 @@
     "@azertykeycaps-app/auth": "workspace:*",
     "@azertykeycaps-app/db": "workspace:*",
     "@azertykeycaps-app/env": "workspace:*",
+    "@azertykeycaps-app/schemas": "workspace:*",
     "@trpc/client": "^11.0.0",
     "@trpc/server": "^11.0.0",
     "dotenv": "catalog:",
     "hono": "^4.11.3",
+    "qs-esm": "^7.0.3",
     "zod": "catalog:"
   },
   "devDependencies": {

@@ -1,0 +1,24 @@
+{
+  "name": "@azertykeycaps-app/schemas",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@azertykeycaps-app/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

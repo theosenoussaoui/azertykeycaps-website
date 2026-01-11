@@ -48,6 +48,7 @@ export default function UserMenu() {
                   onSuccess: () => {
                     navigate({
                       to: "/",
+                      search: { page: 1 },
                     });
                   },
                 },

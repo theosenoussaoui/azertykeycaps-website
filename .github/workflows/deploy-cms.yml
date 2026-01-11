@@ -1,0 +1,64 @@
+name: Deploy CMS (Vercel)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/cms/**"
+      - "packages/**"
+  pull_request:
+    paths:
+      - "apps/cms/**"
+      - "packages/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build CMS
+        run: bun run build
+        working-directory: apps/cms
+        env:
+          DATABASE_URL: file:./payload.db
+          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
+          NEXT_PUBLIC_SERVER_URL: ${{ secrets.CMS_PUBLIC_URL }}
+
+      - name: Deploy to Vercel (Production)
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_CMS_PROJECT_ID }}
+          vercel-args: "--prod"
+          working-directory: apps/cms
+
+      - name: Deploy to Vercel (Preview)
+        if: github.event_name == 'pull_request'
+        uses: amondnet/vercel-action@v25
+        id: vercel-preview
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_CMS_PROJECT_ID }}
+          working-directory: apps/cms
+
+      - name: Comment Preview URL
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## CMS Preview Deployed\n\n**URL:** ${{ steps.vercel-preview.outputs.preview-url }}\n\nBuilt from commit \`${context.sha.slice(0, 7)}\``
+            })
