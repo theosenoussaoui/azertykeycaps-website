@@ -33,13 +33,13 @@ This document describes how to set up GitHub Actions deployments for the azertyk
 
 After Cloudflare shows domain as **"Active"**, configure DNS:
 
-| Type  | Name      | Content                                     | Proxy              | Purpose                      |
-| ----- | --------- | ------------------------------------------- | ------------------ | ---------------------------- |
-| CNAME | `@`       | `cname.vercel-dns.com`                      | DNS only (gray)    | Keep current Vercel site live |
-| CNAME | `www`     | `azertykeycaps.fr`                          | Proxied (orange)   | Redirect to root             |
-| CNAME | `staging` | `azertykeycaps-app-web-prod.workers.dev`    | Proxied (orange)   | **NEW** - Test new site      |
-| CNAME | `api`     | `azertykeycaps-app-server-prod.workers.dev` | Proxied (orange)   | **NEW** - Hono API           |
-| CNAME | `cms`     | `cname.vercel-dns.com`                      | DNS only (gray)    | **NEW** - Payload CMS        |
+| Type  | Name      | Content                                     | Proxy            | Purpose                       |
+| ----- | --------- | ------------------------------------------- | ---------------- | ----------------------------- |
+| CNAME | `@`       | `cname.vercel-dns.com`                      | DNS only (gray)  | Keep current Vercel site live |
+| CNAME | `www`     | `azertykeycaps.fr`                          | Proxied (orange) | Redirect to root              |
+| CNAME | `staging` | `azertykeycaps-app-web-prod.workers.dev`    | Proxied (orange) | **NEW** - Test new site       |
+| CNAME | `api`     | `azertykeycaps-app-server-prod.workers.dev` | Proxied (orange) | **NEW** - Hono API            |
+| CNAME | `cms`     | `cname.vercel-dns.com`                      | DNS only (gray)  | **NEW** - Payload CMS         |
 
 > **Important:** Keep all MX records for email!
 

@@ -139,5 +139,5 @@
     "builtin": true
   },
   "globals": {},
-  "ignorePatterns": ["apps/cms/src/app"]
+  "ignorePatterns": ["apps/cms/src/app", "apps/cms/src/migrations"]
 }

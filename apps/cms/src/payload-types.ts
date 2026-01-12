@@ -13,53 +13,53 @@
  * via the `definition` "supportedTimezones".
  */
 export type SupportedTimezones =
-  | 'Pacific/Midway'
-  | 'Pacific/Niue'
-  | 'Pacific/Honolulu'
-  | 'Pacific/Rarotonga'
-  | 'America/Anchorage'
-  | 'Pacific/Gambier'
-  | 'America/Los_Angeles'
-  | 'America/Tijuana'
-  | 'America/Denver'
-  | 'America/Phoenix'
-  | 'America/Chicago'
-  | 'America/Guatemala'
-  | 'America/New_York'
-  | 'America/Bogota'
-  | 'America/Caracas'
-  | 'America/Santiago'
-  | 'America/Buenos_Aires'
-  | 'America/Sao_Paulo'
-  | 'Atlantic/South_Georgia'
-  | 'Atlantic/Azores'
-  | 'Atlantic/Cape_Verde'
-  | 'Europe/London'
-  | 'Europe/Berlin'
-  | 'Africa/Lagos'
-  | 'Europe/Athens'
-  | 'Africa/Cairo'
-  | 'Europe/Moscow'
-  | 'Asia/Riyadh'
-  | 'Asia/Dubai'
-  | 'Asia/Baku'
-  | 'Asia/Karachi'
-  | 'Asia/Tashkent'
-  | 'Asia/Calcutta'
-  | 'Asia/Dhaka'
-  | 'Asia/Almaty'
-  | 'Asia/Jakarta'
-  | 'Asia/Bangkok'
-  | 'Asia/Shanghai'
-  | 'Asia/Singapore'
-  | 'Asia/Tokyo'
-  | 'Asia/Seoul'
-  | 'Australia/Brisbane'
-  | 'Australia/Sydney'
-  | 'Pacific/Guam'
-  | 'Pacific/Noumea'
-  | 'Pacific/Auckland'
-  | 'Pacific/Fiji';
+  | "Pacific/Midway"
+  | "Pacific/Niue"
+  | "Pacific/Honolulu"
+  | "Pacific/Rarotonga"
+  | "America/Anchorage"
+  | "Pacific/Gambier"
+  | "America/Los_Angeles"
+  | "America/Tijuana"
+  | "America/Denver"
+  | "America/Phoenix"
+  | "America/Chicago"
+  | "America/Guatemala"
+  | "America/New_York"
+  | "America/Bogota"
+  | "America/Caracas"
+  | "America/Santiago"
+  | "America/Buenos_Aires"
+  | "America/Sao_Paulo"
+  | "Atlantic/South_Georgia"
+  | "Atlantic/Azores"
+  | "Atlantic/Cape_Verde"
+  | "Europe/London"
+  | "Europe/Berlin"
+  | "Africa/Lagos"
+  | "Europe/Athens"
+  | "Africa/Cairo"
+  | "Europe/Moscow"
+  | "Asia/Riyadh"
+  | "Asia/Dubai"
+  | "Asia/Baku"
+  | "Asia/Karachi"
+  | "Asia/Tashkent"
+  | "Asia/Calcutta"
+  | "Asia/Dhaka"
+  | "Asia/Almaty"
+  | "Asia/Jakarta"
+  | "Asia/Bangkok"
+  | "Asia/Shanghai"
+  | "Asia/Singapore"
+  | "Asia/Tokyo"
+  | "Asia/Seoul"
+  | "Australia/Brisbane"
+  | "Australia/Sydney"
+  | "Pacific/Guam"
+  | "Pacific/Noumea"
+  | "Pacific/Auckland"
+  | "Pacific/Fiji";
 
 export interface Config {
   auth: {
@@ -70,24 +70,26 @@ export interface Config {
     users: User;
     media: Media;
     articles: Article;
-    'keycap-profiles': KeycapProfile;
-    'dropshipping-websites': DropshippingWebsite;
-    'payload-kv': PayloadKv;
-    'payload-locked-documents': PayloadLockedDocument;
-    'payload-preferences': PayloadPreference;
-    'payload-migrations': PayloadMigration;
+    "keycap-profiles": KeycapProfile;
+    "dropshipping-websites": DropshippingWebsite;
+    "payload-kv": PayloadKv;
+    "payload-locked-documents": PayloadLockedDocument;
+    "payload-preferences": PayloadPreference;
+    "payload-migrations": PayloadMigration;
   };
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
-    'keycap-profiles': KeycapProfilesSelect<false> | KeycapProfilesSelect<true>;
-    'dropshipping-websites': DropshippingWebsitesSelect<false> | DropshippingWebsitesSelect<true>;
-    'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
-    'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
-    'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
-    'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
+    "keycap-profiles": KeycapProfilesSelect<false> | KeycapProfilesSelect<true>;
+    "dropshipping-websites": DropshippingWebsitesSelect<false> | DropshippingWebsitesSelect<true>;
+    "payload-kv": PayloadKvSelect<false> | PayloadKvSelect<true>;
+    "payload-locked-documents":
+      | PayloadLockedDocumentsSelect<false>
+      | PayloadLockedDocumentsSelect<true>;
+    "payload-preferences": PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
+    "payload-migrations": PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
     defaultIDType: number;
@@ -95,23 +97,25 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     homepage: Homepage;
-    'social-networks': SocialNetwork;
-    'dropshipping-info-page': DropshippingInfoPage;
-    'dropshipping-sites-page': DropshippingSitesPage;
-    'informations-page': InformationsPage;
-    'suggestion-page': SuggestionPage;
+    "social-networks": SocialNetwork;
+    "dropshipping-info-page": DropshippingInfoPage;
+    "dropshipping-sites-page": DropshippingSitesPage;
+    "informations-page": InformationsPage;
+    "suggestion-page": SuggestionPage;
   };
   globalsSelect: {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
-    'social-networks': SocialNetworksSelect<false> | SocialNetworksSelect<true>;
-    'dropshipping-info-page': DropshippingInfoPageSelect<false> | DropshippingInfoPageSelect<true>;
-    'dropshipping-sites-page': DropshippingSitesPageSelect<false> | DropshippingSitesPageSelect<true>;
-    'informations-page': InformationsPageSelect<false> | InformationsPageSelect<true>;
-    'suggestion-page': SuggestionPageSelect<false> | SuggestionPageSelect<true>;
+    "social-networks": SocialNetworksSelect<false> | SocialNetworksSelect<true>;
+    "dropshipping-info-page": DropshippingInfoPageSelect<false> | DropshippingInfoPageSelect<true>;
+    "dropshipping-sites-page":
+      | DropshippingSitesPageSelect<false>
+      | DropshippingSitesPageSelect<true>;
+    "informations-page": InformationsPageSelect<false> | InformationsPageSelect<true>;
+    "suggestion-page": SuggestionPageSelect<false> | SuggestionPageSelect<true>;
   };
   locale: null;
   user: User & {
-    collection: 'users';
+    collection: "users";
   };
   jobs: {
     tasks: unknown;
@@ -194,17 +198,24 @@ export interface Article {
   profile: number | KeycapProfile;
   material?:
     | (
-        | 'abs_double_shot'
-        | 'abs_pad_printed'
-        | 'abs_simple'
-        | 'aluminium'
-        | 'pbt_double_shot'
-        | 'pbt_dye_sub'
-        | 'pbt_laser_printed'
+        | "abs_double_shot"
+        | "abs_pad_printed"
+        | "abs_simple"
+        | "aluminium"
+        | "pbt_double_shot"
+        | "pbt_dye_sub"
+        | "pbt_laser_printed"
       )
     | null;
   description?: string | null;
-  status: 'in_stock' | 'extras_gb' | 'extras_in_stock' | 'gb_running' | 'gb_ended' | 'interest_check' | 'out_of_stock';
+  status:
+    | "in_stock"
+    | "extras_gb"
+    | "extras_in_stock"
+    | "gb_running"
+    | "gb_ended"
+    | "interest_check"
+    | "out_of_stock";
   /**
    * Group Buy start date
    */
@@ -251,7 +262,7 @@ export interface KeycapProfile {
    */
   navbarDescription: string;
   thumbnail?: (number | null) | Media;
-  shape: 'sculpted' | 'uniform';
+  shape: "sculpted" | "uniform";
   /**
    * Lucide icon name for the menu
    */
@@ -274,7 +285,16 @@ export interface DropshippingWebsite {
    */
   examples?: string | null;
   categories?:
-    | ('accessories' | 'artisans' | 'keyboards' | 'cables' | 'keycaps' | 'pcb' | 'plates' | 'switches')[]
+    | (
+        | "accessories"
+        | "artisans"
+        | "keyboards"
+        | "cables"
+        | "keycaps"
+        | "pcb"
+        | "plates"
+        | "switches"
+      )[]
     | null;
   url: string;
   updatedAt: string;
@@ -305,28 +325,28 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
+        relationTo: "users";
         value: number | User;
       } | null)
     | ({
-        relationTo: 'media';
+        relationTo: "media";
         value: number | Media;
       } | null)
     | ({
-        relationTo: 'articles';
+        relationTo: "articles";
         value: number | Article;
       } | null)
     | ({
-        relationTo: 'keycap-profiles';
+        relationTo: "keycap-profiles";
         value: number | KeycapProfile;
       } | null)
     | ({
-        relationTo: 'dropshipping-websites';
+        relationTo: "dropshipping-websites";
         value: number | DropshippingWebsite;
       } | null);
   globalSlug?: string | null;
   user: {
-    relationTo: 'users';
+    relationTo: "users";
     value: number | User;
   };
   updatedAt: string;
@@ -339,7 +359,7 @@ export interface PayloadLockedDocument {
 export interface PayloadPreference {
   id: number;
   user: {
-    relationTo: 'users';
+    relationTo: "users";
     value: number | User;
   };
   key?: string | null;
@@ -575,8 +595,8 @@ export interface InformationsPage {
         version: number;
         [k: string]: unknown;
       }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      direction: ("ltr" | "rtl") | null;
+      format: "left" | "start" | "center" | "right" | "end" | "justify" | "";
       indent: number;
       version: number;
     };
@@ -703,7 +723,6 @@ export interface Auth {
   [k: string]: unknown;
 }
 
-
-declare module 'payload' {
+declare module "payload" {
   export interface GeneratedTypes extends Config {}
 }
