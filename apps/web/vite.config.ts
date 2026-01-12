@@ -11,12 +11,9 @@ export default defineConfig({
     tailwindcss(),
     tanstackStart({
       prerender: {
-        // Enable static prerendering
-        enabled: true,
-        // Auto-discover static paths (routes without dynamic params)
-        autoStaticPathsDiscovery: true,
-        // Crawl links from prerendered pages
-        crawlLinks: false,
+        // Disable prerendering until API is live
+        // Pages that fetch from API during build will fail otherwise
+        enabled: false,
       },
     }),
     viteReact(),
