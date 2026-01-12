@@ -100,6 +100,8 @@ export interface Config {
     "social-networks": SocialNetwork;
     "dropshipping-info-page": DropshippingInfoPage;
     "dropshipping-sites-page": DropshippingSitesPage;
+    "informations-page": InformationsPage;
+    "suggestion-page": SuggestionPage;
   };
   globalsSelect: {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
@@ -108,6 +110,8 @@ export interface Config {
     "dropshipping-sites-page":
       | DropshippingSitesPageSelect<false>
       | DropshippingSitesPageSelect<true>;
+    "informations-page": InformationsPageSelect<false> | InformationsPageSelect<true>;
+    "suggestion-page": SuggestionPageSelect<false> | SuggestionPageSelect<true>;
   };
   locale: null;
   user: User & {
@@ -578,6 +582,54 @@ export interface DropshippingSitesPage {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "informations-page".
+ */
+export interface InformationsPage {
+  id: number;
+  title: string;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ("ltr" | "rtl") | null;
+      format: "left" | "start" | "center" | "right" | "end" | "justify" | "";
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "suggestion-page".
+ */
+export interface SuggestionPage {
+  id: number;
+  title: string;
+  description: string;
+  /**
+   * Enable or disable the suggestion form
+   */
+  formEnabled?: boolean | null;
+  seo?: {
+    metaTitle?: string | null;
+    metaDescription?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage_select".
  */
 export interface HomepageSelect<T extends boolean = true> {
@@ -624,6 +676,41 @@ export interface DropshippingInfoPageSelect<T extends boolean = true> {
 export interface DropshippingSitesPageSelect<T extends boolean = true> {
   title?: T;
   description?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "informations-page_select".
+ */
+export interface InformationsPageSelect<T extends boolean = true> {
+  title?: T;
+  content?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "suggestion-page_select".
+ */
+export interface SuggestionPageSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  formEnabled?: T;
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

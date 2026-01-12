@@ -1,4 +1,5 @@
 import type { GlobalConfig } from "payload";
+import { globalAfterChangeHook } from "../hooks/cache-invalidation";
 
 export const Homepage: GlobalConfig = {
   slug: "homepage",
@@ -8,6 +9,9 @@ export const Homepage: GlobalConfig = {
   },
   access: {
     read: () => true,
+  },
+  hooks: {
+    afterChange: [globalAfterChangeHook],
   },
   fields: [
     {

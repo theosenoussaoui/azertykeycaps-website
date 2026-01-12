@@ -1,8 +1,9 @@
+import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
+import type { Article } from "@azertykeycaps-app/schemas";
+
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
-import type { Article } from "@azertykeycaps-app/schemas";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,7 @@ const getArticleBySlug = createServerFn({ method: "GET" })
     return await client.articles.bySlug.query({ slug: data.slug });
   });
 
-export const Route = createFileRoute("/articles/$slug")({
+export const Route = createFileRoute("/_app/articles/$slug")({
   component: ArticleDetailPage,
   loader: async ({ params }) => {
     const article = await getArticleBySlug({ data: { slug: params.slug } });
@@ -41,6 +42,10 @@ export const Route = createFileRoute("/articles/$slug")({
 
     return { article };
   },
+  // ISR: Cache for 1 hour, serve stale for 24 hours while revalidating
+  headers: () => ({
+    "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+  }),
 });
 
 function ArticleDetailPage() {
@@ -75,7 +80,13 @@ function ArticleContent({ article, i18n }: { article: Article; i18n: ReturnType<
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={STATUS_VARIANTS[article.status]}>{i18n.status[article.status]}</Badge>
           {article.isNew && <Badge variant="default">{i18n.common.new}</Badge>}
-          {article.profile && <Badge variant="outline">{article.profile.title}</Badge>}
+          {article.profile && (
+            <Link to="/profile/$slug" params={{ slug: article.profile.slug }}>
+              <Badge variant="outline" className="cursor-pointer hover:bg-accent">
+                {article.profile.title}
+              </Badge>
+            </Link>
+          )}
           {article.material && <Badge variant="outline">{i18n.materials[article.material]}</Badge>}
         </div>
 

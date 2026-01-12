@@ -1,4 +1,5 @@
 import type { GlobalConfig } from "payload";
+import { globalAfterChangeHook } from "../hooks/cache-invalidation";
 
 export const DropshippingSitesPage: GlobalConfig = {
   slug: "dropshipping-sites-page",
@@ -8,6 +9,9 @@ export const DropshippingSitesPage: GlobalConfig = {
   },
   access: {
     read: () => true,
+  },
+  hooks: {
+    afterChange: [globalAfterChangeHook],
   },
   fields: [
     {

@@ -39,6 +39,10 @@ export const Route = createFileRoute("/dashboard")({
 
     return { privateData };
   },
+  // No cache: Auth-protected page with user-specific data
+  headers: () => ({
+    "Cache-Control": "private, no-cache, no-store, must-revalidate",
+  }),
 });
 
 function RouteComponent() {

@@ -1,0 +1,226 @@
+# Deployment Guide
+
+This document describes how to set up GitHub Actions deployments for the azertykeycaps monorepo.
+
+## Architecture Overview
+
+```
+                    GitHub Actions
+                          |
+          +---------------+---------------+
+          |                               |
+    deploy-cloudflare.yml           deploy-cms.yml
+          |                               |
+          v                               v
+    +-----+-----+                   +-----+-----+
+    |  Alchemy  |                   |   Vercel  |
+    +-----------+                   +-----------+
+          |                               |
+    +-----+-----+                   +-----+-----+
+    | Cloudflare|                   |   Turso   |
+    |  Workers  |                   |  + Blob   |
+    +-----------+                   +-----------+
+          |
+    +-----+-----+
+    |    D1     |
+    | Database  |
+    +-----------+
+```
+
+**Deployments:**
+
+- **Web + Server** → Cloudflare Workers (via Alchemy)
+- **CMS** → Vercel (with Turso database + Vercel Blob storage)
+
+## Workflows
+
+| Workflow                | Trigger                                | Deploys                              |
+| ----------------------- | -------------------------------------- | ------------------------------------ |
+| `ci.yml`                | All pushes/PRs                         | Type check, lint, build verification |
+| `deploy-cloudflare.yml` | Push to main, PRs (web/server changes) | Web + Server to Cloudflare           |
+| `deploy-cms.yml`        | Push to main, PRs (cms changes)        | CMS to Vercel                        |
+
+## GitHub Secrets Configuration
+
+Go to **Settings → Secrets and variables → Actions** in your GitHub repository.
+
+### Required Secrets
+
+#### Cloudflare & Alchemy (12 secrets)
+
+| Secret                  | Description                     | How to Get                                                                                                             |
+| ----------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `ALCHEMY_PASSWORD`      | Encrypts Alchemy state          | Generate: `openssl rand -base64 32`                                                                                    |
+| `ALCHEMY_STATE_TOKEN`   | Cloudflare R2 state store token | See [Alchemy State Store Guide](https://alchemy.run/guides/cloudflare-state-store)                                     |
+| `CLOUDFLARE_API_TOKEN`  | Cloudflare API access           | [Cloudflare Dashboard](https://dash.cloudflare.com/profile/api-tokens) - Create token with Workers, D1, R2 permissions |
+| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account         | [Find Account ID](https://developers.cloudflare.com/fundamentals/account/find-account-and-zone-ids/)                   |
+| `CLOUDFLARE_EMAIL`      | Cloudflare account email        | Your Cloudflare login email                                                                                            |
+| `CLOUDFLARE_ZONE_ID`    | Zone for CDN cache purge        | Cloudflare Dashboard → Your domain → Overview (right sidebar)                                                          |
+
+#### App Environment (7 secrets)
+
+| Secret                      | Description                   | Example                             |
+| --------------------------- | ----------------------------- | ----------------------------------- |
+| `CORS_ORIGIN`               | Allowed CORS origin           | `https://azertykeycaps.fr`          |
+| `BETTER_AUTH_SECRET`        | Auth encryption key           | Generate: `openssl rand -base64 32` |
+| `BETTER_AUTH_URL`           | Auth callback URL             | `https://api.azertykeycaps.fr`      |
+| `VITE_SERVER_URL`           | Server URL for web app        | `https://api.azertykeycaps.fr`      |
+| `CMS_API_URL`               | Payload CMS API URL           | `https://cms.azertykeycaps.fr`      |
+| `SERVER_URL`                | Server self-reference         | `https://api.azertykeycaps.fr`      |
+| `CACHE_INVALIDATION_SECRET` | Shared secret for cache purge | Generate: `openssl rand -base64 32` |
+
+#### Vercel & CMS (10 secrets)
+
+| Secret                   | Description            | How to Get                                                            |
+| ------------------------ | ---------------------- | --------------------------------------------------------------------- |
+| `VERCEL_TOKEN`           | Vercel API token       | [Vercel Settings → Tokens](https://vercel.com/account/tokens)         |
+| `VERCEL_ORG_ID`          | Vercel organization ID | Project Settings → General → Vercel ID                                |
+| `VERCEL_CMS_PROJECT_ID`  | CMS project ID         | Project Settings → General → Project ID                               |
+| `PAYLOAD_SECRET`         | CMS encryption key     | Generate: `openssl rand -base64 32`                                   |
+| `CMS_PUBLIC_URL`         | Public CMS URL         | `https://cms.azertykeycaps.fr`                                        |
+| `DATABASE_URL`           | Turso database URL     | `libsql://your-db-name.turso.io`                                      |
+| `DATABASE_AUTH_TOKEN`    | Turso auth token       | [Turso Dashboard](https://turso.tech/app) → Database → Generate Token |
+| `BLOB_READ_WRITE_TOKEN`  | Vercel Blob token      | Auto-set via Vercel Blob Integration, or create in Vercel Dashboard   |
+| `CACHE_INVALIDATION_URL` | Server cache endpoint  | `https://api.azertykeycaps.fr/api/cache/invalidate`                   |
+| `WEB_URL`                | Public website URL     | `https://azertykeycaps.fr`                                            |
+
+### Complete Secrets Checklist
+
+```
+# Cloudflare & Alchemy
+ALCHEMY_PASSWORD=<openssl rand -base64 32>
+ALCHEMY_STATE_TOKEN=<from alchemy state store setup>
+CLOUDFLARE_API_TOKEN=<from cloudflare dashboard>
+CLOUDFLARE_ACCOUNT_ID=<from cloudflare dashboard>
+CLOUDFLARE_EMAIL=<your-email@example.com>
+CLOUDFLARE_ZONE_ID=<from cloudflare dashboard>
+
+# App Environment
+CORS_ORIGIN=https://azertykeycaps.fr
+BETTER_AUTH_SECRET=<openssl rand -base64 32>
+BETTER_AUTH_URL=https://api.azertykeycaps.fr
+VITE_SERVER_URL=https://api.azertykeycaps.fr
+CMS_API_URL=https://cms.azertykeycaps.fr
+SERVER_URL=https://api.azertykeycaps.fr
+CACHE_INVALIDATION_SECRET=<openssl rand -base64 32>
+
+# Vercel & CMS
+VERCEL_TOKEN=<from vercel dashboard>
+VERCEL_ORG_ID=<from vercel project settings>
+VERCEL_CMS_PROJECT_ID=<from vercel project settings>
+PAYLOAD_SECRET=<openssl rand -base64 32>
+CMS_PUBLIC_URL=https://cms.azertykeycaps.fr
+DATABASE_URL=libsql://your-db.turso.io
+DATABASE_AUTH_TOKEN=<from turso dashboard>
+BLOB_READ_WRITE_TOKEN=<from vercel blob integration>
+CACHE_INVALIDATION_URL=https://api.azertykeycaps.fr/api/cache/invalidate
+WEB_URL=https://azertykeycaps.fr
+```
+
+## Preview Deployments
+
+### Cloudflare (Web + Server)
+
+- **Stage naming**: `pr-{number}` for PRs, `prod` for main branch
+- **Preview URLs**: Auto-generated by Cloudflare Workers
+- **Cleanup**: Automatic when PR is closed/merged
+
+### Vercel (CMS)
+
+- **Preview URLs**: Generated by Vercel for each PR
+- **Comment**: Bot posts preview URL on PR
+
+## Cache Invalidation Flow
+
+When content changes in the CMS:
+
+```
+CMS Content Update
+       |
+       v
++------+------+
+| Payload Hook |
++------+------+
+       |
+       +---------------+
+       |               |
+       v               v
+Server Cache      Cloudflare CDN
+  Purge              Purge
+       |               |
+       v               v
+/api/cache/       Zone Cache
+ invalidate         Purge API
+```
+
+**Required for cache invalidation:**
+
+1. `CACHE_INVALIDATION_SECRET` - Shared between CMS and Server
+2. `CACHE_INVALIDATION_URL` - Server endpoint
+3. `CLOUDFLARE_ZONE_ID` + `CLOUDFLARE_API_TOKEN` - CDN purge
+4. `WEB_URL` - Target URLs to purge
+
+## Troubleshooting
+
+### Alchemy Deployment Fails
+
+```bash
+# Check Alchemy state store token is valid
+curl -H "Authorization: Bearer $ALCHEMY_STATE_TOKEN" \
+  https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/r2/buckets
+
+# Verify Cloudflare API token permissions
+curl -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+  https://api.cloudflare.com/client/v4/user/tokens/verify
+```
+
+### Vercel Deployment Fails
+
+```bash
+# Check Vercel token
+curl -H "Authorization: Bearer $VERCEL_TOKEN" \
+  https://api.vercel.com/v2/user
+```
+
+### Database Connection Issues
+
+```bash
+# Test Turso connection
+turso db shell your-db-name "SELECT 1"
+```
+
+### Cache Invalidation Not Working
+
+1. Verify `CACHE_INVALIDATION_SECRET` matches in both CMS and Server
+2. Check Server logs for `/api/cache/invalidate` endpoint errors
+3. Verify `CLOUDFLARE_ZONE_ID` is correct for your domain
+
+## Manual Deployment
+
+```bash
+# Deploy Cloudflare (from root)
+STAGE=prod bun run deploy
+
+# Deploy CMS (from apps/cms)
+cd apps/cms && vercel --prod
+```
+
+## Environment Variables Summary Table
+
+| Variable                    | Web | Server | CMS | GitHub Secret |
+| --------------------------- | --- | ------ | --- | ------------- |
+| `VITE_SERVER_URL`           | ✅  | -      | -   | ✅            |
+| `SERVER_URL`                | -   | ✅     | -   | ✅            |
+| `CORS_ORIGIN`               | ✅  | ✅     | -   | ✅            |
+| `BETTER_AUTH_SECRET`        | ✅  | ✅     | -   | ✅            |
+| `BETTER_AUTH_URL`           | ✅  | ✅     | -   | ✅            |
+| `CMS_API_URL`               | -   | ✅     | -   | ✅            |
+| `CACHE_INVALIDATION_SECRET` | -   | ✅     | ✅  | ✅            |
+| `CACHE_INVALIDATION_URL`    | -   | -      | ✅  | ✅            |
+| `CLOUDFLARE_ZONE_ID`        | -   | -      | ✅  | ✅            |
+| `CLOUDFLARE_API_TOKEN`      | -   | -      | ✅  | ✅            |
+| `WEB_URL`                   | -   | -      | ✅  | ✅            |
+| `DATABASE_URL`              | -   | -      | ✅  | ✅            |
+| `DATABASE_AUTH_TOKEN`       | -   | -      | ✅  | ✅            |
+| `PAYLOAD_SECRET`            | -   | -      | ✅  | ✅            |
+| `BLOB_READ_WRITE_TOKEN`     | -   | -      | ✅  | ✅            |

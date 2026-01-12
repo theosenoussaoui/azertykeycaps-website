@@ -20,6 +20,8 @@ import { Homepage } from "./globals/Homepage";
 import { SocialNetworks } from "./globals/SocialNetworks";
 import { DropshippingInfoPage } from "./globals/DropshippingInfoPage";
 import { DropshippingSitesPage } from "./globals/DropshippingSitesPage";
+import { InformationsPage } from "./globals/InformationsPage";
+import { SuggestionPage } from "./globals/SuggestionPage";
 
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
@@ -36,7 +38,14 @@ export default buildConfig({
     fallbackLanguage: "fr",
   },
   collections: [Users, Media, Articles, KeycapProfiles, DropshippingWebsites],
-  globals: [Homepage, SocialNetworks, DropshippingInfoPage, DropshippingSitesPage],
+  globals: [
+    Homepage,
+    SocialNetworks,
+    DropshippingInfoPage,
+    DropshippingSitesPage,
+    InformationsPage,
+    SuggestionPage,
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

@@ -11,8 +11,12 @@
 import { Route as rootRouteImport } from "./routes/__root";
 import { Route as LoginRouteImport } from "./routes/login";
 import { Route as DashboardRouteImport } from "./routes/dashboard";
-import { Route as IndexRouteImport } from "./routes/index";
-import { Route as ArticlesSlugRouteImport } from "./routes/articles.$slug";
+import { Route as AppRouteImport } from "./routes/_app";
+import { Route as AppIndexRouteImport } from "./routes/_app/index";
+import { Route as AppSuggestRouteImport } from "./routes/_app/suggest";
+import { Route as AppAboutRouteImport } from "./routes/_app/about";
+import { Route as AppProfileSlugRouteImport } from "./routes/_app/profile.$slug";
+import { Route as AppArticlesSlugRouteImport } from "./routes/_app/articles.$slug";
 
 const LoginRoute = LoginRouteImport.update({
   id: "/login",
@@ -24,49 +28,93 @@ const DashboardRoute = DashboardRouteImport.update({
   path: "/dashboard",
   getParentRoute: () => rootRouteImport,
 } as any);
-const IndexRoute = IndexRouteImport.update({
-  id: "/",
-  path: "/",
+const AppRoute = AppRouteImport.update({
+  id: "/_app",
   getParentRoute: () => rootRouteImport,
 } as any);
-const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: "/",
+  path: "/",
+  getParentRoute: () => AppRoute,
+} as any);
+const AppSuggestRoute = AppSuggestRouteImport.update({
+  id: "/suggest",
+  path: "/suggest",
+  getParentRoute: () => AppRoute,
+} as any);
+const AppAboutRoute = AppAboutRouteImport.update({
+  id: "/about",
+  path: "/about",
+  getParentRoute: () => AppRoute,
+} as any);
+const AppProfileSlugRoute = AppProfileSlugRouteImport.update({
+  id: "/profile/$slug",
+  path: "/profile/$slug",
+  getParentRoute: () => AppRoute,
+} as any);
+const AppArticlesSlugRoute = AppArticlesSlugRouteImport.update({
   id: "/articles/$slug",
   path: "/articles/$slug",
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
 } as any);
 
 export interface FileRoutesByFullPath {
-  "/": typeof IndexRoute;
   "/dashboard": typeof DashboardRoute;
   "/login": typeof LoginRoute;
-  "/articles/$slug": typeof ArticlesSlugRoute;
+  "/about": typeof AppAboutRoute;
+  "/suggest": typeof AppSuggestRoute;
+  "/": typeof AppIndexRoute;
+  "/articles/$slug": typeof AppArticlesSlugRoute;
+  "/profile/$slug": typeof AppProfileSlugRoute;
 }
 export interface FileRoutesByTo {
-  "/": typeof IndexRoute;
   "/dashboard": typeof DashboardRoute;
   "/login": typeof LoginRoute;
-  "/articles/$slug": typeof ArticlesSlugRoute;
+  "/about": typeof AppAboutRoute;
+  "/suggest": typeof AppSuggestRoute;
+  "/": typeof AppIndexRoute;
+  "/articles/$slug": typeof AppArticlesSlugRoute;
+  "/profile/$slug": typeof AppProfileSlugRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
-  "/": typeof IndexRoute;
+  "/_app": typeof AppRouteWithChildren;
   "/dashboard": typeof DashboardRoute;
   "/login": typeof LoginRoute;
-  "/articles/$slug": typeof ArticlesSlugRoute;
+  "/_app/about": typeof AppAboutRoute;
+  "/_app/suggest": typeof AppSuggestRoute;
+  "/_app/": typeof AppIndexRoute;
+  "/_app/articles/$slug": typeof AppArticlesSlugRoute;
+  "/_app/profile/$slug": typeof AppProfileSlugRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: "/" | "/dashboard" | "/login" | "/articles/$slug";
+  fullPaths:
+    | "/dashboard"
+    | "/login"
+    | "/about"
+    | "/suggest"
+    | "/"
+    | "/articles/$slug"
+    | "/profile/$slug";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/" | "/dashboard" | "/login" | "/articles/$slug";
-  id: "__root__" | "/" | "/dashboard" | "/login" | "/articles/$slug";
+  to: "/dashboard" | "/login" | "/about" | "/suggest" | "/" | "/articles/$slug" | "/profile/$slug";
+  id:
+    | "__root__"
+    | "/_app"
+    | "/dashboard"
+    | "/login"
+    | "/_app/about"
+    | "/_app/suggest"
+    | "/_app/"
+    | "/_app/articles/$slug"
+    | "/_app/profile/$slug";
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute;
+  AppRoute: typeof AppRouteWithChildren;
   DashboardRoute: typeof DashboardRoute;
   LoginRoute: typeof LoginRoute;
-  ArticlesSlugRoute: typeof ArticlesSlugRoute;
 }
 
 declare module "@tanstack/react-router" {
@@ -85,28 +133,73 @@ declare module "@tanstack/react-router" {
       preLoaderRoute: typeof DashboardRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/": {
-      id: "/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof IndexRouteImport;
+    "/_app": {
+      id: "/_app";
+      path: "";
+      fullPath: "";
+      preLoaderRoute: typeof AppRouteImport;
       parentRoute: typeof rootRouteImport;
     };
-    "/articles/$slug": {
-      id: "/articles/$slug";
+    "/_app/": {
+      id: "/_app/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof AppIndexRouteImport;
+      parentRoute: typeof AppRoute;
+    };
+    "/_app/suggest": {
+      id: "/_app/suggest";
+      path: "/suggest";
+      fullPath: "/suggest";
+      preLoaderRoute: typeof AppSuggestRouteImport;
+      parentRoute: typeof AppRoute;
+    };
+    "/_app/about": {
+      id: "/_app/about";
+      path: "/about";
+      fullPath: "/about";
+      preLoaderRoute: typeof AppAboutRouteImport;
+      parentRoute: typeof AppRoute;
+    };
+    "/_app/profile/$slug": {
+      id: "/_app/profile/$slug";
+      path: "/profile/$slug";
+      fullPath: "/profile/$slug";
+      preLoaderRoute: typeof AppProfileSlugRouteImport;
+      parentRoute: typeof AppRoute;
+    };
+    "/_app/articles/$slug": {
+      id: "/_app/articles/$slug";
       path: "/articles/$slug";
       fullPath: "/articles/$slug";
-      preLoaderRoute: typeof ArticlesSlugRouteImport;
-      parentRoute: typeof rootRouteImport;
+      preLoaderRoute: typeof AppArticlesSlugRouteImport;
+      parentRoute: typeof AppRoute;
     };
   }
 }
 
+interface AppRouteChildren {
+  AppAboutRoute: typeof AppAboutRoute;
+  AppSuggestRoute: typeof AppSuggestRoute;
+  AppIndexRoute: typeof AppIndexRoute;
+  AppArticlesSlugRoute: typeof AppArticlesSlugRoute;
+  AppProfileSlugRoute: typeof AppProfileSlugRoute;
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAboutRoute: AppAboutRoute,
+  AppSuggestRoute: AppSuggestRoute,
+  AppIndexRoute: AppIndexRoute,
+  AppArticlesSlugRoute: AppArticlesSlugRoute,
+  AppProfileSlugRoute: AppProfileSlugRoute,
+};
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren);
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
-  ArticlesSlugRoute: ArticlesSlugRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

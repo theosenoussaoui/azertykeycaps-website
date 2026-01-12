@@ -8,7 +8,6 @@ import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
 
 import { Toaster } from "@/components/ui/sonner";
 
-import Header from "../components/header";
 import appCss from "../index.css?url";
 
 export interface RouterAppContext {
@@ -27,7 +26,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
         content: "width=device-width, initial-scale=1",
       },
       {
-        title: "My App",
+        title: "Azertykeycaps - Annuaire de keycaps françaises",
       },
     ],
     links: [
@@ -43,15 +42,12 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
 
 function RootDocument() {
   return (
-    <html lang="en" className="dark">
+    <html lang="fr" className="dark">
       <head>
         <HeadContent />
       </head>
       <body>
-        <div className="grid h-svh grid-rows-[auto_1fr]">
-          <Header />
-          <Outlet />
-        </div>
+        <Outlet />
         <Toaster richColors />
         <TanStackRouterDevtools position="bottom-left" />
         <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />

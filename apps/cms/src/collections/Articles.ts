@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { ARTICLE_MATERIALS, ARTICLE_STATUS } from "@azertykeycaps-app/schemas";
+import { collectionAfterChangeHook, collectionAfterDeleteHook } from "../hooks/cache-invalidation";
 
 export const Articles: CollectionConfig = {
   slug: "articles",
@@ -16,6 +17,10 @@ export const Articles: CollectionConfig = {
   },
   access: {
     read: () => true,
+  },
+  hooks: {
+    afterChange: [collectionAfterChangeHook],
+    afterDelete: [collectionAfterDeleteHook],
   },
   fields: [
     {

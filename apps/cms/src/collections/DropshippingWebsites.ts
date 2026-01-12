@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { WEBSITE_CATEGORIES } from "@azertykeycaps-app/schemas";
+import { collectionAfterChangeHook, collectionAfterDeleteHook } from "../hooks/cache-invalidation";
 
 export const DropshippingWebsites: CollectionConfig = {
   slug: "dropshipping-websites",
@@ -16,6 +17,10 @@ export const DropshippingWebsites: CollectionConfig = {
   },
   access: {
     read: () => true,
+  },
+  hooks: {
+    afterChange: [collectionAfterChangeHook],
+    afterDelete: [collectionAfterDeleteHook],
   },
   fields: [
     {

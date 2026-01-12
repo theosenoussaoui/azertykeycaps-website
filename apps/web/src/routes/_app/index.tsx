@@ -1,46 +1,86 @@
-import { useQuery } from "@tanstack/react-query";
+import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
+
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createServerFn } from "@tanstack/react-start";
+import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import {
   articleFiltersSchema,
+  type ArticleFilters as ArticleFiltersType,
   type ArticleMaterial,
   type ArticleStatus,
 } from "@azertykeycaps-app/schemas";
 
-import { ArticleCard, ArticleCardSkeleton } from "@/components/article-card";
+import { ArticleCard } from "@/components/article-card";
 import { ArticleFilters } from "@/components/article-filters";
 import { ArticlesPagination } from "@/components/articles-pagination";
-import { useTRPC } from "@/lib/trpc";
 import { t } from "@/i18n";
+import { serverEnv } from "@/lib/server-env";
 
-export const Route = createFileRoute("/")({
+// Create a server-side tRPC client
+function createServerTRPCClient() {
+  return createTRPCClient<AppRouter>({
+    links: [
+      httpBatchLink({
+        url: `${serverEnv.SERVER_URL}/trpc`,
+      }),
+    ],
+  });
+}
+
+// Server function to fetch home page data (articles + profiles for filters)
+const getHomePageData = createServerFn({ method: "GET" })
+  .inputValidator((data: ArticleFiltersType) => data)
+  .handler(async ({ data: filters }) => {
+    const client = createServerTRPCClient();
+
+    const [articles, profiles] = await Promise.all([
+      client.articles.list.query({
+        page: filters.page ?? 1,
+        limit: 12,
+        profile: filters.profile,
+        status: filters.status,
+        material: filters.material,
+        isNew: filters.isNew,
+        search: filters.search,
+      }),
+      client.articles.profiles.query({ limit: 100 }),
+    ]);
+
+    return { articles, profiles };
+  });
+
+export const Route = createFileRoute("/_app/")({
   component: HomeComponent,
   validateSearch: articleFiltersSchema,
+  loaderDeps: ({ search }) => ({ search }),
+  loader: async ({ deps: { search } }) => {
+    const data = await getHomePageData({ data: search });
+    return data;
+  },
+  // ISR: Cache for 1 hour, serve stale for 24 hours while revalidating
+  // Query params (filters) are part of the cache key automatically
+  headers: () => ({
+    "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+  }),
+  head: () => {
+    const i18n = t();
+    return {
+      meta: [
+        { title: i18n.articles.metaTitle },
+        { name: "description", content: i18n.articles.metaDescription },
+      ],
+    };
+  },
 });
 
 function HomeComponent() {
-  const trpc = useTRPC();
   const navigate = useNavigate();
   const search = Route.useSearch();
+  const { articles, profiles } = Route.useLoaderData();
   const i18n = t();
 
   // Check if any filters are active
   const hasActiveFilters = !!(search.profile || search.status || search.material);
-
-  // Fetch profiles for filter dropdown
-  const profilesQuery = useQuery(trpc.articles.profiles.queryOptions({ limit: 100 }));
-
-  // Fetch articles with current filters
-  const articlesQuery = useQuery(
-    trpc.articles.list.queryOptions({
-      page: search.page,
-      limit: 12,
-      profile: search.profile,
-      status: search.status,
-      material: search.material,
-      isNew: search.isNew,
-      search: search.search,
-    }),
-  );
 
   const handleFilterChange = (
     key: "profile" | "status" | "material",
@@ -82,7 +122,7 @@ function HomeComponent() {
       {/* Filters */}
       <section className="mb-6">
         <ArticleFilters
-          profiles={profilesQuery.data ?? []}
+          profiles={profiles}
           selectedProfile={search.profile}
           selectedStatus={search.status}
           selectedMaterial={search.material}
@@ -96,25 +136,19 @@ function HomeComponent() {
 
       {/* Articles Grid */}
       <section className="mb-8">
-        {articlesQuery.isLoading ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <ArticleCardSkeleton key={i} />
-            ))}
-          </div>
-        ) : articlesQuery.data?.error ? (
+        {articles.error ? (
           <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center dark:border-red-900 dark:bg-red-950">
             <p className="text-red-600 dark:text-red-400">
-              {i18n.common.error}: {articlesQuery.data.error}
+              {i18n.common.error}: {articles.error}
             </p>
           </div>
-        ) : articlesQuery.data?.docs.length === 0 ? (
+        ) : articles.docs.length === 0 ? (
           <div className="rounded-lg border p-6 text-center">
             <p className="text-muted-foreground">{i18n.common.noResults}</p>
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {articlesQuery.data?.docs.map((article) => (
+            {articles.docs.map((article) => (
               <ArticleCard key={article.id} article={article} />
             ))}
           </div>
@@ -122,10 +156,10 @@ function HomeComponent() {
       </section>
 
       {/* Pagination */}
-      {articlesQuery.data && articlesQuery.data.totalPages > 1 && (
+      {articles.totalPages > 1 && (
         <ArticlesPagination
-          currentPage={articlesQuery.data.page}
-          totalPages={articlesQuery.data.totalPages}
+          currentPage={articles.page}
+          totalPages={articles.totalPages}
           onPageChange={handlePageChange}
         />
       )}

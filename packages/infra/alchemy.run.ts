@@ -34,6 +34,8 @@ export const server = await Worker("server", {
     BETTER_AUTH_URL: alchemy.env.BETTER_AUTH_URL!,
     CMS_API_URL: alchemy.env.CMS_API_URL!,
     SERVER_URL: alchemy.env.SERVER_URL!,
+    // Cache invalidation secret (shared with CMS)
+    CACHE_INVALIDATION_SECRET: alchemy.env.CACHE_INVALIDATION_SECRET!,
   },
 });
 

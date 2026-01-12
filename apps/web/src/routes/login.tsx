@@ -6,6 +6,10 @@ import SignUpForm from "@/components/sign-up-form";
 
 export const Route = createFileRoute("/login")({
   component: RouteComponent,
+  // No cache: Auth page with sensitive forms
+  headers: () => ({
+    "Cache-Control": "private, no-cache, no-store, must-revalidate",
+  }),
 });
 
 function RouteComponent() {

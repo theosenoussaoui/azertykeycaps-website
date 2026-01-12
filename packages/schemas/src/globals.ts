@@ -46,6 +46,36 @@ export const dropshippingSitesPageSchema = z.object({
 });
 
 // ============================================
+// INFORMATIONS PAGE GLOBAL
+// ============================================
+
+export const seoSchema = z.object({
+  metaTitle: z.string().nullish(), // Can be null, undefined, or string
+  metaDescription: z.string().nullish(),
+});
+
+// Lexical rich text content - using any to avoid serialization issues with TanStack Start
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const lexicalContentSchema = z.any().nullable();
+
+export const informationsPageSchema = z.object({
+  title: z.string(),
+  content: lexicalContentSchema, // Lexical rich text content
+  seo: seoSchema.nullable(),
+});
+
+// ============================================
+// SUGGESTION PAGE GLOBAL
+// ============================================
+
+export const suggestionPageSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+  formEnabled: z.boolean(),
+  seo: seoSchema.nullable(),
+});
+
+// ============================================
 // TYPES
 // ============================================
 
@@ -54,3 +84,6 @@ export type SocialNetworks = z.infer<typeof socialNetworksSchema>;
 export type Homepage = z.infer<typeof homepageSchema>;
 export type DropshippingInfoPage = z.infer<typeof dropshippingInfoPageSchema>;
 export type DropshippingSitesPage = z.infer<typeof dropshippingSitesPageSchema>;
+export type Seo = z.infer<typeof seoSchema>;
+export type InformationsPage = z.infer<typeof informationsPageSchema>;
+export type SuggestionPage = z.infer<typeof suggestionPageSchema>;

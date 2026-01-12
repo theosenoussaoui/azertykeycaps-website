@@ -7,10 +7,23 @@ export const fr = {
     previous: "Précédent",
     next: "Suivant",
     back: "Retour",
+    backHome: "Retour à l'accueil",
     clearFilters: "Effacer les filtres",
+  },
+  nav: {
+    home: "Accueil",
+    about: "Informations",
+    suggest: "Suggérer",
+    profiles: "Profils",
+  },
+  footer: {
+    builtBy: "Construit par",
   },
   articles: {
     title: "Articles",
+    metaTitle: "Azertykeycaps - Keysets AZERTY",
+    metaDescription:
+      "Découvrez notre sélection de keysets compatibles AZERTY. Filtrez par profil, statut et matériau.",
     filters: {
       all: "Tous",
       profile: "Profil",
@@ -22,6 +35,26 @@ export const fr = {
     additionalLink: "Lien additionnel",
     startDate: "Début",
     endDate: "Fin",
+  },
+  pages: {
+    about: {
+      title: "Informations",
+      metaTitle: "Azertykeycaps - Informations",
+      metaDescription: "Informations techniques générales concernant le site Azertykeycaps.",
+    },
+    suggest: {
+      title: "Suggérez un keyset !",
+      description:
+        "Vous avez un keyset en tête qui n'est pas présent sur le site ? Vous pouvez le suggérer ici, et nous l'ajouterons s'il correspond aux critères de sélection.",
+      comingSoon: "Le formulaire de suggestion sera bientôt disponible.",
+      metaTitle: "Azertykeycaps - Suggestion",
+      metaDescription: "Suggérez un keyset à ajouter sur Azertykeycaps.",
+    },
+    profile: {
+      noArticles: "Aucun article pour ce profil",
+      noArticlesDescription:
+        "Nous n'avons pas encore de keysets pour ce profil en particulier, veuillez réessayer plus tard.",
+    },
   },
   status: {
     in_stock: "En stock",
