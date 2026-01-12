@@ -2,6 +2,90 @@
 
 This document describes how to set up GitHub Actions deployments for the azertykeycaps monorepo.
 
+---
+
+## DNS Setup (Cloudflare)
+
+### Prerequisites
+
+- Domain `azertykeycaps.fr` registered at OVH
+- Cloudflare account (free tier is fine)
+- Current site running on Vercel (will keep running during migration)
+
+### Step 1: Add Domain to Cloudflare
+
+1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
+2. Click **Add a site** → Enter `azertykeycaps.fr`
+3. Select **Free plan**
+4. Cloudflare will scan existing DNS records
+5. Click **Continue to activation**
+6. Copy the 2 nameservers Cloudflare provides (e.g., `adaline.ns.cloudflare.com`)
+
+### Step 2: Update OVH Nameservers
+
+1. Go to [OVH Dashboard](https://www.ovh.com/manager/)
+2. Navigate to **Web Cloud** → **Domain names** → `azertykeycaps.fr`
+3. Click **DNS Servers** tab → **Modify DNS servers**
+4. Replace OVH nameservers with Cloudflare's
+5. Save and wait 1-24 hours for propagation
+
+### Step 3: Configure DNS Records (Gradual Migration)
+
+After Cloudflare shows domain as **"Active"**, configure DNS:
+
+| Type  | Name      | Content                                     | Proxy              | Purpose                      |
+| ----- | --------- | ------------------------------------------- | ------------------ | ---------------------------- |
+| CNAME | `@`       | `cname.vercel-dns.com`                      | DNS only (gray)    | Keep current Vercel site live |
+| CNAME | `www`     | `azertykeycaps.fr`                          | Proxied (orange)   | Redirect to root             |
+| CNAME | `staging` | `azertykeycaps-app-web-prod.workers.dev`    | Proxied (orange)   | **NEW** - Test new site      |
+| CNAME | `api`     | `azertykeycaps-app-server-prod.workers.dev` | Proxied (orange)   | **NEW** - Hono API           |
+| CNAME | `cms`     | `cname.vercel-dns.com`                      | DNS only (gray)    | **NEW** - Payload CMS        |
+
+> **Important:** Keep all MX records for email!
+
+### Step 4: Configure Vercel Custom Domain for CMS
+
+1. Vercel Dashboard → CMS Project → Settings → Domains
+2. Add `cms.azertykeycaps.fr`
+3. Vercel will verify the CNAME automatically
+
+### Step 5: Get Cloudflare IDs
+
+In Cloudflare Dashboard → Overview page (right sidebar):
+
+- **Account ID** - Under "API" section
+- **Zone ID** - Under "API" section
+
+### Going Live (When Ready)
+
+When you're ready to switch from Vercel to Cloudflare Workers:
+
+1. In Cloudflare DNS, change the `@` record:
+   - **From:** `cname.vercel-dns.com` (DNS only)
+   - **To:** `azertykeycaps-app-web-prod.workers.dev` (Proxied)
+2. Optionally delete or keep `staging` subdomain
+
+### Environment URLs Summary
+
+**During staging:**
+
+```
+Staging site:  https://staging.azertykeycaps.fr  (new TanStack Start)
+API:           https://api.azertykeycaps.fr      (new Hono server)
+CMS:           https://cms.azertykeycaps.fr      (Payload CMS)
+Current site:  https://azertykeycaps.fr          (old Vercel - still live)
+```
+
+**After going live:**
+
+```
+Website:       https://azertykeycaps.fr          (TanStack Start on Workers)
+API:           https://api.azertykeycaps.fr      (Hono on Workers)
+CMS:           https://cms.azertykeycaps.fr      (Payload on Vercel)
+```
+
+---
+
 ## Architecture Overview
 
 ```
@@ -95,14 +179,16 @@ CLOUDFLARE_ACCOUNT_ID=<from cloudflare dashboard>
 CLOUDFLARE_EMAIL=<your-email@example.com>
 CLOUDFLARE_ZONE_ID=<from cloudflare dashboard>
 
-# App Environment
-CORS_ORIGIN=https://azertykeycaps.fr
+# App Environment (use staging URLs during migration, then switch to prod)
+# Staging:
+CORS_ORIGIN=https://staging.azertykeycaps.fr
 BETTER_AUTH_SECRET=<openssl rand -base64 32>
 BETTER_AUTH_URL=https://api.azertykeycaps.fr
 VITE_SERVER_URL=https://api.azertykeycaps.fr
 CMS_API_URL=https://cms.azertykeycaps.fr
 SERVER_URL=https://api.azertykeycaps.fr
 CACHE_INVALIDATION_SECRET=<openssl rand -base64 32>
+# After going live, change CORS_ORIGIN to: https://azertykeycaps.fr
 
 # Vercel & CMS
 VERCEL_TOKEN=<from vercel dashboard>
