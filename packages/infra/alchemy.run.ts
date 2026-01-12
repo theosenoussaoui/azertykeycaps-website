@@ -15,6 +15,10 @@ const isProd = stage === "prod";
 // For prod, we use custom domains from env
 const CLOUDFLARE_SUBDOMAIN = "theosen95"; // Your Cloudflare account subdomain
 
+// Custom domains from env (only used in prod)
+const WEB_DOMAIN = alchemy.env.WEB_DOMAIN; // e.g., "staging.azertykeycaps.fr"
+const API_DOMAIN = alchemy.env.API_DOMAIN; // e.g., "api.azertykeycaps.fr"
+
 const app = await alchemy("azertykeycaps-app", {
   stage,
   // Use CloudflareStateStore in CI for shared state, local file store in dev
@@ -29,12 +33,12 @@ const db = await D1Database("api-db", {
 // Compute URLs based on stage
 // For prod: use custom domains from env
 // For PR previews: use Workers URLs
-const serverUrl = isProd
-  ? alchemy.env.SERVER_URL!
+const serverUrl = isProd && API_DOMAIN
+  ? `https://${API_DOMAIN}`
   : `https://azertykeycaps-app-server-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
 
-const webUrl = isProd
-  ? alchemy.env.CORS_ORIGIN!
+const webUrl = isProd && WEB_DOMAIN
+  ? `https://${WEB_DOMAIN}`
   : `https://azertykeycaps-app-web-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
 
 // CMS is always on Vercel (same URL for all stages)
@@ -44,6 +48,8 @@ export const server = await Worker("server", {
   cwd: "../../apps/server",
   entrypoint: "src/index.ts",
   compatibility: "node",
+  // Attach custom domain in production (Alchemy manages DNS automatically)
+  domains: isProd && API_DOMAIN ? [API_DOMAIN] : undefined,
   bindings: {
     DB: db,
     CORS_ORIGIN: webUrl,
@@ -58,6 +64,8 @@ export const server = await Worker("server", {
 
 export const web = await TanStackStart("web", {
   cwd: "../../apps/web",
+  // Attach custom domain in production (Alchemy manages DNS automatically)
+  domains: isProd && WEB_DOMAIN ? [WEB_DOMAIN] : undefined,
   bindings: {
     VITE_SERVER_URL: serverUrl,
     DB: db,
@@ -69,8 +77,8 @@ export const web = await TanStackStart("web", {
 });
 
 console.log(`Stage  -> ${stage}`);
-console.log(`Web    -> ${web.url}`);
-console.log(`Server -> ${server.url}`);
+console.log(`Web    -> ${webUrl}`);
+console.log(`Server -> ${serverUrl}`);
 
 // GitHub PR comment for preview deployments
 if (process.env.PULL_REQUEST) {
