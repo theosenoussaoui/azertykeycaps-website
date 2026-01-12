@@ -1,0 +1,9 @@
+{
+  "extends": "@azertykeycaps-app/config/tsconfig.base.json",
+  "compilerOptions": {
+    "strict": true,
+    "outDir": "./dist",
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*", "../env/env.d.ts"]
+}

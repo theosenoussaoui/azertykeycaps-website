@@ -1,0 +1,109 @@
+name: Deploy Cloudflare (Web + Server)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "apps/web/**"
+      - "apps/server/**"
+      - "packages/**"
+      - ".github/workflows/deploy-cloudflare.yml"
+  pull_request:
+    types: [opened, reopened, synchronize, closed]
+    paths:
+      - "apps/web/**"
+      - "apps/server/**"
+      - "packages/**"
+      - ".github/workflows/deploy-cloudflare.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-cloudflare-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  STAGE: ${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.number) || (github.ref == 'refs/heads/main' && 'prod' || github.ref_name) }}
+
+jobs:
+  # Run CI checks first
+  ci:
+    if: ${{ github.event.action != 'closed' }}
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    if: ${{ github.event.action != 'closed' }}
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Deploy to Cloudflare
+        run: bun alchemy deploy --stage ${{ env.STAGE }}
+        working-directory: packages/infra
+        env:
+          CI: true
+          # Alchemy & Cloudflare credentials
+          ALCHEMY_PASSWORD: ${{ secrets.ALCHEMY_PASSWORD }}
+          ALCHEMY_STATE_TOKEN: ${{ secrets.ALCHEMY_STATE_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+          # GitHub context
+          PULL_REQUEST: ${{ github.event.number }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}
+          # App environment variables
+          CORS_ORIGIN: ${{ secrets.CORS_ORIGIN }}
+          BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
+          BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
+          VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
+          CMS_API_URL: ${{ secrets.CMS_API_URL }}
+          SERVER_URL: ${{ secrets.SERVER_URL }}
+          # Cache invalidation (shared secret with CMS)
+          CACHE_INVALIDATION_SECRET: ${{ secrets.CACHE_INVALIDATION_SECRET }}
+
+  cleanup:
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' && github.event.action == 'closed' }}
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Safety Check
+        run: |
+          if [ "${{ env.STAGE }}" = "prod" ]; then
+            echo "ERROR: Cannot destroy prod environment"
+            exit 1
+          fi
+
+      - name: Destroy Preview Environment
+        run: bun alchemy destroy --stage ${{ env.STAGE }}
+        working-directory: packages/infra
+        env:
+          CI: true
+          ALCHEMY_PASSWORD: ${{ secrets.ALCHEMY_PASSWORD }}
+          ALCHEMY_STATE_TOKEN: ${{ secrets.ALCHEMY_STATE_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_EMAIL: ${{ secrets.CLOUDFLARE_EMAIL }}
+          PULL_REQUEST: ${{ github.event.number }}

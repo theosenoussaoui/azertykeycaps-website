@@ -1,0 +1,24 @@
+{
+  "name": "@azertykeycaps-app/auth",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@azertykeycaps-app/db": "workspace:*",
+    "@azertykeycaps-app/env": "workspace:*",
+    "better-auth": "catalog:",
+    "dotenv": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@azertykeycaps-app/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
