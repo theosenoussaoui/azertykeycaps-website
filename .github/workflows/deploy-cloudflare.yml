@@ -72,6 +72,8 @@ jobs:
           SERVER_URL: ${{ secrets.SERVER_URL }}
           # Cache invalidation (shared secret with CMS)
           CACHE_INVALIDATION_SECRET: ${{ secrets.CACHE_INVALIDATION_SECRET }}
+          # CMS API key for authenticated requests to Payload CMS
+          CMS_API_KEY: ${{ secrets.CMS_API_KEY }}
           # Custom domains for production (Alchemy attaches these to Workers)
           WEB_DOMAIN: ${{ secrets.WEB_DOMAIN }}
           API_DOMAIN: ${{ secrets.API_DOMAIN }}
