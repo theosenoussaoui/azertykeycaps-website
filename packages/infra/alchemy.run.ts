@@ -10,14 +10,17 @@ config({ path: "../../apps/server/.env" });
 
 const stage = process.env.STAGE ?? "dev";
 const isProd = stage === "prod";
+// Local development: not in CI and not deploying to prod
+const isLocalDev = !process.env.CI && stage === "dev";
 
 // For PR previews, we'll use the Workers URLs directly
 // For prod, we use custom domains from env
 const CLOUDFLARE_SUBDOMAIN = "theosen95"; // Your Cloudflare account subdomain
 
 // Custom domains from env (only used in prod)
-const WEB_DOMAIN = alchemy.env.WEB_DOMAIN; // e.g., "staging.azertykeycaps.fr"
-const API_DOMAIN = alchemy.env.API_DOMAIN; // e.g., "api.azertykeycaps.fr"
+// Use process.env directly to avoid throwing in dev when not set
+const WEB_DOMAIN = process.env.WEB_DOMAIN; // e.g., "staging.azertykeycaps.fr"
+const API_DOMAIN = process.env.API_DOMAIN; // e.g., "api.azertykeycaps.fr"
 
 const app = await alchemy("azertykeycaps-app", {
   stage,
@@ -30,19 +33,34 @@ const db = await D1Database("api-db", {
   migrationsDir: "../../packages/db/src/migrations",
 });
 
-// Compute URLs based on stage
-// For prod: use custom domains from env
-// For PR previews: use Workers URLs
-const serverUrl = isProd && API_DOMAIN
-  ? `https://${API_DOMAIN}`
-  : `https://azertykeycaps-app-server-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
+// Compute URLs based on environment
+// Local dev: use localhost
+// Prod with custom domains: use custom domains
+// PR previews / staging: use Workers URLs
+const serverUrl = isLocalDev
+  ? "http://localhost:1337"
+  : isProd && API_DOMAIN
+    ? `https://${API_DOMAIN}`
+    : `https://azertykeycaps-app-server-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
 
-const webUrl = isProd && WEB_DOMAIN
-  ? `https://${WEB_DOMAIN}`
-  : `https://azertykeycaps-app-web-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
+const webUrl = isLocalDev
+  ? "http://localhost:3001"
+  : isProd && WEB_DOMAIN
+    ? `https://${WEB_DOMAIN}`
+    : `https://azertykeycaps-app-web-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
 
-// CMS is always on Vercel (same URL for all stages)
-const cmsUrl = alchemy.env.CMS_API_URL!;
+// CMS URL - required in prod, defaults to localhost in dev
+const cmsUrl = isProd
+  ? alchemy.env("CMS_API_URL")
+  : (process.env.CMS_API_URL ?? "http://localhost:3000");
+
+// Secrets - use process.env with defaults for dev, alchemy.env for prod (throws if missing)
+const getSecret = (name: string, devDefault: string = "dev-secret-placeholder") => {
+  if (isProd) {
+    return alchemy.env(name);
+  }
+  return process.env[name] ?? devDefault;
+};
 
 export const server = await Worker("server", {
   cwd: "../../apps/server",
@@ -53,12 +71,16 @@ export const server = await Worker("server", {
   bindings: {
     DB: db,
     CORS_ORIGIN: webUrl,
-    BETTER_AUTH_SECRET: alchemy.env.BETTER_AUTH_SECRET!,
+    BETTER_AUTH_SECRET: getSecret("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: serverUrl,
     CMS_API_URL: cmsUrl,
     SERVER_URL: serverUrl,
     // Cache invalidation secret (shared with CMS)
-    CACHE_INVALIDATION_SECRET: alchemy.env.CACHE_INVALIDATION_SECRET!,
+    CACHE_INVALIDATION_SECRET: getSecret("CACHE_INVALIDATION_SECRET"),
+    // CMS API key for authenticated requests to Payload CMS
+    // In dev, CMS allows unauthenticated access; in prod, this is required
+    // Generate in CMS admin panel: Users -> Create API user -> Enable API Key
+    CMS_API_KEY: getSecret("CMS_API_KEY", ""),
   },
 });
 
@@ -70,7 +92,7 @@ export const web = await TanStackStart("web", {
     VITE_SERVER_URL: serverUrl,
     DB: db,
     CORS_ORIGIN: webUrl,
-    BETTER_AUTH_SECRET: alchemy.env.BETTER_AUTH_SECRET!,
+    BETTER_AUTH_SECRET: getSecret("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: serverUrl,
     SERVER_URL: serverUrl,
   },

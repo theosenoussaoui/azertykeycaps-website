@@ -35,7 +35,8 @@
     "db:push": "turbo -F @azertykeycaps-app/db db:push",
     "db:generate": "turbo -F @azertykeycaps-app/db db:generate",
     "deploy": "turbo -F @azertykeycaps-app/infra deploy",
-    "destroy": "turbo -F @azertykeycaps-app/infra destroy"
+    "destroy": "turbo -F @azertykeycaps-app/infra destroy",
+    "prepare": "husky"
   },
   "dependencies": {
     "@azertykeycaps-app/env": "workspace:*",
@@ -46,6 +47,7 @@
     "@azertykeycaps-app/config": "workspace:*",
     "@cloudflare/workers-types": "catalog:",
     "@types/node": "catalog:",
+    "husky": "^9.1.7",
     "oxfmt": "^0.19.0",
     "oxlint": "^1.34.0",
     "turbo": "^2.6.3",

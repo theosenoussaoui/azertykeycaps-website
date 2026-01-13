@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { PROFILE_SHAPES } from "@azertykeycaps-app/schemas";
 import { collectionAfterChangeHook, collectionAfterDeleteHook } from "../hooks/cache-invalidation";
+import { isAuthenticated } from "../access/authenticated";
 
 export const KeycapProfiles: CollectionConfig = {
   slug: "keycap-profiles",
@@ -16,7 +17,7 @@ export const KeycapProfiles: CollectionConfig = {
     group: { fr: "Contenu", en: "Content" },
   },
   access: {
-    read: () => true,
+    read: isAuthenticated,
   },
   hooks: {
     afterChange: [collectionAfterChangeHook],

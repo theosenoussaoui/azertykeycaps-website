@@ -166,8 +166,6 @@ export function buildCacheKeys(
     // Globals
     homepage: ["articles.list", "articles.profiles"],
     "social-networks": [],
-    "dropshipping-info-page": [],
-    "dropshipping-sites-page": [],
   };
 
   const endpoints = endpointMap[slug] || [];

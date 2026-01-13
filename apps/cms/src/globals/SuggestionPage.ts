@@ -1,4 +1,5 @@
 import type { GlobalConfig } from "payload";
+import { isAuthenticated } from "../access/authenticated";
 
 export const SuggestionPage: GlobalConfig = {
   slug: "suggestion-page",
@@ -7,7 +8,7 @@ export const SuggestionPage: GlobalConfig = {
     group: { fr: "Pages", en: "Pages" },
   },
   access: {
-    read: () => true,
+    read: isAuthenticated,
   },
   fields: [
     {

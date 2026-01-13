@@ -2,6 +2,7 @@ import type { CollectionConfig } from "payload";
 
 import { ARTICLE_MATERIALS, ARTICLE_STATUS } from "@azertykeycaps-app/schemas";
 import { collectionAfterChangeHook, collectionAfterDeleteHook } from "../hooks/cache-invalidation";
+import { isAuthenticated } from "../access/authenticated";
 
 export const Articles: CollectionConfig = {
   slug: "articles",
@@ -16,7 +17,7 @@ export const Articles: CollectionConfig = {
     group: { fr: "Contenu", en: "Content" },
   },
   access: {
-    read: () => true,
+    read: isAuthenticated,
   },
   hooks: {
     afterChange: [collectionAfterChangeHook],

@@ -9,13 +9,33 @@ import {
 
 import { publicProcedure, router } from "../index";
 
+/**
+ * Fetch from CMS with API key authentication
+ * Uses Payload's API key format: "users API-Key <key>"
+ */
+function fetchCMS(url: string, apiKey: string | undefined): Promise<Response> {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  // Add API key auth header if available (required in production)
+  if (apiKey) {
+    headers["Authorization"] = `users API-Key ${apiKey}`;
+  }
+
+  return fetch(url, { headers });
+}
+
 export const globalsRouter = router({
   /**
    * Get social networks global
    */
   socialNetworks: publicProcedure.output(socialNetworksSchema.nullable()).query(async ({ ctx }) => {
     try {
-      const response = await fetch(`${ctx.env.CMS_API_URL}/api/globals/social-networks`);
+      const response = await fetchCMS(
+        `${ctx.env.CMS_API_URL}/api/globals/social-networks`,
+        ctx.env.CMS_API_KEY,
+      );
 
       if (!response.ok) {
         console.error(`CMS API error: ${response.status}`);
@@ -46,7 +66,10 @@ export const globalsRouter = router({
     .output(informationsPageSchema.nullable())
     .query(async ({ ctx }) => {
       try {
-        const response = await fetch(`${ctx.env.CMS_API_URL}/api/globals/informations-page`);
+        const response = await fetchCMS(
+          `${ctx.env.CMS_API_URL}/api/globals/informations-page`,
+          ctx.env.CMS_API_KEY,
+        );
 
         if (!response.ok) {
           console.error(`CMS API error: ${response.status}`);
@@ -75,7 +98,10 @@ export const globalsRouter = router({
    */
   suggestionPage: publicProcedure.output(suggestionPageSchema.nullable()).query(async ({ ctx }) => {
     try {
-      const response = await fetch(`${ctx.env.CMS_API_URL}/api/globals/suggestion-page`);
+      const response = await fetchCMS(
+        `${ctx.env.CMS_API_URL}/api/globals/suggestion-page`,
+        ctx.env.CMS_API_KEY,
+      );
 
       if (!response.ok) {
         console.error(`CMS API error: ${response.status}`);

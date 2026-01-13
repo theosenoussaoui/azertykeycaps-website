@@ -30,14 +30,11 @@ const CDN_INVALIDATION_MAP: Record<string, string[]> = {
   // Collections
   articles: ["/", "/articles"],
   "keycap-profiles": ["/", "/articles"],
-  "dropshipping-websites": ["/dropshipping"],
   media: [], // Media changes don't invalidate pages directly
 
   // Globals
   homepage: ["/"],
   "social-networks": ["/"],
-  "dropshipping-info-page": ["/dropshipping"],
-  "dropshipping-sites-page": ["/dropshipping"],
 };
 
 /**

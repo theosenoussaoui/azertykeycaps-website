@@ -27,25 +27,6 @@ export const homepageSchema = z.object({
 });
 
 // ============================================
-// DROPSHIPPING INFO PAGE GLOBAL
-// ============================================
-
-export const dropshippingInfoPageSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  youtubeUrl: z.string().nullable(),
-});
-
-// ============================================
-// DROPSHIPPING SITES PAGE GLOBAL
-// ============================================
-
-export const dropshippingSitesPageSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-});
-
-// ============================================
 // INFORMATIONS PAGE GLOBAL
 // ============================================
 
@@ -82,8 +63,6 @@ export const suggestionPageSchema = z.object({
 export type SocialNetworkItem = z.infer<typeof socialNetworkItemSchema>;
 export type SocialNetworks = z.infer<typeof socialNetworksSchema>;
 export type Homepage = z.infer<typeof homepageSchema>;
-export type DropshippingInfoPage = z.infer<typeof dropshippingInfoPageSchema>;
-export type DropshippingSitesPage = z.infer<typeof dropshippingSitesPageSchema>;
 export type Seo = z.infer<typeof seoSchema>;
 export type InformationsPage = z.infer<typeof informationsPageSchema>;
 export type SuggestionPage = z.infer<typeof suggestionPageSchema>;

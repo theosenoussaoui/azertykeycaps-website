@@ -13,13 +13,10 @@ import { Users } from "./collections/Users";
 import { Media } from "./collections/Media";
 import { Articles } from "./collections/Articles";
 import { KeycapProfiles } from "./collections/KeycapProfiles";
-import { DropshippingWebsites } from "./collections/DropshippingWebsites";
 
 // Globals
 import { Homepage } from "./globals/Homepage";
 import { SocialNetworks } from "./globals/SocialNetworks";
-import { DropshippingInfoPage } from "./globals/DropshippingInfoPage";
-import { DropshippingSitesPage } from "./globals/DropshippingSitesPage";
 import { InformationsPage } from "./globals/InformationsPage";
 import { SuggestionPage } from "./globals/SuggestionPage";
 
@@ -37,15 +34,8 @@ export default buildConfig({
     supportedLanguages: { fr, en },
     fallbackLanguage: "fr",
   },
-  collections: [Users, Media, Articles, KeycapProfiles, DropshippingWebsites],
-  globals: [
-    Homepage,
-    SocialNetworks,
-    DropshippingInfoPage,
-    DropshippingSitesPage,
-    InformationsPage,
-    SuggestionPage,
-  ],
+  collections: [Users, Media, Articles, KeycapProfiles],
+  globals: [Homepage, SocialNetworks, InformationsPage, SuggestionPage],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {

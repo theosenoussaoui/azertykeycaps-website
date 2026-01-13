@@ -7,9 +7,6 @@ export * from "./profiles";
 // Articles
 export * from "./articles";
 
-// Dropshipping
-export * from "./dropshipping";
-
 // Globals
 export * from "./globals";
 

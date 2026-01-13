@@ -23,15 +23,47 @@ function transformMediaUrls<T>(data: T, serverUrl: string): T {
   return JSON.parse(transformed);
 }
 
+/**
+ * Fetch from CMS with API key authentication
+ * Uses Payload's API key format: "users API-Key <key>"
+ */
+function fetchCMS(url: string, apiKey: string | undefined): Promise<Response> {
+  const headers: HeadersInit = {
+    "Content-Type": "application/json",
+  };
+
+  // Add API key auth header if available (required in production)
+  if (apiKey) {
+    headers["Authorization"] = `users API-Key ${apiKey}`;
+  }
+
+  return fetch(url, { headers });
+}
+
 export const articlesRouter = router({
   /**
    * List articles with pagination and filters
+   * Input is optional - defaults are applied when no input provided
    */
   list: publicProcedure
-    .input(articleListInputSchema)
+    .input(articleListInputSchema.optional())
     .output(articleListResponseSchema)
     .query(async ({ ctx, input }): Promise<ArticleListResponse> => {
-      const { limit, page, profile, status, material, isNew, search } = input;
+      // Safely parse and apply defaults from schema (limit: 12, page: 1)
+      const parsed = articleListInputSchema.safeParse(input ?? {});
+      if (!parsed.success) {
+        console.error("[articles.list] Input validation failed:", parsed.error.issues);
+        return {
+          docs: [],
+          totalDocs: 0,
+          totalPages: 0,
+          page: 1,
+          hasNextPage: false,
+          hasPrevPage: false,
+          error: "Invalid input parameters",
+        };
+      }
+      const { limit, page, profile, status, material, isNew, search } = parsed.data;
 
       try {
         // Build where clause using Payload query format
@@ -66,7 +98,10 @@ export const articlesRouter = router({
           { addQueryPrefix: true },
         );
 
-        const response = await fetch(`${ctx.env.CMS_API_URL}/api/articles${queryString}`);
+        const response = await fetchCMS(
+          `${ctx.env.CMS_API_URL}/api/articles${queryString}`,
+          ctx.env.CMS_API_KEY,
+        );
 
         if (!response.ok) {
           console.error(`CMS API error: ${response.status}`);
@@ -137,7 +172,10 @@ export const articlesRouter = router({
           { addQueryPrefix: true },
         );
 
-        const response = await fetch(`${ctx.env.CMS_API_URL}/api/articles${queryString}`);
+        const response = await fetchCMS(
+          `${ctx.env.CMS_API_URL}/api/articles${queryString}`,
+          ctx.env.CMS_API_KEY,
+        );
 
         if (!response.ok) {
           throw new TRPCError({
@@ -165,22 +203,33 @@ export const articlesRouter = router({
 
   /**
    * List keycap profiles for filters
+   * Input is optional - defaults are applied when no input provided
    */
   profiles: publicProcedure
-    .input(profileListInputSchema)
+    .input(profileListInputSchema.optional())
     .output(profileListResponseSchema)
     .query(async ({ ctx, input }) => {
+      // Safely parse and apply defaults from schema (limit: 100)
+      const parsed = profileListInputSchema.safeParse(input ?? {});
+      if (!parsed.success) {
+        console.error("[articles.profiles] Input validation failed:", parsed.error.issues);
+        return [];
+      }
+
       try {
         // Use qs-esm to properly format query string for Payload REST API
         const queryString = stringify(
           {
-            limit: input.limit,
+            limit: parsed.data.limit,
             sort: "title",
           },
           { addQueryPrefix: true },
         );
 
-        const response = await fetch(`${ctx.env.CMS_API_URL}/api/keycap-profiles${queryString}`);
+        const response = await fetchCMS(
+          `${ctx.env.CMS_API_URL}/api/keycap-profiles${queryString}`,
+          ctx.env.CMS_API_KEY,
+        );
 
         if (!response.ok) {
           console.error(`CMS API error: ${response.status}`);

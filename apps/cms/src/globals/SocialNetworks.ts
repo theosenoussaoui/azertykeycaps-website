@@ -1,5 +1,6 @@
 import type { GlobalConfig } from "payload";
 import { globalAfterChangeHook } from "../hooks/cache-invalidation";
+import { isAuthenticated } from "../access/authenticated";
 
 export const SocialNetworks: GlobalConfig = {
   slug: "social-networks",
@@ -8,7 +9,7 @@ export const SocialNetworks: GlobalConfig = {
     group: { fr: "Configuration", en: "Settings" },
   },
   access: {
-    read: () => true,
+    read: isAuthenticated,
   },
   hooks: {
     afterChange: [globalAfterChangeHook],

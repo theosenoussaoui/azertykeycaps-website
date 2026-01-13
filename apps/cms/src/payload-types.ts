@@ -71,7 +71,6 @@ export interface Config {
     media: Media;
     articles: Article;
     "keycap-profiles": KeycapProfile;
-    "dropshipping-websites": DropshippingWebsite;
     "payload-kv": PayloadKv;
     "payload-locked-documents": PayloadLockedDocument;
     "payload-preferences": PayloadPreference;
@@ -83,7 +82,6 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
     "keycap-profiles": KeycapProfilesSelect<false> | KeycapProfilesSelect<true>;
-    "dropshipping-websites": DropshippingWebsitesSelect<false> | DropshippingWebsitesSelect<true>;
     "payload-kv": PayloadKvSelect<false> | PayloadKvSelect<true>;
     "payload-locked-documents":
       | PayloadLockedDocumentsSelect<false>
@@ -98,18 +96,12 @@ export interface Config {
   globals: {
     homepage: Homepage;
     "social-networks": SocialNetwork;
-    "dropshipping-info-page": DropshippingInfoPage;
-    "dropshipping-sites-page": DropshippingSitesPage;
     "informations-page": InformationsPage;
     "suggestion-page": SuggestionPage;
   };
   globalsSelect: {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     "social-networks": SocialNetworksSelect<false> | SocialNetworksSelect<true>;
-    "dropshipping-info-page": DropshippingInfoPageSelect<false> | DropshippingInfoPageSelect<true>;
-    "dropshipping-sites-page":
-      | DropshippingSitesPageSelect<false>
-      | DropshippingSitesPageSelect<true>;
     "informations-page": InformationsPageSelect<false> | InformationsPageSelect<true>;
     "suggestion-page": SuggestionPageSelect<false> | SuggestionPageSelect<true>;
   };
@@ -146,8 +138,15 @@ export interface UserAuthOperations {
  */
 export interface User {
   id: number;
+  /**
+   * API role is for server integrations using API keys
+   */
+  role: "admin" | "api";
   updatedAt: string;
   createdAt: string;
+  enableAPIKey?: boolean | null;
+  apiKey?: string | null;
+  apiKeyIndex?: string | null;
   email: string;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
@@ -272,36 +271,6 @@ export interface KeycapProfile {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "dropshipping-websites".
- */
-export interface DropshippingWebsite {
-  id: number;
-  title: string;
-  slug: string;
-  banner?: (number | null) | Media;
-  description?: string | null;
-  /**
-   * Examples of products available on this site
-   */
-  examples?: string | null;
-  categories?:
-    | (
-        | "accessories"
-        | "artisans"
-        | "keyboards"
-        | "cables"
-        | "keycaps"
-        | "pcb"
-        | "plates"
-        | "switches"
-      )[]
-    | null;
-  url: string;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -339,10 +308,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: "keycap-profiles";
         value: number | KeycapProfile;
-      } | null)
-    | ({
-        relationTo: "dropshipping-websites";
-        value: number | DropshippingWebsite;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -391,8 +356,12 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  role?: T;
   updatedAt?: T;
   createdAt?: T;
+  enableAPIKey?: T;
+  apiKey?: T;
+  apiKeyIndex?: T;
   email?: T;
   resetPasswordToken?: T;
   resetPasswordExpiration?: T;
@@ -461,21 +430,6 @@ export interface KeycapProfilesSelect<T extends boolean = true> {
   thumbnail?: T;
   shape?: T;
   navbarIconName?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "dropshipping-websites_select".
- */
-export interface DropshippingWebsitesSelect<T extends boolean = true> {
-  title?: T;
-  slug?: T;
-  banner?: T;
-  description?: T;
-  examples?: T;
-  categories?: T;
-  url?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -556,32 +510,6 @@ export interface SocialNetwork {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "dropshipping-info-page".
- */
-export interface DropshippingInfoPage {
-  id: number;
-  title: string;
-  description: string;
-  /**
-   * Link to an explanatory video
-   */
-  youtubeUrl?: string | null;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "dropshipping-sites-page".
- */
-export interface DropshippingSitesPage {
-  id: number;
-  title: string;
-  description: string;
-  updatedAt?: string | null;
-  createdAt?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "informations-page".
  */
 export interface InformationsPage {
@@ -653,29 +581,6 @@ export interface SocialNetworksSelect<T extends boolean = true> {
         iconText?: T;
         id?: T;
       };
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "dropshipping-info-page_select".
- */
-export interface DropshippingInfoPageSelect<T extends boolean = true> {
-  title?: T;
-  description?: T;
-  youtubeUrl?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  globalType?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "dropshipping-sites-page_select".
- */
-export interface DropshippingSitesPageSelect<T extends boolean = true> {
-  title?: T;
-  description?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

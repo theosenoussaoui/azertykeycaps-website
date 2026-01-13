@@ -143,15 +143,16 @@ Go to **Settings → Secrets and variables → Actions** in your GitHub reposito
 
 #### App Environment (7 secrets)
 
-| Secret                      | Description                   | Example                             |
-| --------------------------- | ----------------------------- | ----------------------------------- |
-| `CORS_ORIGIN`               | Allowed CORS origin           | `https://azertykeycaps.fr`          |
-| `BETTER_AUTH_SECRET`        | Auth encryption key           | Generate: `openssl rand -base64 32` |
-| `BETTER_AUTH_URL`           | Auth callback URL             | `https://api.azertykeycaps.fr`      |
-| `VITE_SERVER_URL`           | Server URL for web app        | `https://api.azertykeycaps.fr`      |
-| `CMS_API_URL`               | Payload CMS API URL           | `https://cms.azertykeycaps.fr`      |
-| `SERVER_URL`                | Server self-reference         | `https://api.azertykeycaps.fr`      |
-| `CACHE_INVALIDATION_SECRET` | Shared secret for cache purge | Generate: `openssl rand -base64 32` |
+| Secret                      | Description                   | Example                                 |
+| --------------------------- | ----------------------------- | --------------------------------------- |
+| `CORS_ORIGIN`               | Allowed CORS origin           | `https://azertykeycaps.fr`              |
+| `BETTER_AUTH_SECRET`        | Auth encryption key           | Generate: `openssl rand -base64 32`     |
+| `BETTER_AUTH_URL`           | Auth callback URL             | `https://api.azertykeycaps.fr`          |
+| `VITE_SERVER_URL`           | Server URL for web app        | `https://api.azertykeycaps.fr`          |
+| `CMS_API_URL`               | Payload CMS API URL           | `https://cms.azertykeycaps.fr`          |
+| `SERVER_URL`                | Server self-reference         | `https://api.azertykeycaps.fr`          |
+| `CACHE_INVALIDATION_SECRET` | Shared secret for cache purge | Generate: `openssl rand -base64 32`     |
+| `CMS_API_KEY`               | Payload CMS API key           | Generate in CMS admin panel (see below) |
 
 #### Vercel & CMS (10 secrets)
 
@@ -188,6 +189,7 @@ VITE_SERVER_URL=https://api.azertykeycaps.fr
 CMS_API_URL=https://cms.azertykeycaps.fr
 SERVER_URL=https://api.azertykeycaps.fr
 CACHE_INVALIDATION_SECRET=<openssl rand -base64 32>
+CMS_API_KEY=<from cms admin panel - see instructions below>
 # After going live, change CORS_ORIGIN to: https://azertykeycaps.fr
 
 # Vercel & CMS
@@ -202,6 +204,27 @@ BLOB_READ_WRITE_TOKEN=<from vercel blob integration>
 CACHE_INVALIDATION_URL=https://api.azertykeycaps.fr/api/cache/invalidate
 WEB_URL=https://azertykeycaps.fr
 ```
+
+## Generating CMS API Key
+
+After deploying the CMS, you need to generate an API key for the server to authenticate with the CMS:
+
+1. Go to your CMS admin panel: `https://cms.azertykeycaps.fr/admin`
+2. Login with your admin account
+3. Navigate to **Users** collection
+4. Click **Create New User**
+5. Fill in:
+   - Email: `api@azertykeycaps.fr` (or any email)
+   - Password: Generate a strong password
+   - Role: Select **API**
+6. Save the user
+7. Edit the user you just created
+8. Scroll down to find **Enable API Key** checkbox
+9. Check it and click **Save**
+10. Copy the generated API key
+11. Add it as `CMS_API_KEY` secret in GitHub Actions
+
+**Important:** The API key is only shown once when generated. If you lose it, you'll need to regenerate it.
 
 ## Preview Deployments
 
@@ -301,6 +324,7 @@ cd apps/cms && vercel --prod
 | `BETTER_AUTH_SECRET`        | ✅  | ✅     | -   | ✅            |
 | `BETTER_AUTH_URL`           | ✅  | ✅     | -   | ✅            |
 | `CMS_API_URL`               | -   | ✅     | -   | ✅            |
+| `CMS_API_KEY`               | -   | ✅     | -   | ✅            |
 | `CACHE_INVALIDATION_SECRET` | -   | ✅     | ✅  | ✅            |
 | `CACHE_INVALIDATION_URL`    | -   | -      | ✅  | ✅            |
 | `CLOUDFLARE_ZONE_ID`        | -   | -      | ✅  | ✅            |

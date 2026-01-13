@@ -1,5 +1,6 @@
 import type { GlobalConfig } from "payload";
 import { globalAfterChangeHook } from "../hooks/cache-invalidation";
+import { isAuthenticated } from "../access/authenticated";
 
 export const Homepage: GlobalConfig = {
   slug: "homepage",
@@ -8,7 +9,7 @@ export const Homepage: GlobalConfig = {
     group: { fr: "Pages", en: "Pages" },
   },
   access: {
-    read: () => true,
+    read: isAuthenticated,
   },
   hooks: {
     afterChange: [globalAfterChangeHook],
