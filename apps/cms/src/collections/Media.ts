@@ -19,5 +19,28 @@ export const Media: CollectionConfig = {
       required: true,
     },
   ],
-  upload: true,
+  upload: {
+    imageSizes: [
+      {
+        name: "thumbnail",
+        width: 400,
+        height: 225, // 16:9 aspect ratio
+        position: "centre",
+      },
+      {
+        name: "card",
+        width: 768,
+        height: 432, // 16:9 aspect ratio
+        position: "centre",
+      },
+    ],
+    formatOptions: {
+      format: "webp",
+      options: {
+        quality: 80,
+      },
+    },
+    adminThumbnail: "thumbnail",
+    mimeTypes: ["image/*"],
+  },
 };

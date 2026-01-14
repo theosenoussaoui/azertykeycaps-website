@@ -17,7 +17,13 @@ export function ArticleCard({ article }: ArticleCardProps) {
     <Link to="/articles/$slug" params={{ slug: article.slug }}>
       <Card className="h-full transition-shadow hover:shadow-lg">
         <img
-          src={article.img.url}
+          src={article.img.sizes?.card?.url ?? article.img.url}
+          srcSet={
+            article.img.sizes
+              ? `${article.img.sizes.thumbnail?.url ?? article.img.url} 400w, ${article.img.sizes.card?.url ?? article.img.url} 768w`
+              : undefined
+          }
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           alt={article.img.alt}
           className="aspect-video w-full object-cover"
           loading="lazy"
