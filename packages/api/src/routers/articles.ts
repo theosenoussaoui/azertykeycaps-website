@@ -38,7 +38,7 @@ class CMSError extends Error {
   }
 }
 
-const CMS_CACHE_TTL = 600;
+const CMS_CACHE_TTL = 604800;
 
 /**
  * Fetch from CMS with API key authentication and optional edge caching

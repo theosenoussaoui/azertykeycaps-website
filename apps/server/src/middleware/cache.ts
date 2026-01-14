@@ -122,8 +122,14 @@ export async function purgeCloudflareCDN(
   type: "collection" | "global",
   slug: string,
   articleSlug?: string,
+  serverUrl?: string,
 ): Promise<{ success: boolean; message: string; purgedUrls?: string[] }> {
   const urlsToPurge: string[] = [];
+
+  if (serverUrl) {
+    const apiEndpoints = buildCacheKeys(serverUrl, type, slug);
+    urlsToPurge.push(...apiEndpoints);
+  }
 
   if (type === "collection") {
     switch (slug) {
@@ -158,6 +164,8 @@ export async function purgeCloudflareCDN(
       message: "No CDN URLs to purge for this content type",
     };
   }
+
+  console.log("[cache] URLs to purge:", urlsToPurge);
 
   try {
     const response = await fetch(

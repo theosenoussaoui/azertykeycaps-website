@@ -125,6 +125,7 @@ app.post("/api/cache/invalidate", async (c) => {
         type,
         slug,
         articleSlug,
+        env.SERVER_URL,
       );
       console.log(`[cache] CDN cache: ${cdnResult.message}`);
     }
