@@ -133,7 +133,17 @@ async function invalidateCDNCache(slug: string): Promise<void> {
  * Invalidates both server cache and CDN cache in parallel
  */
 async function invalidateAllCaches(slug: string, id?: string | number): Promise<void> {
-  console.log(`[cache-invalidation] Triggered for ${slug}${id ? ` (id: ${id})` : ""}`);
+  console.warn(`[cache-invalidation] Triggered for ${slug}${id ? ` (id: ${id})` : ""}`);
+  console.warn("[cache-invalidation] ENV CHECK:", {
+    hasUrl: !!process.env.CACHE_INVALIDATION_URL,
+    hasSecret: !!process.env.CACHE_INVALIDATION_SECRET,
+    hasZoneId: !!process.env.CLOUDFLARE_ZONE_ID,
+    hasApiToken: !!process.env.CLOUDFLARE_API_TOKEN,
+    hasWebUrl: !!process.env.WEB_URL,
+    envKeys: Object.keys(process.env).filter(
+      (k) => k.includes("CACHE") || k.includes("CLOUD") || k.includes("WEB_URL"),
+    ),
+  });
 
   await Promise.all([invalidateServerCache(slug, id), invalidateCDNCache(slug)]);
 }
