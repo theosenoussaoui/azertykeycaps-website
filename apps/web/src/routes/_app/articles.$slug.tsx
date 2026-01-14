@@ -42,10 +42,12 @@ export const Route = createFileRoute("/_app/articles/$slug")({
 
     return { article };
   },
-  // ISR: Cache for 1 hour, serve stale for 24 hours while revalidating
   headers: () => ({
     "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+    "CDN-Cache-Control": "max-age=7200",
   }),
+  staleTime: 5 * 60_000, // Client considers data fresh for 5 minutes
+  gcTime: 30 * 60_000, // Keep in memory for 30 minutes
 });
 
 function ArticleDetailPage() {

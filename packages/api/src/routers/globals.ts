@@ -9,21 +9,32 @@ import {
 
 import { publicProcedure, router } from "../index";
 
+const CMS_CACHE_TTL = 86400;
+
 /**
- * Fetch from CMS with API key authentication
+ * Fetch from CMS with API key authentication and optional edge caching
  * Uses Payload's API key format: "users API-Key <key>"
+ * When cacheTtl is provided, uses Cloudflare's edge cache via cf options
  */
-function fetchCMS(url: string, apiKey: string | undefined): Promise<Response> {
+function fetchCMS(url: string, apiKey: string | undefined, cacheTtl?: number): Promise<Response> {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
 
-  // Add API key auth header if available (required in production)
   if (apiKey) {
     headers["Authorization"] = `users API-Key ${apiKey}`;
   }
 
-  return fetch(url, { headers });
+  const fetchOptions: RequestInit & { cf?: object } = { headers };
+
+  if (cacheTtl) {
+    fetchOptions.cf = {
+      cacheTtl,
+      cacheEverything: true,
+    };
+  }
+
+  return fetch(url, fetchOptions);
 }
 
 export const globalsRouter = router({
@@ -35,6 +46,7 @@ export const globalsRouter = router({
       const response = await fetchCMS(
         `${ctx.env.CMS_API_URL}/api/globals/social-networks`,
         ctx.env.CMS_API_KEY,
+        ctx.isDev ? undefined : CMS_CACHE_TTL,
       );
 
       if (!response.ok) {
@@ -69,6 +81,7 @@ export const globalsRouter = router({
         const response = await fetchCMS(
           `${ctx.env.CMS_API_URL}/api/globals/informations-page`,
           ctx.env.CMS_API_KEY,
+          ctx.isDev ? undefined : CMS_CACHE_TTL,
         );
 
         if (!response.ok) {
@@ -101,6 +114,7 @@ export const globalsRouter = router({
       const response = await fetchCMS(
         `${ctx.env.CMS_API_URL}/api/globals/suggestion-page`,
         ctx.env.CMS_API_KEY,
+        ctx.isDev ? undefined : CMS_CACHE_TTL,
       );
 
       if (!response.ok) {

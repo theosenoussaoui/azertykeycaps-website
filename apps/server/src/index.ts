@@ -9,10 +9,10 @@ import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
 import {
-  cmsCacheMiddleware,
   mediaCacheMiddleware,
   invalidateCache,
   buildCacheKeys,
+  purgeCloudflareCDN,
   CACHE_NAMES,
 } from "./middleware/cache";
 
@@ -37,9 +37,6 @@ app.use(
 );
 
 app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
-
-// Apply cache middleware to tRPC endpoints (CMS data)
-app.use("/trpc/*", cmsCacheMiddleware);
 
 app.use(
   "/trpc/*",
@@ -82,16 +79,7 @@ app.get("/api/media/*", async (c) => {
   }
 });
 
-/**
- * Cache invalidation endpoint
- * Called by CMS webhook when content changes
- *
- * POST /api/cache/invalidate
- * Headers: Authorization: Bearer <CACHE_INVALIDATION_SECRET>
- * Body: { type: "collection" | "global", slug: string, id?: string }
- */
 app.post("/api/cache/invalidate", async (c) => {
-  // Verify authorization
   const authHeader = c.req.header("Authorization");
   const expectedToken = `Bearer ${env.CACHE_INVALIDATION_SECRET}`;
 
@@ -105,25 +93,40 @@ app.post("/api/cache/invalidate", async (c) => {
       type: "collection" | "global";
       slug: string;
       id?: string;
+      articleSlug?: string;
     }>();
 
-    const { type, slug, id } = body;
+    const { type, slug, id, articleSlug } = body;
 
     console.log(`[cache] Invalidation request: type=${type}, slug=${slug}, id=${id || "N/A"}`);
 
-    // Build cache keys to invalidate based on what changed
     const cacheKeys = buildCacheKeys(env.SERVER_URL, type, slug);
 
-    // Invalidate CMS API cache
     const cmsResult = await invalidateCache(CACHE_NAMES.CMS_API, cacheKeys);
     console.log(`[cache] CMS cache: ${cmsResult.message}`);
 
-    // If media was updated, also invalidate media cache
     let mediaResult = { success: true, message: "Skipped (not media)" };
     if (slug === "media" && id) {
       const mediaKeys = [`${env.SERVER_URL}/api/media/${id}`];
       mediaResult = await invalidateCache(CACHE_NAMES.MEDIA, mediaKeys);
       console.log(`[cache] Media cache: ${mediaResult.message}`);
+    }
+
+    let cdnResult: { success: boolean; message: string; purgedUrls?: string[] } = {
+      success: true,
+      message: "Skipped (CF credentials not configured)",
+    };
+
+    if (env.CF_ZONE_ID && env.CF_API_TOKEN) {
+      cdnResult = await purgeCloudflareCDN(
+        env.CF_ZONE_ID,
+        env.CF_API_TOKEN,
+        env.CORS_ORIGIN,
+        type,
+        slug,
+        articleSlug,
+      );
+      console.log(`[cache] CDN cache: ${cdnResult.message}`);
     }
 
     return c.json({
@@ -134,6 +137,7 @@ app.post("/api/cache/invalidate", async (c) => {
       results: {
         cms: cmsResult,
         media: mediaResult,
+        cdn: cdnResult,
       },
     });
   } catch (error) {
@@ -150,6 +154,57 @@ app.post("/api/cache/invalidate", async (c) => {
 
 app.get("/", (c) => {
   return c.text("OK");
+});
+
+// Debug endpoint to test CMS connection
+app.get("/debug/cms", async (c) => {
+  const cmsUrl = env.CMS_API_URL;
+  const apiKey = env.CMS_API_KEY;
+
+  console.log("[DEBUG] CMS_API_URL:", cmsUrl);
+  console.log("[DEBUG] CMS_API_KEY:", apiKey ? `${apiKey.slice(0, 8)}...` : "NOT SET");
+
+  const testUrl = `${cmsUrl}/api/articles?limit=1`;
+  console.log("[DEBUG] Testing URL:", testUrl);
+
+  try {
+    const headers: HeadersInit = {
+      "Content-Type": "application/json",
+    };
+    if (apiKey) {
+      headers["Authorization"] = `users API-Key ${apiKey}`;
+    }
+
+    console.log("[DEBUG] Request headers:", JSON.stringify(headers));
+
+    const response = await fetch(testUrl, { headers });
+
+    console.log("[DEBUG] Response status:", response.status);
+    const body = await response.text();
+    console.log("[DEBUG] Response body:", body.slice(0, 500));
+
+    return c.json({
+      success: response.ok,
+      status: response.status,
+      cmsUrl,
+      apiKeySet: !!apiKey,
+      testUrl,
+      responsePreview: body.slice(0, 200),
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    console.error("[DEBUG] Fetch failed:", message);
+    console.error("[DEBUG] Full error:", error);
+
+    return c.json({
+      success: false,
+      error: message,
+      cmsUrl,
+      apiKeySet: !!apiKey,
+      testUrl,
+      errorType: error instanceof Error ? error.constructor.name : typeof error,
+    });
+  }
 });
 
 export default app;

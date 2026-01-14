@@ -43,19 +43,14 @@ export const Route = createFileRoute("/_app/profile/$slug")({
   component: ProfilePage,
   loader: async ({ params }) => {
     const data = await getArticlesByProfile({ data: { slug: params.slug } });
-
-    // If no articles found, the profile might not exist
-    if (data.articles.docs.length === 0) {
-      // We still render the page but show a "no articles" message
-      // You could also throw notFound() here if preferred
-    }
-
     return data;
   },
-  // ISR: Cache for 1 hour, serve stale for 24 hours while revalidating
   headers: () => ({
     "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+    "CDN-Cache-Control": "max-age=7200",
   }),
+  staleTime: 5 * 60_000, // Client considers data fresh for 5 minutes
+  gcTime: 30 * 60_000, // Keep in memory for 30 minutes
   head: ({ loaderData }) => {
     const profileTitle = loaderData?.articles.docs[0]?.profile?.title ?? loaderData?.profileSlug;
     const articleCount = loaderData?.articles.totalDocs ?? 0;

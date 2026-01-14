@@ -48,11 +48,11 @@ export const Route = createFileRoute("/_app")({
       profiles: data.profiles,
     };
   },
-  // ISR: Cache layout data (header/footer) for 1 hour
-  // This data rarely changes and is safe to cache
   headers: () => ({
     "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
   }),
+  staleTime: 10 * 60_000, // Client considers data fresh for 10 minutes
+  gcTime: 60 * 60_000, // Keep in memory for 1 hour
   component: AppLayout,
 });
 

@@ -11,10 +11,14 @@ export default defineConfig({
     tailwindcss(),
     tanstackStart({
       prerender: {
-        // Disable prerendering until API is live
-        // Pages that fetch from API during build will fail otherwise
-        enabled: false,
+        enabled: true,
+        crawlLinks: false,
+        failOnError: false,
       },
+      pages: [
+        { path: "/about", prerender: { enabled: true } },
+        { path: "/suggest", prerender: { enabled: true } },
+      ],
     }),
     viteReact(),
     alchemy(),

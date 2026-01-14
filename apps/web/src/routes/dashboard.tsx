@@ -14,6 +14,7 @@ export const getPrivateData = createServerFn({ method: "GET" }).handler(async ()
   const caller = appRouter.createCaller({
     session,
     env: process.env as unknown as Env,
+    isDev: process.env.NODE_ENV !== "production",
   });
 
   // Call tRPC procedure - happens server-side only with auth

@@ -10,7 +10,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
 import UserMenu from "./user-menu";
 
 interface HeaderProps {
@@ -38,13 +37,7 @@ export default function Header({ profiles }: HeaderProps) {
             {profiles && profiles.length > 0 && (
               <DropdownMenu>
                 <DropdownMenuTrigger>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground hover:text-foreground"
-                  >
-                    {i18n.nav.profiles}
-                  </Button>
+                  <div className="flex items-center gap-2">{i18n.nav.profiles}</div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start">
                   {profiles.map((profile) => (

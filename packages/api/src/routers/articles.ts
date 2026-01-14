@@ -24,20 +24,89 @@ function transformMediaUrls<T>(data: T, serverUrl: string): T {
 }
 
 /**
- * Fetch from CMS with API key authentication
- * Uses Payload's API key format: "users API-Key <key>"
+ * CMS fetch error with detailed information
  */
-function fetchCMS(url: string, apiKey: string | undefined): Promise<Response> {
+class CMSError extends Error {
+  constructor(
+    message: string,
+    public readonly code: "NETWORK_ERROR" | "AUTH_ERROR" | "NOT_FOUND" | "SERVER_ERROR" | "UNKNOWN",
+    public readonly status?: number,
+    public readonly url?: string,
+  ) {
+    super(message);
+    this.name = "CMSError";
+  }
+}
+
+const CMS_CACHE_TTL = 86400;
+
+/**
+ * Fetch from CMS with API key authentication and optional edge caching
+ * Uses Payload's API key format: "users API-Key <key>"
+ * When cacheTtl is provided, uses Cloudflare's edge cache via cf options
+ */
+async function fetchCMS(
+  url: string,
+  apiKey: string | undefined,
+  cacheTtl?: number,
+): Promise<Response> {
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
 
-  // Add API key auth header if available (required in production)
   if (apiKey) {
     headers["Authorization"] = `users API-Key ${apiKey}`;
   }
 
-  return fetch(url, { headers });
+  const fetchOptions: RequestInit & { cf?: object } = { headers };
+
+  if (cacheTtl) {
+    fetchOptions.cf = {
+      cacheTtl,
+      cacheEverything: true,
+    };
+  }
+
+  try {
+    const response = await fetch(url, fetchOptions);
+
+    if (!response.ok) {
+      const errorBody = await response.text().catch(() => "Unable to read error body");
+      console.error("[CMS] Error response body:", errorBody);
+
+      if (response.status === 401 || response.status === 403) {
+        throw new CMSError(
+          `CMS authentication failed: ${errorBody}`,
+          "AUTH_ERROR",
+          response.status,
+          url,
+        );
+      }
+      if (response.status === 404) {
+        throw new CMSError(`CMS endpoint not found: ${url}`, "NOT_FOUND", response.status, url);
+      }
+      if (response.status >= 500) {
+        throw new CMSError(`CMS server error: ${errorBody}`, "SERVER_ERROR", response.status, url);
+      }
+      throw new CMSError(
+        `CMS request failed: ${response.status} - ${errorBody}`,
+        "UNKNOWN",
+        response.status,
+        url,
+      );
+    }
+
+    return response;
+  } catch (error) {
+    if (error instanceof CMSError) throw error;
+
+    // Network-level errors (connection refused, DNS failure, etc.)
+    const message = error instanceof Error ? error.message : "Unknown network error";
+    console.error("[CMS] Network error:", message);
+    console.error("[CMS] Full error:", error);
+
+    throw new CMSError(`CMS network error: ${message}`, "NETWORK_ERROR", undefined, url);
+  }
 }
 
 export const articlesRouter = router({
@@ -101,20 +170,8 @@ export const articlesRouter = router({
         const response = await fetchCMS(
           `${ctx.env.CMS_API_URL}/api/articles${queryString}`,
           ctx.env.CMS_API_KEY,
+          ctx.isDev ? undefined : CMS_CACHE_TTL,
         );
-
-        if (!response.ok) {
-          console.error(`CMS API error: ${response.status}`);
-          return {
-            docs: [],
-            totalDocs: 0,
-            totalPages: 0,
-            page: 1,
-            hasNextPage: false,
-            hasPrevPage: false,
-            error: "Failed to fetch articles from CMS",
-          };
-        }
 
         const data = (await response.json()) as ArticleListResponse;
 
@@ -137,7 +194,15 @@ export const articlesRouter = router({
 
         return output;
       } catch (error) {
-        console.error("Failed to fetch articles:", error);
+        console.error("[articles.list] Failed:", error);
+
+        let errorMessage = "Unknown error";
+        if (error instanceof CMSError) {
+          errorMessage = `[${error.code}] ${error.message}`;
+        } else if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+
         return {
           docs: [],
           totalDocs: 0,
@@ -145,7 +210,7 @@ export const articlesRouter = router({
           page: 1,
           hasNextPage: false,
           hasPrevPage: false,
-          error: error instanceof Error ? error.message : "Unknown error",
+          error: errorMessage,
         };
       }
     }),
@@ -175,6 +240,7 @@ export const articlesRouter = router({
         const response = await fetchCMS(
           `${ctx.env.CMS_API_URL}/api/articles${queryString}`,
           ctx.env.CMS_API_KEY,
+          ctx.isDev ? undefined : CMS_CACHE_TTL,
         );
 
         if (!response.ok) {
@@ -229,6 +295,7 @@ export const articlesRouter = router({
         const response = await fetchCMS(
           `${ctx.env.CMS_API_URL}/api/keycap-profiles${queryString}`,
           ctx.env.CMS_API_KEY,
+          ctx.isDev ? undefined : CMS_CACHE_TTL,
         );
 
         if (!response.ok) {

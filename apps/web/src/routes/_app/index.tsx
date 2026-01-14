@@ -57,11 +57,11 @@ export const Route = createFileRoute("/_app/")({
     const data = await getHomePageData({ data: search });
     return data;
   },
-  // ISR: Cache for 1 hour, serve stale for 24 hours while revalidating
-  // Query params (filters) are part of the cache key automatically
   headers: () => ({
-    "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
+  staleTime: 60_000,
+  gcTime: 5 * 60_000,
   head: () => {
     const i18n = t();
     return {

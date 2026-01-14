@@ -6,7 +6,7 @@ import { config } from "dotenv";
 
 config({ path: "./.env" });
 config({ path: "../../apps/web/.env" });
-config({ path: "../../apps/server/.env" });
+config({ path: "../../apps/server/.env", override: true });
 
 const stage = process.env.STAGE ?? "dev";
 const isProd = stage === "prod";
@@ -66,7 +66,6 @@ export const server = await Worker("server", {
   cwd: "../../apps/server",
   entrypoint: "src/index.ts",
   compatibility: "node",
-  // Attach custom domain in production (Alchemy manages DNS automatically)
   domains: isProd && API_DOMAIN ? [API_DOMAIN] : undefined,
   bindings: {
     DB: db,
@@ -75,18 +74,15 @@ export const server = await Worker("server", {
     BETTER_AUTH_URL: serverUrl,
     CMS_API_URL: cmsUrl,
     SERVER_URL: serverUrl,
-    // Cache invalidation secret (shared with CMS)
     CACHE_INVALIDATION_SECRET: getSecret("CACHE_INVALIDATION_SECRET"),
-    // CMS API key for authenticated requests to Payload CMS
-    // In dev, CMS allows unauthenticated access; in prod, this is required
-    // Generate in CMS admin panel: Users -> Create API user -> Enable API Key
     CMS_API_KEY: getSecret("CMS_API_KEY", ""),
+    CF_ZONE_ID: getSecret("CF_ZONE_ID", ""),
+    CF_API_TOKEN: getSecret("CF_API_TOKEN", ""),
   },
 });
 
 export const web = await TanStackStart("web", {
   cwd: "../../apps/web",
-  // Attach custom domain in production (Alchemy manages DNS automatically)
   domains: isProd && WEB_DOMAIN ? [WEB_DOMAIN] : undefined,
   bindings: {
     VITE_SERVER_URL: serverUrl,
@@ -101,6 +97,10 @@ export const web = await TanStackStart("web", {
 console.log(`Stage  -> ${stage}`);
 console.log(`Web    -> ${webUrl}`);
 console.log(`Server -> ${serverUrl}`);
+console.log(`CMS    -> ${cmsUrl}`);
+console.log(
+  `CMS_API_KEY -> ${process.env.CMS_API_KEY ? "set (" + process.env.CMS_API_KEY.slice(0, 8) + "...)" : "NOT SET"}`,
+);
 
 // GitHub PR comment for preview deployments
 if (process.env.PULL_REQUEST) {
