@@ -102,6 +102,8 @@ export function buildCacheKeys(
     media: [],
     homepage: ["articles.list", "articles.profiles"],
     "social-networks": [],
+    "informations-page": ["globals.informationsPage"],
+    "suggestion-page": ["globals.suggestionPage"],
   };
 
   const endpoints = endpointMap[slug] || [];
@@ -139,6 +141,9 @@ export async function purgeCloudflareCDN(
     switch (slug) {
       case "informations-page":
         urlsToPurge.push(`${webUrl}/about`);
+        break;
+      case "suggestion-page":
+        urlsToPurge.push(`${webUrl}/suggest`);
         break;
       case "social-networks":
         urlsToPurge.push(`${webUrl}/`);

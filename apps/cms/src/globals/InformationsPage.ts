@@ -1,5 +1,6 @@
 import type { GlobalConfig } from "payload";
 import { isAuthenticated } from "../access/authenticated";
+import { globalAfterChangeHook } from "../hooks/cache-invalidation";
 
 export const InformationsPage: GlobalConfig = {
   slug: "informations-page",
@@ -9,6 +10,9 @@ export const InformationsPage: GlobalConfig = {
   },
   access: {
     read: isAuthenticated,
+  },
+  hooks: {
+    afterChange: [globalAfterChangeHook],
   },
   fields: [
     {

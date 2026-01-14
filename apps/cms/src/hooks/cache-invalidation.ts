@@ -30,11 +30,13 @@ const CDN_INVALIDATION_MAP: Record<string, string[]> = {
   // Collections
   articles: ["/", "/articles"],
   "keycap-profiles": ["/", "/articles"],
-  media: [], // Media changes don't invalidate pages directly
+  media: [],
 
   // Globals
   homepage: ["/"],
   "social-networks": ["/"],
+  "informations-page": ["/about"],
+  "suggestion-page": ["/suggest"],
 };
 
 /**
