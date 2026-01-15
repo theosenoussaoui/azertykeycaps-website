@@ -43,7 +43,7 @@ export const Route = createFileRoute("/_app/articles/$slug")({
     return { article };
   },
   headers: () => ({
-    "Cache-Control": "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400",
+    "Cache-Control": "public, max-age=604800, s-maxage=604800, stale-while-revalidate=86400",
     "CDN-Cache-Control": "max-age=7200",
   }),
   staleTime: 5 * 60_000, // Client considers data fresh for 5 minutes

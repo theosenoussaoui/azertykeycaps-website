@@ -11,14 +11,8 @@ export default defineConfig({
     tailwindcss(),
     tanstackStart({
       prerender: {
-        enabled: true,
-        crawlLinks: false,
-        failOnError: false,
+        enabled: false,
       },
-      pages: [
-        { path: "/about", prerender: { enabled: true } },
-        { path: "/suggest", prerender: { enabled: true } },
-      ],
     }),
     viteReact(),
     alchemy(),

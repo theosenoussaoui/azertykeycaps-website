@@ -38,7 +38,9 @@ class CMSError extends Error {
   }
 }
 
-const CMS_CACHE_TTL = 604800;
+// Disabled: cf.cacheTtl subrequest cache can't be purged via Cloudflare API
+// Relying on CDN cache for HTML pages instead (purged on content change)
+const CMS_CACHE_TTL = 0;
 
 /**
  * Fetch from CMS with API key authentication and optional edge caching

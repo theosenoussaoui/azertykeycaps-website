@@ -165,7 +165,12 @@ export async function purgeCloudflareCDN(
     };
   }
 
-  console.log("[cache] URLs to purge:", urlsToPurge);
+  console.log("[cache] webUrl:", webUrl, "serverUrl:", serverUrl);
+  const webHost = new URL(webUrl).host;
+  const apiHost = serverUrl ? new URL(serverUrl).host : null;
+  const hostsToPurge = apiHost ? [webHost, apiHost] : [webHost];
+
+  console.log("[cache] Purging hosts:", JSON.stringify(hostsToPurge));
 
   try {
     const response = await fetch(
@@ -176,19 +181,21 @@ export async function purgeCloudflareCDN(
           Authorization: `Bearer ${apiToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ files: urlsToPurge }),
+        body: JSON.stringify({ hosts: hostsToPurge }),
       },
     );
 
+    const responseData = await response.json();
+    console.log("[cache] Cloudflare purge response:", JSON.stringify(responseData));
+
     if (!response.ok) {
-      const error = await response.text();
-      return { success: false, message: `Cloudflare API error: ${error}` };
+      return { success: false, message: `Cloudflare API error: ${JSON.stringify(responseData)}` };
     }
 
     return {
       success: true,
-      message: `Purged ${urlsToPurge.length} URLs from Cloudflare CDN`,
-      purgedUrls: urlsToPurge,
+      message: `Purged hosts: ${hostsToPurge.join(", ")}`,
+      purgedUrls: hostsToPurge,
     };
   } catch (error) {
     return {
