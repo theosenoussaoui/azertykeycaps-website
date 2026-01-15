@@ -15,6 +15,14 @@ export const articleFiltersSchema = z.object({
   search: z.string().optional(),
 });
 
+export const profilePageFiltersSchema = z.object({
+  page: z.number().min(1).catch(1),
+  status: articleStatusSchema.optional(),
+  material: articleMaterialSchema.optional(),
+  isNew: z.boolean().optional(),
+  search: z.string().optional(),
+});
+
 // ============================================
 // tRPC INPUT SCHEMAS
 // ============================================
@@ -42,6 +50,7 @@ export const profileListInputSchema = z.object({
 // ============================================
 
 export type ArticleFilters = z.infer<typeof articleFiltersSchema>;
+export type ProfilePageFilters = z.infer<typeof profilePageFiltersSchema>;
 export type ArticleListInput = z.infer<typeof articleListInputSchema>;
 export type ArticleBySlugInput = z.infer<typeof articleBySlugInputSchema>;
 export type ProfileListInput = z.infer<typeof profileListInputSchema>;

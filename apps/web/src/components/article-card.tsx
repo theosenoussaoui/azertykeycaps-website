@@ -8,13 +8,14 @@ import { STATUS_VARIANTS } from "@/lib/article-utils";
 
 interface ArticleCardProps {
   article: Article;
+  preload?: "intent" | "viewport" | "render" | false;
 }
 
-export function ArticleCard({ article }: ArticleCardProps) {
+export function ArticleCard({ article, preload = "intent" }: ArticleCardProps) {
   const i18n = t();
 
   return (
-    <Link to="/articles/$slug" params={{ slug: article.slug }}>
+    <Link to="/articles/$slug" params={{ slug: article.slug }} preload={preload}>
       <Card className="h-full transition-shadow hover:shadow-lg">
         <img
           src={article.img.sizes?.card?.url ?? article.img.url}

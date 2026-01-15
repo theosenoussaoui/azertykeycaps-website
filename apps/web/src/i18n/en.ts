@@ -19,6 +19,15 @@ export const en = {
   footer: {
     builtBy: "Built by",
   },
+  home: {
+    title: "Azertykeycaps",
+    subtitle: "Discover AZERTY-compatible keysets",
+    latestArticles: "Latest additions",
+    browseByProfile: "Browse by profile",
+    metaTitle: "Azertykeycaps - AZERTY Keysets",
+    metaDescription:
+      "Discover our selection of AZERTY-compatible keysets. Filter by profile, status and material.",
+  },
   articles: {
     title: "Articles",
     metaTitle: "Azertykeycaps - AZERTY Keysets",
