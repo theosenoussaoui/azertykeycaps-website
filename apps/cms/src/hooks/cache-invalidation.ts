@@ -2,53 +2,67 @@ import type {
   CollectionAfterChangeHook,
   CollectionAfterDeleteHook,
   GlobalAfterChangeHook,
+  PayloadRequest,
 } from "payload";
 
-/**
- * Cache Invalidation Hooks for Payload CMS
- *
- * These hooks trigger cache invalidation when content changes in the CMS.
- * They use the "fire-and-forget" pattern (non-blocking) since cache invalidation
- * doesn't need to block the CMS response.
- *
- * Two caches are invalidated:
- * 1. Server cache (CMS API responses) - via /api/cache/invalidate endpoint
- * 2. Cloudflare CDN cache (HTML pages) - via Cloudflare purge_cache API
- *
- * Required environment variables:
- * - CACHE_INVALIDATION_URL: Server endpoint URL (e.g., https://server.example.com/api/cache/invalidate)
- * - CACHE_INVALIDATION_SECRET: Shared secret for authentication
- * - CLOUDFLARE_ZONE_ID: Cloudflare zone ID for CDN purging
- * - CLOUDFLARE_API_TOKEN: Cloudflare API token with Cache Purge permission
- * - WEB_URL: Public website URL (e.g., https://www.example.com)
- */
+export interface CacheInvalidationPayload {
+  type: "collection" | "global";
+  slug: string;
+  id?: string;
+  articleSlug?: string;
+  profileSlug?: string;
+  relatedArticleSlugs?: string[];
+}
 
-/**
- * Maps collection/global slugs to affected page paths for CDN invalidation
- */
-const CDN_INVALIDATION_MAP: Record<string, string[]> = {
-  // Collections
-  articles: ["/", "/articles"],
-  "keycap-profiles": ["/", "/articles"],
-  media: [],
+async function getProfileSlug(
+  profileField: unknown,
+  req: PayloadRequest,
+): Promise<string | undefined> {
+  if (!profileField) return undefined;
 
-  // Globals
-  homepage: ["/"],
-  "social-networks": ["/"],
-  "informations-page": ["/about"],
-  "suggestion-page": ["/suggest"],
-};
+  if (typeof profileField === "object" && profileField !== null && "slug" in profileField) {
+    return (profileField as { slug: string }).slug;
+  }
 
-/**
- * Invalidates server-side cache via the API endpoint
- */
-async function invalidateServerCache(slug: string, id?: string | number): Promise<void> {
+  if (typeof profileField === "number" || typeof profileField === "string") {
+    try {
+      const profile = await req.payload.findByID({
+        collection: "keycap-profiles",
+        id: profileField,
+      });
+      return profile?.slug;
+    } catch {
+      return undefined;
+    }
+  }
+
+  return undefined;
+}
+
+async function getRelatedArticleSlugs(
+  profileId: number | string,
+  req: PayloadRequest,
+): Promise<string[]> {
+  try {
+    const articles = await req.payload.find({
+      collection: "articles",
+      where: { profile: { equals: profileId } },
+      limit: 500,
+      depth: 0,
+    });
+    return articles.docs.map((a) => a.slug).filter((slug): slug is string => !!slug);
+  } catch {
+    return [];
+  }
+}
+
+async function sendInvalidationToServer(payload: CacheInvalidationPayload): Promise<void> {
   const invalidationUrl = process.env.CACHE_INVALIDATION_URL;
   const invalidationSecret = process.env.CACHE_INVALIDATION_SECRET;
 
   if (!invalidationUrl || !invalidationSecret) {
     console.warn(
-      "[cache-invalidation] Missing CACHE_INVALIDATION_URL or CACHE_INVALIDATION_SECRET env vars",
+      "[cache-invalidation] Missing CACHE_INVALIDATION_URL or CACHE_INVALIDATION_SECRET",
     );
     return;
   }
@@ -60,130 +74,83 @@ async function invalidateServerCache(slug: string, id?: string | number): Promis
         "Content-Type": "application/json",
         Authorization: `Bearer ${invalidationSecret}`,
       },
-      body: JSON.stringify({
-        type: slug in CDN_INVALIDATION_MAP ? "collection" : "global",
-        slug,
-        id: id?.toString(),
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error(
-        `[cache-invalidation] Server cache invalidation failed: ${response.status} - ${errorText}`,
+        `[cache-invalidation] Server invalidation failed: ${response.status} - ${errorText}`,
       );
     } else {
-      console.log(`[cache-invalidation] Server cache invalidated for ${slug}`);
+      console.log(`[cache-invalidation] Server invalidation sent for ${payload.slug}`);
     }
   } catch (error) {
-    console.error("[cache-invalidation] Failed to invalidate server cache:", error);
+    console.error("[cache-invalidation] Failed to send invalidation:", error);
   }
 }
 
-/**
- * Invalidates Cloudflare CDN cache for affected pages
- */
-async function invalidateCDNCache(slug: string): Promise<void> {
-  const zoneId = process.env.CLOUDFLARE_ZONE_ID;
-  const apiToken = process.env.CLOUDFLARE_API_TOKEN;
-  const webUrl = process.env.WEB_URL;
+export const collectionAfterChangeHook: CollectionAfterChangeHook = ({ collection, doc, req }) => {
+  const buildAndSendPayload = async () => {
+    const payload: CacheInvalidationPayload = {
+      type: "collection",
+      slug: collection.slug,
+      id: doc.id?.toString(),
+    };
 
-  if (!zoneId || !apiToken || !webUrl) {
-    console.warn(
-      "[cache-invalidation] Missing Cloudflare env vars (CLOUDFLARE_ZONE_ID, CLOUDFLARE_API_TOKEN, WEB_URL)",
-    );
-    return;
-  }
-
-  const paths = CDN_INVALIDATION_MAP[slug];
-  if (!paths || paths.length === 0) {
-    console.log(`[cache-invalidation] No CDN paths to invalidate for ${slug}`);
-    return;
-  }
-
-  // Build full URLs for purging
-  const urls = paths.map((path) => `${webUrl}${path}`);
-
-  try {
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ files: urls }),
-      },
-    );
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error("[cache-invalidation] Cloudflare purge failed:", JSON.stringify(errorData));
-    } else {
-      console.log(`[cache-invalidation] CDN cache purged for ${slug}: ${urls.join(", ")}`);
+    if (collection.slug === "articles") {
+      payload.articleSlug = doc.slug;
+      payload.profileSlug = await getProfileSlug(doc.profile, req);
     }
-  } catch (error) {
-    console.error("[cache-invalidation] Failed to purge CDN cache:", error);
-  }
-}
 
-/**
- * Main cache invalidation function
- * Invalidates both server cache and CDN cache in parallel
- */
-async function invalidateAllCaches(slug: string, id?: string | number): Promise<void> {
-  console.log(`[cache-invalidation] Triggered for ${slug}${id ? ` (id: ${id})` : ""}`);
+    if (collection.slug === "keycap-profiles") {
+      payload.profileSlug = doc.slug;
+      payload.relatedArticleSlugs = await getRelatedArticleSlugs(doc.id, req);
+    }
 
-  await Promise.all([invalidateServerCache(slug, id), invalidateCDNCache(slug)]);
-}
+    await sendInvalidationToServer(payload);
+  };
 
-/**
- * Hook for collection afterChange events
- * Triggers cache invalidation when a document is created or updated
- *
- * Uses non-blocking (fire-and-forget) pattern - doesn't return a Promise
- * so Payload won't wait for invalidation to complete
- */
-export const collectionAfterChangeHook: CollectionAfterChangeHook = ({
-  collection,
-  doc,
-  operation,
-}) => {
-  console.log(`[cache-invalidation] Collection ${collection.slug} ${operation}: ${doc.id}`);
-
-  // Fire and forget - don't block the response
-  void invalidateAllCaches(collection.slug, doc.id);
+  console.log(`[cache-invalidation] Collection ${collection.slug} changed: ${doc.id}`);
+  void buildAndSendPayload();
 
   return doc;
 };
 
-/**
- * Hook for collection afterDelete events
- * Triggers cache invalidation when a document is deleted
- *
- * Uses non-blocking (fire-and-forget) pattern
- */
-export const collectionAfterDeleteHook: CollectionAfterDeleteHook = ({ collection, doc }) => {
+export const collectionAfterDeleteHook: CollectionAfterDeleteHook = ({ collection, doc, req }) => {
+  const buildAndSendPayload = async () => {
+    const payload: CacheInvalidationPayload = {
+      type: "collection",
+      slug: collection.slug,
+      id: doc.id?.toString(),
+    };
+
+    if (collection.slug === "articles") {
+      payload.articleSlug = doc.slug;
+      payload.profileSlug = await getProfileSlug(doc.profile, req);
+    }
+
+    if (collection.slug === "keycap-profiles") {
+      payload.profileSlug = doc.slug;
+    }
+
+    await sendInvalidationToServer(payload);
+  };
+
   console.log(`[cache-invalidation] Collection ${collection.slug} deleted: ${doc.id}`);
-
-  // Fire and forget - don't block the response
-  void invalidateAllCaches(collection.slug, doc.id);
+  void buildAndSendPayload();
 
   return doc;
 };
 
-/**
- * Hook for global afterChange events
- * Triggers cache invalidation when a global is updated
- *
- * Uses non-blocking (fire-and-forget) pattern
- */
 export const globalAfterChangeHook: GlobalAfterChangeHook = ({ global, doc }) => {
-  console.log(`[cache-invalidation] Global ${global.slug} updated`);
+  const payload: CacheInvalidationPayload = {
+    type: "global",
+    slug: global.slug,
+  };
 
-  // Fire and forget - don't block the response
-  void invalidateAllCaches(global.slug);
+  console.log(`[cache-invalidation] Global ${global.slug} updated`);
+  void sendInvalidationToServer(payload);
 
   return doc;
 };

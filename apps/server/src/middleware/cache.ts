@@ -6,6 +6,15 @@ export const CACHE_NAMES = {
   CMS_API: "cms-api-cache",
 } as const;
 
+export interface CacheInvalidationPayload {
+  type: "collection" | "global";
+  slug: string;
+  id?: string;
+  articleSlug?: string;
+  profileSlug?: string;
+  relatedArticleSlugs?: string[];
+}
+
 function isDevMode(): boolean {
   try {
     const hasCacheApi = typeof caches !== "undefined" && typeof caches.open === "function";
@@ -101,7 +110,7 @@ export function buildCacheKeys(
     "keycap-profiles": ["articles.profiles", "articles.list"],
     media: [],
     homepage: ["articles.list", "articles.profiles"],
-    "social-networks": [],
+    "social-networks": ["globals.socialNetworks"],
     "informations-page": ["globals.informationsPage"],
     "suggestion-page": ["globals.suggestionPage"],
   };
@@ -115,48 +124,66 @@ export function buildCacheKeys(
   return keys;
 }
 
-export async function purgeCloudflareCDN(
-  zoneId: string,
-  apiToken: string,
-  webUrl: string,
-  type: "collection" | "global",
-  slug: string,
-  articleSlug?: string,
-  serverUrl?: string,
-): Promise<{ success: boolean; message: string; purgedUrls?: string[] }> {
-  const urlsToPurge: string[] = [];
-
-  if (serverUrl) {
-    const apiEndpoints = buildCacheKeys(serverUrl, type, slug);
-    urlsToPurge.push(...apiEndpoints);
-  }
+export function buildUrlsToPurge(webUrl: string, payload: CacheInvalidationPayload): string[] {
+  const urls: string[] = [];
+  const { type, slug, articleSlug, profileSlug, relatedArticleSlugs } = payload;
 
   if (type === "collection") {
     switch (slug) {
       case "articles":
-        urlsToPurge.push(`${webUrl}/`);
+        urls.push(`${webUrl}/`);
         if (articleSlug) {
-          urlsToPurge.push(`${webUrl}/articles/${articleSlug}`);
+          urls.push(`${webUrl}/articles/${articleSlug}`);
+        }
+        if (profileSlug) {
+          urls.push(`${webUrl}/profile/${profileSlug}`);
         }
         break;
+
       case "keycap-profiles":
-        urlsToPurge.push(`${webUrl}/`);
+        urls.push(`${webUrl}/`);
+        if (profileSlug) {
+          urls.push(`${webUrl}/profile/${profileSlug}`);
+        }
+        if (relatedArticleSlugs && relatedArticleSlugs.length > 0) {
+          for (const slug of relatedArticleSlugs) {
+            urls.push(`${webUrl}/articles/${slug}`);
+          }
+        }
+        break;
+
+      case "media":
         break;
     }
   } else if (type === "global") {
     switch (slug) {
       case "informations-page":
-        urlsToPurge.push(`${webUrl}/about`);
+        urls.push(`${webUrl}/about`);
         break;
       case "suggestion-page":
-        urlsToPurge.push(`${webUrl}/suggest`);
+        urls.push(`${webUrl}/suggest`);
         break;
       case "social-networks":
-        urlsToPurge.push(`${webUrl}/`);
-        urlsToPurge.push(`${webUrl}/about`);
+        urls.push(`${webUrl}/`);
+        urls.push(`${webUrl}/about`);
+        urls.push(`${webUrl}/suggest`);
+        break;
+      case "homepage":
+        urls.push(`${webUrl}/`);
         break;
     }
   }
+
+  return [...new Set(urls)];
+}
+
+export async function purgeCloudflareCDN(
+  zoneId: string,
+  apiToken: string,
+  webUrl: string,
+  payload: CacheInvalidationPayload,
+): Promise<{ success: boolean; message: string; purgedUrls?: string[] }> {
+  const urlsToPurge = buildUrlsToPurge(webUrl, payload);
 
   if (urlsToPurge.length === 0) {
     return {
@@ -165,12 +192,7 @@ export async function purgeCloudflareCDN(
     };
   }
 
-  console.log("[cache] webUrl:", webUrl, "serverUrl:", serverUrl);
-  const webHost = new URL(webUrl).host;
-  const apiHost = serverUrl ? new URL(serverUrl).host : null;
-  const hostsToPurge = apiHost ? [webHost, apiHost] : [webHost];
-
-  console.log("[cache] Purging hosts:", JSON.stringify(hostsToPurge));
+  console.log("[cache] URLs to purge:", JSON.stringify(urlsToPurge));
 
   try {
     const response = await fetch(
@@ -181,7 +203,7 @@ export async function purgeCloudflareCDN(
           Authorization: `Bearer ${apiToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ hosts: hostsToPurge }),
+        body: JSON.stringify({ files: urlsToPurge }),
       },
     );
 
@@ -194,8 +216,8 @@ export async function purgeCloudflareCDN(
 
     return {
       success: true,
-      message: `Purged hosts: ${hostsToPurge.join(", ")}`,
-      purgedUrls: hostsToPurge,
+      message: `Purged ${urlsToPurge.length} URLs`,
+      purgedUrls: urlsToPurge,
     };
   } catch (error) {
     return {

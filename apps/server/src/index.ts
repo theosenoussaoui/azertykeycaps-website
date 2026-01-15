@@ -89,14 +89,16 @@ app.post("/api/cache/invalidate", async (c) => {
   }
 
   try {
-    const body = await c.req.json<{
+    const payload = await c.req.json<{
       type: "collection" | "global";
       slug: string;
       id?: string;
       articleSlug?: string;
+      profileSlug?: string;
+      relatedArticleSlugs?: string[];
     }>();
 
-    const { type, slug, id, articleSlug } = body;
+    const { type, slug, id } = payload;
 
     console.log(`[cache] Invalidation request: type=${type}, slug=${slug}, id=${id || "N/A"}`);
 
@@ -122,19 +124,14 @@ app.post("/api/cache/invalidate", async (c) => {
         env.CF_ZONE_ID,
         env.CF_API_TOKEN,
         env.CORS_ORIGIN,
-        type,
-        slug,
-        articleSlug,
-        env.SERVER_URL,
+        payload,
       );
       console.log(`[cache] CDN cache: ${cdnResult.message}`);
     }
 
     return c.json({
       success: true,
-      type,
-      slug,
-      id,
+      payload,
       results: {
         cms: cmsResult,
         media: mediaResult,
