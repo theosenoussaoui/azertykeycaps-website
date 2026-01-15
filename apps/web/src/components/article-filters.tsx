@@ -17,11 +17,12 @@ import {
 import { t } from "@/i18n";
 
 interface ArticleFiltersProps {
-  profiles: KeycapProfileRef[];
+  profiles?: KeycapProfileRef[];
   selectedProfile?: string;
   selectedStatus?: ArticleStatus;
   selectedMaterial?: ArticleMaterial;
-  onProfileChange: (value: string | undefined) => void;
+  showProfileFilter?: boolean;
+  onProfileChange?: (value: string | undefined) => void;
   onStatusChange: (value: ArticleStatus | undefined) => void;
   onMaterialChange: (value: ArticleMaterial | undefined) => void;
   onClearFilters: () => void;
@@ -29,10 +30,11 @@ interface ArticleFiltersProps {
 }
 
 export function ArticleFilters({
-  profiles,
+  profiles = [],
   selectedProfile,
   selectedStatus,
   selectedMaterial,
+  showProfileFilter = true,
   onProfileChange,
   onStatusChange,
   onMaterialChange,
@@ -43,24 +45,28 @@ export function ArticleFilters({
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      {/* Profile filter */}
-      <Select value={selectedProfile ?? ""} onValueChange={(v) => onProfileChange(v || undefined)}>
-        <SelectTrigger className="w-40">
-          <SelectValue>
-            {selectedProfile
-              ? profiles.find((p) => p.slug === selectedProfile)?.title
-              : i18n.articles.filters.profile}
-          </SelectValue>
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="">{i18n.articles.filters.all}</SelectItem>
-          {profiles.map((profile) => (
-            <SelectItem key={profile.id} value={profile.slug}>
-              {profile.title}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      {showProfileFilter && profiles.length > 0 && onProfileChange && (
+        <Select
+          value={selectedProfile ?? ""}
+          onValueChange={(v) => onProfileChange(v || undefined)}
+        >
+          <SelectTrigger className="w-40">
+            <SelectValue>
+              {selectedProfile
+                ? profiles.find((p) => p.slug === selectedProfile)?.title
+                : i18n.articles.filters.profile}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">{i18n.articles.filters.all}</SelectItem>
+            {profiles.map((profile) => (
+              <SelectItem key={profile.id} value={profile.slug}>
+                {profile.title}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      )}
 
       {/* Status filter */}
       <Select

@@ -1,18 +1,10 @@
 import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
 
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, getRouteApi } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import {
-  articleFiltersSchema,
-  type ArticleFilters as ArticleFiltersType,
-  type ArticleMaterial,
-  type ArticleStatus,
-} from "@azertykeycaps-app/schemas";
 
 import { ArticleCard } from "@/components/article-card";
-import { ArticleFilters } from "@/components/article-filters";
-import { ArticlesPagination } from "@/components/articles-pagination";
 import { t } from "@/i18n";
 import { serverEnv } from "@/lib/server-env";
 
@@ -27,38 +19,29 @@ function createServerTRPCClient() {
   });
 }
 
-// Server function to fetch home page data (articles + profiles for filters)
-const getHomePageData = createServerFn({ method: "GET" })
-  .inputValidator((data: ArticleFiltersType) => data)
-  .handler(async ({ data: filters }) => {
-    const client = createServerTRPCClient();
+// Server function to fetch latest articles for landing page
+const getLatestArticles = createServerFn({ method: "GET" }).handler(async () => {
+  const client = createServerTRPCClient();
 
-    const [articles, profiles] = await Promise.all([
-      client.articles.list.query({
-        page: filters.page ?? 1,
-        limit: 12,
-        profile: filters.profile,
-        status: filters.status,
-        material: filters.material,
-        isNew: filters.isNew,
-        search: filters.search,
-      }),
-      client.articles.profiles.query({ limit: 100 }),
-    ]);
-
-    return { articles, profiles };
+  const articles = await client.articles.list.query({
+    page: 1,
+    limit: 3,
   });
+
+  return { articles };
+});
+
+// Get parent route API to access profiles from layout
+const appRouteApi = getRouteApi("/_app");
 
 export const Route = createFileRoute("/_app/")({
   component: HomeComponent,
-  validateSearch: articleFiltersSchema,
-  loaderDeps: ({ search }) => ({ search }),
-  loader: async ({ deps: { search } }) => {
-    const data = await getHomePageData({ data: search });
+  loader: async () => {
+    const data = await getLatestArticles();
     return data;
   },
   headers: () => ({
-    "Cache-Control": "public, max-age=604800, s-maxage=604800, stale-while-revalidate=86400",
+    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 60_000,
   gcTime: 5 * 60_000,
@@ -66,76 +49,29 @@ export const Route = createFileRoute("/_app/")({
     const i18n = t();
     return {
       meta: [
-        { title: i18n.articles.metaTitle },
-        { name: "description", content: i18n.articles.metaDescription },
+        { title: i18n.home.metaTitle },
+        { name: "description", content: i18n.home.metaDescription },
       ],
     };
   },
 });
 
 function HomeComponent() {
-  const navigate = useNavigate();
-  const search = Route.useSearch();
-  const { articles, profiles } = Route.useLoaderData();
+  const { articles } = Route.useLoaderData();
+  const { profiles } = appRouteApi.useLoaderData();
   const i18n = t();
-
-  // Check if any filters are active
-  const hasActiveFilters = !!(search.profile || search.status || search.material);
-
-  const handleFilterChange = (
-    key: "profile" | "status" | "material",
-    value: string | ArticleStatus | ArticleMaterial | undefined,
-  ) => {
-    navigate({
-      to: "/",
-      search: {
-        ...search,
-        [key]: value,
-        page: 1, // Reset to first page on filter change
-      },
-    });
-  };
-
-  const handleClearFilters = () => {
-    navigate({
-      to: "/",
-      search: { page: 1 },
-    });
-  };
-
-  const handlePageChange = (page: number) => {
-    navigate({
-      to: "/",
-      search: {
-        ...search,
-        page,
-      },
-    });
-  };
 
   return (
     <div className="container mx-auto max-w-6xl px-4 py-8">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold">{i18n.articles.title}</h1>
+      {/* Hero Section */}
+      <header className="mb-12 text-center">
+        <h1 className="mb-4 text-4xl font-bold">{i18n.home.title}</h1>
+        <p className="text-lg text-muted-foreground">{i18n.home.subtitle}</p>
       </header>
 
-      {/* Filters */}
-      <section className="mb-6">
-        <ArticleFilters
-          profiles={profiles}
-          selectedProfile={search.profile}
-          selectedStatus={search.status}
-          selectedMaterial={search.material}
-          onProfileChange={(v) => handleFilterChange("profile", v)}
-          onStatusChange={(v) => handleFilterChange("status", v)}
-          onMaterialChange={(v) => handleFilterChange("material", v)}
-          onClearFilters={handleClearFilters}
-          hasActiveFilters={hasActiveFilters}
-        />
-      </section>
-
-      {/* Articles Grid */}
-      <section className="mb-8">
+      {/* Latest Articles Section */}
+      <section className="mb-12">
+        <h2 className="mb-6 text-2xl font-semibold">{i18n.home.latestArticles}</h2>
         {articles.error ? (
           <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center dark:border-red-900 dark:bg-red-950">
             <p className="text-red-600 dark:text-red-400">
@@ -155,14 +91,26 @@ function HomeComponent() {
         )}
       </section>
 
-      {/* Pagination */}
-      {articles.totalPages > 1 && (
-        <ArticlesPagination
-          currentPage={articles.page}
-          totalPages={articles.totalPages}
-          onPageChange={handlePageChange}
-        />
-      )}
+      {/* Browse by Profile Section */}
+      <section>
+        <h2 className="mb-6 text-2xl font-semibold">{i18n.home.browseByProfile}</h2>
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {profiles.map((profile) => (
+            <Link
+              key={profile.slug}
+              to="/profile/$slug"
+              params={{ slug: profile.slug }}
+              search={{ page: 1 }}
+              className="group rounded-lg border bg-card p-4 transition-colors hover:bg-accent"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-medium">{profile.title}</span>
+                <span className="text-sm text-muted-foreground">{profile.abbreviation}</span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

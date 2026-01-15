@@ -42,7 +42,12 @@ export default function Header({ profiles }: HeaderProps) {
                 <DropdownMenuContent align="start">
                   {profiles.map((profile) => (
                     <DropdownMenuItem key={profile.id}>
-                      <Link to="/profile/$slug" params={{ slug: profile.slug }}>
+                      <Link
+                        to="/profile/$slug"
+                        params={{ slug: profile.slug }}
+                        search={{ page: 1 }}
+                        preload="viewport"
+                      >
                         {profile.title}
                       </Link>
                     </DropdownMenuItem>

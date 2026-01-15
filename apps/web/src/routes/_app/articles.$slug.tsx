@@ -43,8 +43,7 @@ export const Route = createFileRoute("/_app/articles/$slug")({
     return { article };
   },
   headers: () => ({
-    "Cache-Control": "public, max-age=604800, s-maxage=604800, stale-while-revalidate=86400",
-    "CDN-Cache-Control": "max-age=7200",
+    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 5 * 60_000, // Client considers data fresh for 5 minutes
   gcTime: 30 * 60_000, // Keep in memory for 30 minutes
@@ -83,7 +82,7 @@ function ArticleContent({ article, i18n }: { article: Article; i18n: ReturnType<
           <Badge variant={STATUS_VARIANTS[article.status]}>{i18n.status[article.status]}</Badge>
           {article.isNew && <Badge variant="default">{i18n.common.new}</Badge>}
           {article.profile && (
-            <Link to="/profile/$slug" params={{ slug: article.profile.slug }}>
+            <Link to="/profile/$slug" params={{ slug: article.profile.slug }} search={{ page: 1 }}>
               <Badge variant="outline" className="cursor-pointer hover:bg-accent">
                 {article.profile.title}
               </Badge>

@@ -49,7 +49,7 @@ export const Route = createFileRoute("/_app")({
     };
   },
   headers: () => ({
-    "Cache-Control": "public, max-age=604800, s-maxage=604800, stale-while-revalidate=86400",
+    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 10 * 60_000, // Client considers data fresh for 10 minutes
   gcTime: 60 * 60_000, // Keep in memory for 1 hour
