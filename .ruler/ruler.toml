@@ -26,12 +26,8 @@ command = "npx"
 args = ["shadcn@latest", "mcp"]
 
 
-
-
-
 [mcp_servers.better-auth]
 url = "https://mcp.chonkie.ai/better-auth/better-auth-builder/mcp"
-
 
 
 # --- Global .gitignore Configuration ---

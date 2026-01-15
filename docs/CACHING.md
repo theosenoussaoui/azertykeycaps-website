@@ -214,7 +214,7 @@ If upgrading to Cloudflare Enterprise, cache-tags enable more efficient purging:
 headers: () => ({
   "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   "Cache-Tag": "articles, profile-cherry",
-})
+});
 ```
 
 Then purge by tag instead of URL:

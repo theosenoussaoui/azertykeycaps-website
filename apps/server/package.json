@@ -19,11 +19,11 @@
     "@azertykeycaps-app/db": "workspace:*",
     "@azertykeycaps-app/env": "workspace:*",
     "@azertykeycaps-app/schemas": "workspace:*",
-    "@hono/trpc-server": "^0.4.0",
-    "@trpc/server": "^11.0.0",
+    "@hono/trpc-server": "^0.4.2",
+    "@trpc/server": "^11.8.1",
     "better-auth": "catalog:",
     "dotenv": "catalog:",
-    "hono": "^4.11.3",
+    "hono": "^4.11.4",
     "zod": "catalog:"
   },
   "devDependencies": {
@@ -31,8 +31,8 @@
     "@cloudflare/workers-types": "catalog:",
     "@types/node": "catalog:",
     "alchemy": "catalog:",
-    "tsdown": "^0.18.3",
+    "tsdown": "^0.19.0",
     "typescript": "catalog:",
-    "wrangler": "^4.54.0"
+    "wrangler": "^4.59.2"
   }
 }
