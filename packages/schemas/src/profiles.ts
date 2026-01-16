@@ -26,6 +26,8 @@ export const keycapProfileRefSchema = z.object({
   title: z.string(),
   slug: z.string(),
   abbreviation: z.string(),
+  navbarDescription: z.string(),
+  shape: profileShapeSchema,
 });
 
 // Full profile schema

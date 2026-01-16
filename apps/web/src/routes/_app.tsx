@@ -1,7 +1,7 @@
 import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
 import type { SocialNetworks, KeycapProfileRef } from "@azertykeycaps-app/schemas";
 
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Outlet, ErrorComponent } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 
@@ -53,7 +53,12 @@ export const Route = createFileRoute("/_app")({
   }),
   staleTime: 10 * 60_000, // Client considers data fresh for 10 minutes
   gcTime: 60 * 60_000, // Keep in memory for 1 hour
+  shouldReload: false, // Only reload on entry, not on child navigation
   component: AppLayout,
+  errorComponent: ({ error }) => {
+    // Layout errors are critical - fall back to default error display
+    return <ErrorComponent error={error} />;
+  },
 });
 
 function AppLayout() {

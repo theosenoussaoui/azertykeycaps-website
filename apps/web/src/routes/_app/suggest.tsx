@@ -1,9 +1,28 @@
 import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { ClockIcon, AlertCircleIcon } from "lucide-react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from "@/components/ui/empty";
+import {
+  PageContainer,
+  PageHeader,
+  PageTitle,
+  PageDescription,
+  PageSection,
+  PageSectionContent,
+} from "@/components/ui/page-container";
 import { t } from "@/i18n";
 import { serverEnv } from "@/lib/server-env";
 
@@ -49,6 +68,32 @@ export const Route = createFileRoute("/_app/suggest")({
       ],
     };
   },
+  errorComponent: () => {
+    const router = useRouter();
+    const i18n = t();
+    return (
+      <PageContainer size="md">
+        <PageSection>
+          <PageSectionContent>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <AlertCircleIcon />
+                </EmptyMedia>
+                <EmptyTitle>{i18n.errors.generic}</EmptyTitle>
+                <EmptyDescription>{i18n.errors.loadingFailed}</EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                <Button variant="outline" onClick={() => router.invalidate()}>
+                  {i18n.common.retry}
+                </Button>
+              </EmptyContent>
+            </Empty>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    );
+  },
 });
 
 function SuggestPage() {
@@ -56,19 +101,20 @@ function SuggestPage() {
   const i18n = t();
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
-      <div className="space-y-6">
-        <header className="space-y-4">
-          <h1 className="text-3xl font-bold">{content?.title ?? i18n.pages.suggest.title}</h1>
-          <p className="text-muted-foreground text-lg">
-            {content?.description ?? i18n.pages.suggest.description}
-          </p>
-        </header>
+    <PageContainer size="md">
+      <PageHeader>
+        <PageTitle>{content?.title ?? i18n.pages.suggest.title}</PageTitle>
+        <PageDescription>{content?.description ?? i18n.pages.suggest.description}</PageDescription>
+      </PageHeader>
 
-        <div className="rounded-lg border bg-muted/50 p-6">
-          <p className="text-muted-foreground text-center">{i18n.pages.suggest.comingSoon}</p>
-        </div>
-      </div>
-    </div>
+      <PageSection>
+        <PageSectionContent>
+          <Alert variant="info">
+            <ClockIcon className="size-4" />
+            <AlertDescription>{i18n.pages.suggest.comingSoon}</AlertDescription>
+          </Alert>
+        </PageSectionContent>
+      </PageSection>
+    </PageContainer>
   );
 }

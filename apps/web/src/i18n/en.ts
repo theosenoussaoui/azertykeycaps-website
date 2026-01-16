@@ -9,12 +9,22 @@ export const en = {
     back: "Back",
     backHome: "Back to home",
     clearFilters: "Clear filters",
+    retry: "Retry",
+  },
+  errors: {
+    generic: "An error occurred",
+    loadingFailed: "Failed to load data",
+    tryAgain: "Please try again",
   },
   nav: {
     home: "Home",
     about: "About",
     suggest: "Suggest",
     profiles: "Profiles",
+    profileShapes: {
+      sculpted: "Sculpted",
+      uniform: "Uniform",
+    },
   },
   footer: {
     builtBy: "Built by",

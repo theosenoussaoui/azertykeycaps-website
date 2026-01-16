@@ -1,76 +1,300 @@
-import type { KeycapProfileRef } from "@azertykeycaps-app/schemas";
+import type { KeycapProfileRef, ProfileShape } from "@azertykeycaps-app/schemas";
 
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
+import { MenuIcon } from "lucide-react";
 
 import { t } from "@/i18n";
 
+import { Button } from "./ui/button";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import UserMenu from "./user-menu";
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuPopup,
+  NavigationMenuPortal,
+  NavigationMenuPositioner,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from "./ui/navigation-menu";
+import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 
 interface HeaderProps {
   profiles?: KeycapProfileRef[];
 }
 
-export default function Header({ profiles }: HeaderProps) {
-  const i18n = t();
+/**
+ * Groups profiles by their shape (sculpted | uniform)
+ */
+function groupProfilesByShape(profiles: KeycapProfileRef[]) {
+  return profiles.reduce(
+    (acc, profile) => {
+      const shape = profile.shape;
+      if (!acc[shape]) {
+        acc[shape] = [];
+      }
+      acc[shape].push(profile);
+      return acc;
+    },
+    {} as Record<ProfileShape, KeycapProfileRef[]>,
+  );
+}
+
+/**
+ * Profile dropdown menu for a specific shape
+ */
+function ProfileShapeMenu({ profiles, label }: { profiles: KeycapProfileRef[]; label: string }) {
+  const location = useLocation();
+
+  if (profiles.length === 0) return null;
 
   return (
-    <header className="border-b">
-      <div className="container flex h-14 items-center justify-between">
-        <div className="flex items-center gap-6">
-          <Link to="/" search={{ page: 1 }} className="font-bold">
-            Azertykeycaps
-          </Link>
-          <nav className="flex items-center gap-4 text-sm">
-            <Link
-              to="/"
-              search={{ page: 1 }}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+    <NavigationMenuItem>
+      <NavigationMenuTrigger render={<Button variant="ghost" />}>{label}</NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <ul className="w-[280px] space-y-0.5 p-2">
+          {profiles.map((profile) => (
+            <li key={profile.id}>
+              <NavigationMenuLink
+                href={`/profile/${profile.slug}`}
+                render={
+                  <Link to="/profile/$slug" params={{ slug: profile.slug }} preload="viewport" />
+                }
+                active={location.pathname === `/profile/${profile.slug}`}
+                closeOnClick
+              >
+                <span className="text-sm font-medium">{profile.title}</span>
+                {profile.navbarDescription && (
+                  <span className="mt-0.5 block text-xs text-muted-foreground">
+                    {profile.navbarDescription}
+                  </span>
+                )}
+              </NavigationMenuLink>
+            </li>
+          ))}
+        </ul>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+  );
+}
+
+/**
+ * Desktop navigation using NavigationMenu with hover dropdowns
+ */
+function DesktopNav({ profiles }: { profiles: KeycapProfileRef[] }) {
+  const i18n = t();
+  const location = useLocation();
+  const groupedProfiles = groupProfilesByShape(profiles);
+
+  return (
+    <NavigationMenu className="hidden md:block">
+      <NavigationMenuList>
+        {/* Home */}
+        <NavigationMenuItem>
+          <NavigationMenuLink
+            href="/"
+            render={<Link to="/" />}
+            active={location.pathname === "/"}
+            className="inline-flex h-9 items-center px-3 py-2 text-sm font-medium"
+          >
+            {i18n.nav.home}
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+
+        {/* Sculpted Profiles Menu */}
+        <ProfileShapeMenu
+          profiles={groupedProfiles.sculpted || []}
+          label={i18n.nav.profileShapes.sculpted}
+        />
+
+        {/* Uniform Profiles Menu */}
+        <ProfileShapeMenu
+          profiles={groupedProfiles.uniform || []}
+          label={i18n.nav.profileShapes.uniform}
+        />
+
+        {/* About */}
+        <NavigationMenuItem>
+          <NavigationMenuLink
+            href="/about"
+            render={<Link to="/about" />}
+            active={location.pathname === "/about"}
+            className="inline-flex h-9 items-center px-3 py-2 text-sm font-medium"
+          >
+            {i18n.nav.about}
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+
+        {/* Suggest */}
+        <NavigationMenuItem>
+          <NavigationMenuLink
+            href="/suggest"
+            render={<Link to="/suggest" />}
+            active={location.pathname === "/suggest"}
+            className="inline-flex h-9 items-center px-3 py-2 text-sm font-medium"
+          >
+            {i18n.nav.suggest}
+          </NavigationMenuLink>
+        </NavigationMenuItem>
+      </NavigationMenuList>
+
+      {/* Portal for popup content */}
+      <NavigationMenuPortal>
+        <NavigationMenuPositioner>
+          <NavigationMenuPopup>
+            <NavigationMenuViewport />
+          </NavigationMenuPopup>
+        </NavigationMenuPositioner>
+      </NavigationMenuPortal>
+    </NavigationMenu>
+  );
+}
+
+/**
+ * Mobile navigation using Sheet (slide-out drawer)
+ */
+function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
+  const i18n = t();
+  const location = useLocation();
+  const groupedProfiles = groupProfilesByShape(profiles);
+
+  return (
+    <Sheet>
+      <SheetTrigger
+        render={<Button variant="ghost" size="icon" className="md:hidden" />}
+        aria-label="Open menu"
+      >
+        <MenuIcon className="size-5" />
+      </SheetTrigger>
+      <SheetContent side="left" showCloseButton>
+        <SheetHeader>
+          <SheetTitle>
+            <Link to="/" className="font-bold">
+              Azertykeycaps
+            </Link>
+          </SheetTitle>
+        </SheetHeader>
+        <nav className="flex flex-col gap-4 p-6 pt-0">
+          {/* Main Links */}
+          <div className="flex flex-col gap-1">
+            <SheetClose
+              render={
+                <Link
+                  to="/"
+                  className="py-2 text-base font-medium text-foreground data-[active]:text-primary"
+                  data-active={location.pathname === "/" || undefined}
+                />
+              }
             >
               {i18n.nav.home}
-            </Link>
-            {profiles && profiles.length > 0 && (
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <div className="flex items-center gap-2">{i18n.nav.profiles}</div>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  {profiles.map((profile) => (
-                    <DropdownMenuItem key={profile.id}>
-                      <Link
-                        to="/profile/$slug"
-                        params={{ slug: profile.slug }}
-                        search={{ page: 1 }}
-                        preload="viewport"
-                      >
-                        {profile.title}
-                      </Link>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-            <Link
-              to="/about"
-              className="text-muted-foreground hover:text-foreground transition-colors"
+            </SheetClose>
+            <SheetClose
+              render={
+                <Link
+                  to="/about"
+                  className="py-2 text-base font-medium text-foreground data-[active]:text-primary"
+                  data-active={location.pathname === "/about" || undefined}
+                />
+              }
             >
               {i18n.nav.about}
-            </Link>
-            <Link
-              to="/suggest"
-              className="text-muted-foreground hover:text-foreground transition-colors"
+            </SheetClose>
+            <SheetClose
+              render={
+                <Link
+                  to="/suggest"
+                  className="py-2 text-base font-medium text-foreground data-[active]:text-primary"
+                  data-active={location.pathname === "/suggest" || undefined}
+                />
+              }
             >
               {i18n.nav.suggest}
-            </Link>
-          </nav>
-        </div>
+            </SheetClose>
+          </div>
+
+          {/* Profiles Section */}
+          {profiles.length > 0 && (
+            <>
+              <hr className="border-border" />
+              <div className="flex flex-col gap-4">
+                {/* Sculpted */}
+                {groupedProfiles.sculpted && groupedProfiles.sculpted.length > 0 && (
+                  <div className="flex flex-col gap-1">
+                    <h3 className="py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      {i18n.nav.profileShapes.sculpted}
+                    </h3>
+                    {groupedProfiles.sculpted.map((profile) => (
+                      <SheetClose
+                        key={profile.id}
+                        render={
+                          <Link
+                            to="/profile/$slug"
+                            params={{ slug: profile.slug }}
+                            preload="viewport"
+                            className="py-2 text-base font-medium text-foreground data-[active]:text-primary"
+                            data-active={
+                              location.pathname === `/profile/${profile.slug}` || undefined
+                            }
+                          />
+                        }
+                      >
+                        {profile.title}
+                      </SheetClose>
+                    ))}
+                  </div>
+                )}
+
+                {/* Uniform */}
+                {groupedProfiles.uniform && groupedProfiles.uniform.length > 0 && (
+                  <div className="flex flex-col gap-1">
+                    <h3 className="py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      {i18n.nav.profileShapes.uniform}
+                    </h3>
+                    {groupedProfiles.uniform.map((profile) => (
+                      <SheetClose
+                        key={profile.id}
+                        render={
+                          <Link
+                            to="/profile/$slug"
+                            params={{ slug: profile.slug }}
+                            preload="viewport"
+                            className="py-2 text-base font-medium text-foreground data-[active]:text-primary"
+                            data-active={
+                              location.pathname === `/profile/${profile.slug}` || undefined
+                            }
+                          />
+                        }
+                      >
+                        {profile.title}
+                      </SheetClose>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </nav>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+export default function Header({ profiles = [] }: HeaderProps) {
+  return (
+    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container mx-auto flex h-14 items-center px-4 sm:px-6 lg:px-8">
+        {/* Logo + Mobile Menu */}
         <div className="flex items-center gap-2">
-          <UserMenu />
+          <MobileNav profiles={profiles} />
+          <Link to="/" className="font-bold">
+            Azertykeycaps
+          </Link>
+        </div>
+
+        {/* Desktop Navigation - pushed to the right */}
+        <div className="ml-auto">
+          <DesktopNav profiles={profiles} />
         </div>
       </div>
     </header>

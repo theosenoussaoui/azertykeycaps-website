@@ -1,12 +1,23 @@
 import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
 import type { Article } from "@azertykeycaps-app/schemas";
 
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { ArrowLeftIcon, ExternalLinkIcon, AlertTriangleIcon, AlertCircleIcon } from "lucide-react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from "@/components/ui/empty";
+import { PageContainer, PageSection, PageSectionContent } from "@/components/ui/page-container";
 import { t } from "@/i18n";
 import { STATUS_VARIANTS } from "@/lib/article-utils";
 import { formatDate } from "@/lib/date-utils";
@@ -42,11 +53,57 @@ export const Route = createFileRoute("/_app/articles/$slug")({
 
     return { article };
   },
+  head: ({ loaderData }) => {
+    const article = loaderData?.article;
+    return {
+      meta: [
+        {
+          title: article ? `${article.title} - Azertykeycaps` : "Article - Azertykeycaps",
+        },
+        {
+          name: "description",
+          content: article?.description ?? "Decouvrez ce keyset sur Azertykeycaps.",
+        },
+      ],
+    };
+  },
   headers: () => ({
     "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 5 * 60_000, // Client considers data fresh for 5 minutes
   gcTime: 30 * 60_000, // Keep in memory for 30 minutes
+  errorComponent: () => {
+    const router = useRouter();
+    const i18n = t();
+    return (
+      <PageContainer size="md">
+        <nav className="py-4">
+          <Button variant="ghost" size="sm" render={<Link to="/" />}>
+            <ArrowLeftIcon />
+            {i18n.common.back}
+          </Button>
+        </nav>
+        <PageSection>
+          <PageSectionContent>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <AlertCircleIcon />
+                </EmptyMedia>
+                <EmptyTitle>{i18n.errors.generic}</EmptyTitle>
+                <EmptyDescription>{i18n.errors.loadingFailed}</EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                <Button variant="outline" onClick={() => router.invalidate()}>
+                  {i18n.common.retry}
+                </Button>
+              </EmptyContent>
+            </Empty>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    );
+  },
 });
 
 function ArticleDetailPage() {
@@ -54,35 +111,41 @@ function ArticleDetailPage() {
   const i18n = t();
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
-      <div className="mb-6">
-        <Link to="/" search={{ page: 1 }}>
-          <Button variant="ghost" size="sm">
-            &larr; {i18n.common.back}
-          </Button>
-        </Link>
-      </div>
+    <PageContainer size="md">
+      {/* Back Navigation */}
+      <nav className="py-4">
+        <Button variant="ghost" size="sm" render={<Link to="/" />}>
+          <ArrowLeftIcon />
+          {i18n.common.back}
+        </Button>
+      </nav>
 
       <ArticleContent article={article} i18n={i18n} />
-    </div>
+    </PageContainer>
   );
 }
 
 function ArticleContent({ article, i18n }: { article: Article; i18n: ReturnType<typeof t> }) {
   return (
-    <article className="space-y-6">
-      <img
-        src={article.img.url}
-        alt={article.img.alt}
-        className="aspect-video w-full rounded-lg object-cover"
-      />
+    <article>
+      {/* Hero Image */}
+      <figure className="mb-8">
+        <img
+          src={article.img.url ?? ""}
+          alt={article.img.alt}
+          className="aspect-video w-full object-cover"
+          loading="eager"
+        />
+      </figure>
 
-      <header className="space-y-4">
+      {/* Article Header */}
+      <header className="mb-8 space-y-4">
+        {/* Badges */}
         <div className="flex flex-wrap items-center gap-2">
           <Badge variant={STATUS_VARIANTS[article.status]}>{i18n.status[article.status]}</Badge>
           {article.isNew && <Badge variant="default">{i18n.common.new}</Badge>}
           {article.profile && (
-            <Link to="/profile/$slug" params={{ slug: article.profile.slug }} search={{ page: 1 }}>
+            <Link to="/profile/$slug" params={{ slug: article.profile.slug }}>
               <Badge variant="outline" className="cursor-pointer hover:bg-accent">
                 {article.profile.title}
               </Badge>
@@ -91,46 +154,83 @@ function ArticleContent({ article, i18n }: { article: Article; i18n: ReturnType<
           {article.material && <Badge variant="outline">{i18n.materials[article.material]}</Badge>}
         </div>
 
-        <h1 className="text-3xl font-bold">{article.title}</h1>
+        {/* Title */}
+        <h1 className="font-heading text-3xl @sm:text-4xl">{article.title}</h1>
 
-        {article.description && <p className="text-muted-foreground">{article.description}</p>}
+        {/* Description */}
+        {article.description && (
+          <p className="text-lg text-muted-foreground">{article.description}</p>
+        )}
       </header>
 
+      {/* Warning */}
       {article.warningText && (
-        <div className="rounded-lg border border-yellow-500 bg-yellow-50 p-4 dark:bg-yellow-950">
-          <p className="text-sm text-yellow-800 dark:text-yellow-200">{article.warningText}</p>
-        </div>
+        <PageSection spacing="sm">
+          <PageSectionContent>
+            <Alert variant="warning">
+              <AlertTriangleIcon className="size-4" />
+              <AlertDescription>{article.warningText}</AlertDescription>
+            </Alert>
+          </PageSectionContent>
+        </PageSection>
       )}
 
-      <div className="flex flex-wrap gap-3">
-        <a href={article.url} target="_blank" rel="noopener noreferrer">
-          <Button>{i18n.articles.viewArticle}</Button>
-        </a>
-        {article.affiliateUrl && (
-          <a href={article.affiliateUrl} target="_blank" rel="noopener noreferrer">
-            <Button variant="secondary">{i18n.articles.affiliateLink}</Button>
-          </a>
-        )}
-        {article.additionalUrl && (
-          <a href={article.additionalUrl} target="_blank" rel="noopener noreferrer">
-            <Button variant="outline">{i18n.articles.additionalLink}</Button>
-          </a>
-        )}
-      </div>
+      {/* Action Buttons */}
+      <PageSection spacing="sm">
+        <PageSectionContent>
+          <div className="flex flex-wrap gap-3">
+            <Button render={<a href={article.url} target="_blank" rel="noopener noreferrer" />}>
+              {i18n.articles.viewArticle}
+              <ExternalLinkIcon />
+            </Button>
+            {article.affiliateUrl && (
+              <Button
+                variant="secondary"
+                render={<a href={article.affiliateUrl} target="_blank" rel="noopener noreferrer" />}
+              >
+                {i18n.articles.affiliateLink}
+                <ExternalLinkIcon />
+              </Button>
+            )}
+            {article.additionalUrl && (
+              <Button
+                variant="outline"
+                render={
+                  <a href={article.additionalUrl} target="_blank" rel="noopener noreferrer" />
+                }
+              >
+                {i18n.articles.additionalLink}
+                <ExternalLinkIcon />
+              </Button>
+            )}
+          </div>
+        </PageSectionContent>
+      </PageSection>
 
+      {/* Dates */}
       {(article.startDate || article.endDate) && (
-        <div className="text-muted-foreground text-sm">
-          {article.startDate && (
-            <p>
-              {i18n.articles.startDate}: {formatDate(article.startDate)}
-            </p>
-          )}
-          {article.endDate && (
-            <p>
-              {i18n.articles.endDate}: {formatDate(article.endDate)}
-            </p>
-          )}
-        </div>
+        <PageSection spacing="sm">
+          <PageSectionContent>
+            <dl className="grid gap-2 text-sm @xs:grid-cols-2">
+              {article.startDate && (
+                <div>
+                  <dt className="text-muted-foreground">{i18n.articles.startDate}</dt>
+                  <dd>
+                    <time dateTime={article.startDate}>{formatDate(article.startDate)}</time>
+                  </dd>
+                </div>
+              )}
+              {article.endDate && (
+                <div>
+                  <dt className="text-muted-foreground">{i18n.articles.endDate}</dt>
+                  <dd>
+                    <time dateTime={article.endDate}>{formatDate(article.endDate)}</time>
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </PageSectionContent>
+        </PageSection>
       )}
     </article>
   );

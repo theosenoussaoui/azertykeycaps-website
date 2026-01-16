@@ -1,8 +1,10 @@
-import { Link } from "@tanstack/react-router";
 import type { Article } from "@azertykeycaps-app/schemas";
+
+import { Link } from "@tanstack/react-router";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { t } from "@/i18n";
 import { STATUS_VARIANTS } from "@/lib/article-utils";
 
@@ -15,55 +17,70 @@ export function ArticleCard({ article, preload = "intent" }: ArticleCardProps) {
   const i18n = t();
 
   return (
-    <Link to="/articles/$slug" params={{ slug: article.slug }} preload={preload}>
-      <Card className="h-full transition-shadow hover:shadow-lg">
-        <img
-          src={article.img.sizes?.card?.url ?? article.img.url}
-          srcSet={
-            article.img.sizes
-              ? `${article.img.sizes.thumbnail?.url ?? article.img.url} 400w, ${article.img.sizes.card?.url ?? article.img.url} 768w`
-              : undefined
-          }
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          alt={article.img.alt}
-          className="aspect-video w-full object-cover"
-          loading="lazy"
-        />
-        <CardHeader>
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle className="line-clamp-2">{article.title}</CardTitle>
+    <article>
+      <Link to="/articles/$slug" params={{ slug: article.slug }} preload={preload}>
+        <Card className="h-full transition-shadow hover:shadow-lg">
+          {/* Article Image */}
+          <figure className="relative overflow-hidden">
+            <img
+              src={article.img.sizes?.card?.url ?? article.img.url ?? ""}
+              srcSet={
+                article.img.sizes
+                  ? `${article.img.sizes.thumbnail?.url ?? article.img.url} 400w, ${article.img.sizes.card?.url ?? article.img.url} 768w`
+                  : undefined
+              }
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              alt={article.img.alt}
+              className="aspect-video w-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+            {/* New Badge - Positioned over image */}
             {article.isNew && (
-              <Badge variant="default" className="shrink-0">
+              <Badge variant="default" className="absolute right-2 top-2">
                 {i18n.common.new}
               </Badge>
             )}
-          </div>
-        </CardHeader>
-        <CardContent className="flex-1">
-          {article.profile && (
-            <p className="text-muted-foreground text-xs">{article.profile.title}</p>
-          )}
-        </CardContent>
-        <CardFooter className="justify-between">
-          <Badge variant={STATUS_VARIANTS[article.status]}>{i18n.status[article.status]}</Badge>
-        </CardFooter>
-      </Card>
-    </Link>
+          </figure>
+
+          <CardHeader>
+            <CardTitle className="line-clamp-2">{article.title}</CardTitle>
+          </CardHeader>
+
+          <CardContent className="flex-1">
+            {article.profile && (
+              <p className="text-xs text-muted-foreground">{article.profile.title}</p>
+            )}
+          </CardContent>
+
+          <CardFooter className="justify-between">
+            <Badge variant={STATUS_VARIANTS[article.status]}>{i18n.status[article.status]}</Badge>
+          </CardFooter>
+        </Card>
+      </Link>
+    </article>
   );
 }
 
 export function ArticleCardSkeleton() {
   return (
     <Card className="h-full">
-      <div className="bg-muted aspect-video w-full animate-pulse" />
+      {/* Image skeleton */}
+      <Skeleton className="aspect-video w-full" />
+
       <CardHeader>
-        <div className="bg-muted h-4 w-3/4 animate-pulse rounded" />
+        {/* Title skeleton */}
+        <Skeleton className="h-5 w-3/4" />
       </CardHeader>
+
       <CardContent className="flex-1">
-        <div className="bg-muted h-3 w-1/2 animate-pulse rounded" />
+        {/* Profile skeleton */}
+        <Skeleton className="h-3 w-1/2" />
       </CardContent>
+
       <CardFooter>
-        <div className="bg-muted h-5 w-20 animate-pulse rounded" />
+        {/* Badge skeleton */}
+        <Skeleton className="h-5 w-20" />
       </CardFooter>
     </Card>
   );

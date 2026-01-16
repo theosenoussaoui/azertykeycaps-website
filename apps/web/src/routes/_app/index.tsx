@@ -1,10 +1,31 @@
 import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
 
-import { createFileRoute, Link, getRouteApi } from "@tanstack/react-router";
+import { createFileRoute, Link, getRouteApi, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { AlertCircleIcon, InboxIcon } from "lucide-react";
 
 import { ArticleCard } from "@/components/article-card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+} from "@/components/ui/empty";
+import {
+  PageContainer,
+  PageHeader,
+  PageTitle,
+  PageDescription,
+  PageSection,
+  PageSectionHeader,
+  PageSectionTitle,
+  PageSectionContent,
+} from "@/components/ui/page-container";
 import { t } from "@/i18n";
 import { serverEnv } from "@/lib/server-env";
 
@@ -54,6 +75,27 @@ export const Route = createFileRoute("/_app/")({
       ],
     };
   },
+  errorComponent: () => {
+    const router = useRouter();
+    const i18n = t();
+    return (
+      <PageContainer size="md">
+        <PageSection>
+          <PageSectionContent>
+            <Alert variant="error">
+              <AlertCircleIcon className="size-4" />
+              <AlertDescription>{i18n.errors.loadingFailed}</AlertDescription>
+            </Alert>
+            <div className="mt-4 text-center">
+              <Button variant="outline" onClick={() => router.invalidate()}>
+                {i18n.common.retry}
+              </Button>
+            </div>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    );
+  },
 });
 
 function HomeComponent() {
@@ -62,55 +104,80 @@ function HomeComponent() {
   const i18n = t();
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-8">
+    <PageContainer size="lg">
       {/* Hero Section */}
-      <header className="mb-12 text-center">
-        <h1 className="mb-4 text-4xl font-bold">{i18n.home.title}</h1>
-        <p className="text-lg text-muted-foreground">{i18n.home.subtitle}</p>
-      </header>
+      <PageHeader className="text-center">
+        <PageTitle>{i18n.home.title}</PageTitle>
+        <PageDescription className="mx-auto">{i18n.home.subtitle}</PageDescription>
+      </PageHeader>
 
       {/* Latest Articles Section */}
-      <section className="mb-12">
-        <h2 className="mb-6 text-2xl font-semibold">{i18n.home.latestArticles}</h2>
-        {articles.error ? (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center dark:border-red-900 dark:bg-red-950">
-            <p className="text-red-600 dark:text-red-400">
-              {i18n.common.error}: {articles.error}
-            </p>
-          </div>
-        ) : articles.docs.length === 0 ? (
-          <div className="rounded-lg border p-6 text-center">
-            <p className="text-muted-foreground">{i18n.common.noResults}</p>
-          </div>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {articles.docs.map((article) => (
-              <ArticleCard key={article.id} article={article} />
-            ))}
-          </div>
-        )}
-      </section>
+      <PageSection>
+        <PageSectionHeader>
+          <PageSectionTitle>{i18n.home.latestArticles}</PageSectionTitle>
+        </PageSectionHeader>
+        <PageSectionContent>
+          {articles.error ? (
+            <Alert variant="error">
+              <AlertCircleIcon className="size-4" />
+              <AlertDescription>
+                {i18n.common.error}: {articles.error}
+              </AlertDescription>
+            </Alert>
+          ) : articles.docs.length === 0 ? (
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <InboxIcon />
+                </EmptyMedia>
+                <EmptyTitle>{i18n.common.noResults}</EmptyTitle>
+                <EmptyDescription>Aucun article disponible pour le moment.</EmptyDescription>
+              </EmptyHeader>
+            </Empty>
+          ) : (
+            <ul className="grid gap-6 @sm:grid-cols-2 @lg:grid-cols-3" role="list">
+              {articles.docs.map((article) => (
+                <li key={article.id}>
+                  <ArticleCard article={article} />
+                </li>
+              ))}
+            </ul>
+          )}
+        </PageSectionContent>
+      </PageSection>
 
       {/* Browse by Profile Section */}
-      <section>
-        <h2 className="mb-6 text-2xl font-semibold">{i18n.home.browseByProfile}</h2>
-        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-          {profiles.map((profile) => (
-            <Link
-              key={profile.slug}
-              to="/profile/$slug"
-              params={{ slug: profile.slug }}
-              search={{ page: 1 }}
-              className="group rounded-lg border bg-card p-4 transition-colors hover:bg-accent"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-medium">{profile.title}</span>
-                <span className="text-sm text-muted-foreground">{profile.abbreviation}</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-    </div>
+      <PageSection>
+        <PageSectionHeader>
+          <PageSectionTitle>{i18n.home.browseByProfile}</PageSectionTitle>
+        </PageSectionHeader>
+        <PageSectionContent>
+          <ul className="grid gap-4 @xs:grid-cols-2 @sm:grid-cols-3 @lg:grid-cols-4" role="list">
+            {profiles.map((profile) => (
+              <li key={profile.slug}>
+                <Link
+                  to="/profile/$slug"
+                  params={{ slug: profile.slug }}
+                  preload="viewport"
+                  className="block"
+                >
+                  <Card className="h-full transition-colors hover:bg-accent">
+                    <CardHeader>
+                      <CardTitle className="flex items-center justify-between">
+                        <span>{profile.title}</span>
+                        <span className="text-sm font-normal text-muted-foreground">
+                          {profile.abbreviation}
+                        </span>
+                      </CardTitle>
+                      <CardDescription>{profile.navbarDescription}</CardDescription>
+                    </CardHeader>
+                  </Card>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </PageSectionContent>
+      </PageSection>
+    </PageContainer>
   );
 }

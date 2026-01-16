@@ -1,9 +1,27 @@
 import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
 
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
 
+import { AlertCircleIcon } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from "@/components/ui/empty";
+import {
+  PageContainer,
+  PageHeader,
+  PageTitle,
+  PageSection,
+  PageSectionContent,
+} from "@/components/ui/page-container";
 import { t } from "@/i18n";
 import { serverEnv } from "@/lib/server-env";
 
@@ -49,6 +67,32 @@ export const Route = createFileRoute("/_app/about")({
   }),
   staleTime: 60 * 60_000, // Client considers data fresh for 1 hour
   gcTime: 24 * 60 * 60_000, // Keep in memory for 24 hours
+  errorComponent: () => {
+    const router = useRouter();
+    const i18n = t();
+    return (
+      <PageContainer size="md">
+        <PageSection>
+          <PageSectionContent>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <AlertCircleIcon />
+                </EmptyMedia>
+                <EmptyTitle>{i18n.errors.generic}</EmptyTitle>
+                <EmptyDescription>{i18n.errors.loadingFailed}</EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                <Button variant="outline" onClick={() => router.invalidate()}>
+                  {i18n.common.retry}
+                </Button>
+              </EmptyContent>
+            </Empty>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    );
+  },
 });
 
 function AboutPage() {
@@ -56,16 +100,23 @@ function AboutPage() {
   const i18n = t();
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8">
-      <article className="prose dark:prose-invert max-w-none">
-        <h1>{content?.title ?? i18n.pages.about.title}</h1>
-        {content?.content ? (
-          <RichTextContent content={content.content} />
-        ) : (
-          <p className="text-muted-foreground">{i18n.pages.about.metaDescription}</p>
-        )}
+    <PageContainer size="md">
+      <article>
+        <PageHeader>
+          <PageTitle>{content?.title ?? i18n.pages.about.title}</PageTitle>
+        </PageHeader>
+
+        <PageSection spacing="none">
+          <PageSectionContent className="prose prose-neutral dark:prose-invert max-w-none">
+            {content?.content ? (
+              <RichTextContent content={content.content} />
+            ) : (
+              <p className="text-muted-foreground">{i18n.pages.about.metaDescription}</p>
+            )}
+          </PageSectionContent>
+        </PageSection>
       </article>
-    </div>
+    </PageContainer>
   );
 }
 
@@ -82,9 +133,5 @@ function RichTextContent({ content }: { content: unknown }) {
 
   // If it's Lexical JSON, we need to parse it
   // For now, display a message that content is available
-  return (
-    <div className="text-muted-foreground">
-      <p>Le contenu de cette page est géré via le CMS.</p>
-    </div>
-  );
+  return <p className="text-muted-foreground">Le contenu de cette page est gere via le CMS.</p>;
 }

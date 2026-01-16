@@ -6,14 +6,31 @@ import {
   type ArticleStatus,
 } from "@azertykeycaps-app/schemas";
 
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { ArrowLeftIcon, SearchXIcon, AlertCircleIcon } from "lucide-react";
 
 import { ArticleCard } from "@/components/article-card";
 import { ArticleFilters } from "@/components/article-filters";
 import { ArticlesPagination } from "@/components/articles-pagination";
 import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+} from "@/components/ui/empty";
+import {
+  PageContainer,
+  PageHeader,
+  PageTitle,
+  PageDescription,
+  PageSection,
+  PageSectionContent,
+} from "@/components/ui/page-container";
 import { t } from "@/i18n";
 import { serverEnv } from "@/lib/server-env";
 
@@ -53,10 +70,16 @@ const getArticlesByProfile = createServerFn({ method: "GET" })
 export const Route = createFileRoute("/_app/profile/$slug")({
   component: ProfilePage,
   validateSearch: profilePageFiltersSchema,
-  loaderDeps: ({ search }) => ({ search }),
-  loader: async ({ params, deps: { search } }) => {
+  loaderDeps: ({ search }) => ({
+    page: search.page,
+    status: search.status,
+    material: search.material,
+    isNew: search.isNew,
+    search: search.search,
+  }),
+  loader: async ({ params, deps }) => {
     const data = await getArticlesByProfile({
-      data: { slug: params.slug, ...search },
+      data: { slug: params.slug, ...deps },
     });
     return data;
   },
@@ -75,10 +98,42 @@ export const Route = createFileRoute("/_app/profile/$slug")({
         },
         {
           name: "description",
-          content: `Découvrez ${articleCount} keyset${articleCount > 1 ? "s" : ""} avec le profil ${profileTitle} sur Azertykeycaps.`,
+          content: `Decouvrez ${articleCount} keyset${articleCount > 1 ? "s" : ""} avec le profil ${profileTitle} sur Azertykeycaps.`,
         },
       ],
     };
+  },
+  errorComponent: () => {
+    const router = useRouter();
+    const i18n = t();
+    return (
+      <PageContainer size="md">
+        <nav className="py-4">
+          <Button variant="ghost" size="sm" render={<Link to="/" />}>
+            <ArrowLeftIcon />
+            {i18n.common.back}
+          </Button>
+        </nav>
+        <PageSection>
+          <PageSectionContent>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <AlertCircleIcon />
+                </EmptyMedia>
+                <EmptyTitle>{i18n.errors.generic}</EmptyTitle>
+                <EmptyDescription>{i18n.errors.loadingFailed}</EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                <Button variant="outline" onClick={() => router.invalidate()}>
+                  {i18n.common.retry}
+                </Button>
+              </EmptyContent>
+            </Empty>
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+    );
   },
 });
 
@@ -111,7 +166,7 @@ function ProfilePage() {
     navigate({
       to: "/profile/$slug",
       params: { slug: params.slug },
-      search: { page: 1 },
+      search: {},
     });
   };
 
@@ -126,74 +181,108 @@ function ProfilePage() {
     });
   };
 
+  // Empty state when no articles exist for this profile (not filtered)
   if (articles.docs.length === 0 && !hasActiveFilters) {
     return (
-      <div className="container mx-auto max-w-6xl px-4 py-16">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold">
-            <span className="text-primary">{i18n.pages.profile.noArticles}</span>
-          </h1>
-          <p className="text-muted-foreground mt-4">{i18n.pages.profile.noArticlesDescription}</p>
-          <Link to="/" search={{ page: 1 }} className="mt-8 inline-block">
-            <Button variant="secondary">{i18n.common.backHome}</Button>
-          </Link>
-        </div>
-      </div>
+      <PageContainer size="md">
+        <Empty className="py-16">
+          <EmptyHeader>
+            <EmptyMedia variant="icon">
+              <SearchXIcon />
+            </EmptyMedia>
+            <EmptyTitle>{i18n.pages.profile.noArticles}</EmptyTitle>
+            <EmptyDescription>{i18n.pages.profile.noArticlesDescription}</EmptyDescription>
+          </EmptyHeader>
+          <EmptyContent>
+            <Button variant="secondary" render={<Link to="/" />}>
+              <ArrowLeftIcon />
+              {i18n.common.backHome}
+            </Button>
+          </EmptyContent>
+        </Empty>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="container mx-auto max-w-6xl px-4 py-8">
-      <div className="mb-6">
-        <Link to="/" search={{ page: 1 }}>
-          <Button variant="ghost" size="sm">
-            &larr; {i18n.common.back}
-          </Button>
-        </Link>
-      </div>
+    <PageContainer size="lg">
+      {/* Back Navigation */}
+      <nav className="py-4">
+        <Button variant="ghost" size="sm" render={<Link to="/" />}>
+          <ArrowLeftIcon />
+          {i18n.common.back}
+        </Button>
+      </nav>
 
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold">{profileInfo?.title ?? profileSlug}</h1>
+      {/* Page Header */}
+      <PageHeader className="py-4">
+        <PageTitle>{profileInfo?.title ?? profileSlug}</PageTitle>
         {articles.totalDocs > 0 && (
-          <p className="text-muted-foreground mt-2">
+          <PageDescription>
             {articles.totalDocs} article{articles.totalDocs > 1 ? "s" : ""}
-          </p>
+          </PageDescription>
         )}
-      </header>
+      </PageHeader>
 
-      <section className="mb-6">
-        <ArticleFilters
-          showProfileFilter={false}
-          selectedStatus={search.status}
-          selectedMaterial={search.material}
-          onStatusChange={(v) => handleFilterChange("status", v)}
-          onMaterialChange={(v) => handleFilterChange("material", v)}
-          onClearFilters={handleClearFilters}
-          hasActiveFilters={hasActiveFilters}
-        />
-      </section>
+      {/* Filters */}
+      <PageSection spacing="sm">
+        <PageSectionContent>
+          <ArticleFilters
+            showProfileFilter={false}
+            selectedStatus={search.status}
+            selectedMaterial={search.material}
+            onStatusChange={(v) => handleFilterChange("status", v)}
+            onMaterialChange={(v) => handleFilterChange("material", v)}
+            onClearFilters={handleClearFilters}
+            hasActiveFilters={hasActiveFilters}
+          />
+        </PageSectionContent>
+      </PageSection>
 
-      <section className="mb-8">
-        {articles.docs.length === 0 ? (
-          <div className="rounded-lg border p-6 text-center">
-            <p className="text-muted-foreground">{i18n.common.noResults}</p>
-          </div>
-        ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {articles.docs.map((article) => (
-              <ArticleCard key={article.id} article={article} preload="viewport" />
-            ))}
-          </div>
-        )}
-      </section>
+      {/* Articles Grid */}
+      <PageSection>
+        <PageSectionContent>
+          {articles.docs.length === 0 ? (
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <SearchXIcon />
+                </EmptyMedia>
+                <EmptyTitle>{i18n.common.noResults}</EmptyTitle>
+                <EmptyDescription>
+                  Essayez de modifier vos filtres pour trouver des articles.
+                </EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                <Button variant="outline" onClick={handleClearFilters}>
+                  {i18n.common.clearFilters}
+                </Button>
+              </EmptyContent>
+            </Empty>
+          ) : (
+            <ul className="grid gap-6 @sm:grid-cols-2 @lg:grid-cols-3" role="list">
+              {articles.docs.map((article) => (
+                <li key={article.id}>
+                  <ArticleCard article={article} preload="viewport" />
+                </li>
+              ))}
+            </ul>
+          )}
+        </PageSectionContent>
+      </PageSection>
 
+      {/* Pagination */}
       {articles.totalPages > 1 && (
-        <ArticlesPagination
-          currentPage={articles.page}
-          totalPages={articles.totalPages}
-          onPageChange={handlePageChange}
-        />
+        <PageSection spacing="sm">
+          <PageSectionContent>
+            <ArticlesPagination
+              currentPage={articles.page}
+              totalPages={articles.totalPages}
+              onPageChange={handlePageChange}
+            />
+          </PageSectionContent>
+        </PageSection>
       )}
-    </div>
+    </PageContainer>
   );
 }

@@ -16,7 +16,7 @@ export const articleFiltersSchema = z.object({
 });
 
 export const profilePageFiltersSchema = z.object({
-  page: z.number().min(1).catch(1),
+  page: z.number().min(1).optional().default(1),
   status: articleStatusSchema.optional(),
   material: articleMaterialSchema.optional(),
   isNew: z.boolean().optional(),
