@@ -1,5 +1,5 @@
 import alchemy from "alchemy";
-import { TanStackStart, Worker, D1Database } from "alchemy/cloudflare";
+import { TanStackStart, Worker, D1Database, R2Bucket, Nextjs } from "alchemy/cloudflare";
 import { GitHubComment } from "alchemy/github";
 import { CloudflareStateStore } from "alchemy/state";
 import { config } from "dotenv";
@@ -19,8 +19,9 @@ const CLOUDFLARE_SUBDOMAIN = "theosen95"; // Your Cloudflare account subdomain
 
 // Custom domains from env (only used in prod)
 // Use process.env directly to avoid throwing in dev when not set
-const WEB_DOMAIN = process.env.WEB_DOMAIN; // e.g., "staging.azertykeycaps.fr"
+const WEB_DOMAIN = process.env.WEB_DOMAIN; // e.g., "www.azertykeycaps.fr"
 const API_DOMAIN = process.env.API_DOMAIN; // e.g., "api.azertykeycaps.fr"
+const CMS_DOMAIN = process.env.CMS_DOMAIN; // e.g., "cms.azertykeycaps.fr"
 
 const app = await alchemy("azertykeycaps-app", {
   stage,
@@ -31,6 +32,11 @@ const app = await alchemy("azertykeycaps-app", {
 // API database (for Better-Auth used by web/server)
 const db = await D1Database("api-db", {
   migrationsDir: "../../packages/db/src/migrations",
+});
+
+// CMS database (for Payload CMS)
+const cmsDb = await D1Database("cms-db", {
+  migrationsDir: "../../apps/cms/src/migrations",
 });
 
 // Compute URLs based on environment
@@ -49,10 +55,13 @@ const webUrl = isLocalDev
     ? `https://${WEB_DOMAIN}`
     : `https://azertykeycaps-app-web-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
 
-// CMS URL - required in prod, defaults to localhost in dev
-const cmsUrl = isProd
-  ? alchemy.env("CMS_API_URL")
-  : (process.env.CMS_API_URL ?? "http://localhost:3000");
+// CMS URL - now deployed to Cloudflare Workers
+// Note: In local dev, Alchemy runs Next.js on port 3000 (default)
+const cmsUrl = isLocalDev
+  ? "http://localhost:3000"
+  : isProd && CMS_DOMAIN
+    ? `https://${CMS_DOMAIN}`
+    : `https://azertykeycaps-app-cms-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
 
 // Secrets - use process.env with defaults for dev, alchemy.env for prod (throws if missing)
 const getSecret = (name: string, devDefault: string = "dev-secret-placeholder") => {
@@ -61,6 +70,20 @@ const getSecret = (name: string, devDefault: string = "dev-secret-placeholder") 
   }
   return process.env[name] ?? devDefault;
 };
+
+// CMS media storage (Cloudflare R2)
+const cmsBucket = await R2Bucket("cms-media", {
+  name: `azertykeycaps-cms-media-${stage}`,
+  cors: [
+    {
+      allowed: {
+        origins: isProd ? [webUrl, cmsUrl] : ["*"],
+        methods: ["GET", "PUT", "POST", "DELETE", "HEAD"],
+        headers: ["*"],
+      },
+    },
+  ],
+});
 
 export const server = await Worker("server", {
   cwd: "../../apps/server",
@@ -95,6 +118,21 @@ export const web = await TanStackStart("web", {
   },
 });
 
+// CMS Worker (Payload CMS via OpenNext)
+export const cms = await Nextjs("cms", {
+  cwd: "../../apps/cms",
+  adopt: true,
+  domains: isProd && CMS_DOMAIN ? [CMS_DOMAIN] : undefined,
+  bindings: {
+    D1: cmsDb,
+    R2: cmsBucket,
+    PAYLOAD_SECRET: getSecret("PAYLOAD_SECRET"),
+    CACHE_INVALIDATION_URL: `${serverUrl}/api/cache/invalidate`,
+    CACHE_INVALIDATION_SECRET: getSecret("CACHE_INVALIDATION_SECRET"),
+    WEB_URL: webUrl,
+  },
+});
+
 console.log(`Stage  -> ${stage}`);
 console.log(`Web    -> ${webUrl}`);
 console.log(`Server -> ${serverUrl}`);
@@ -115,6 +153,7 @@ if (process.env.PULL_REQUEST) {
 |-----|-----|
 | Web | ${web.url} |
 | Server | ${server.url} |
+| CMS | ${cms.url} |
 
 Built from commit \`${process.env.GITHUB_SHA?.slice(0, 7) || "local"}\`
 

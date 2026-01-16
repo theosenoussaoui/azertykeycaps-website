@@ -1,4 +1,4 @@
-name: Deploy Cloudflare (Web + Server)
+name: Deploy Cloudflare (Web + Server + CMS)
 
 on:
   push:
@@ -6,6 +6,7 @@ on:
     paths:
       - "apps/web/**"
       - "apps/server/**"
+      - "apps/cms/**"
       - "packages/**"
       - ".github/workflows/deploy-cloudflare.yml"
   pull_request:
@@ -13,6 +14,7 @@ on:
     paths:
       - "apps/web/**"
       - "apps/server/**"
+      - "apps/cms/**"
       - "packages/**"
       - ".github/workflows/deploy-cloudflare.yml"
   workflow_dispatch:
@@ -72,15 +74,17 @@ jobs:
           BETTER_AUTH_SECRET: ${{ secrets.BETTER_AUTH_SECRET }}
           BETTER_AUTH_URL: ${{ secrets.BETTER_AUTH_URL }}
           VITE_SERVER_URL: ${{ secrets.VITE_SERVER_URL }}
-          CMS_API_URL: ${{ secrets.CMS_API_URL }}
           SERVER_URL: ${{ secrets.SERVER_URL }}
-          # Cache invalidation (shared secret with CMS)
+          # Cache invalidation (shared secret between CMS and Server)
           CACHE_INVALIDATION_SECRET: ${{ secrets.CACHE_INVALIDATION_SECRET }}
-          # CMS API key for authenticated requests to Payload CMS
+          # CMS API key for authenticated requests from Server to CMS
           CMS_API_KEY: ${{ secrets.CMS_API_KEY }}
+          # Payload CMS secret (for encryption)
+          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
           # Custom domains for production (Alchemy attaches these to Workers)
           WEB_DOMAIN: ${{ secrets.WEB_DOMAIN }}
           API_DOMAIN: ${{ secrets.API_DOMAIN }}
+          CMS_DOMAIN: ${{ secrets.CMS_DOMAIN }}
 
   cleanup:
     runs-on: ubuntu-latest

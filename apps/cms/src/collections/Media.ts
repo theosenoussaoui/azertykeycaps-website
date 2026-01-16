@@ -10,7 +10,6 @@ export const Media: CollectionConfig = {
     read: () => true,
   },
   // When media is populated from relationships, include filename for URL generation
-  // and sizes for responsive images
   defaultPopulate: {
     id: true,
     alt: true,
@@ -18,7 +17,7 @@ export const Media: CollectionConfig = {
     filename: true, // Required for Payload to construct correct URLs
     width: true,
     height: true,
-    sizes: true,
+    // Note: sizes removed - image processing disabled on Cloudflare Workers
   },
   hooks: {
     afterChange: [collectionAfterChangeHook],
@@ -32,33 +31,11 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
-    imageSizes: [
-      {
-        name: "thumbnail",
-        width: 400,
-        height: 225, // 16:9 aspect ratio
-        position: "centre",
-      },
-      {
-        name: "card",
-        width: 768,
-        height: 432, // 16:9 aspect ratio
-        position: "centre",
-      },
-      {
-        name: "hero",
-        width: 1200,
-        height: 675, // 16:9 aspect ratio - optimized for article detail pages
-        position: "centre",
-      },
-    ],
-    formatOptions: {
-      format: "webp",
-      options: {
-        quality: 80,
-      },
-    },
-    adminThumbnail: "thumbnail",
+    // Image resizing disabled - sharp is not available on Cloudflare Workers
+    // Original images are served directly from R2
+    // Consider using Cloudflare Images for on-the-fly transforms in the future
+    crop: false,
+    focalPoint: false,
     mimeTypes: ["image/*"],
   },
 };

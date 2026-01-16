@@ -5,21 +5,8 @@
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": ["dist/**", ".next/**"],
-      "env": ["PAYLOAD_SECRET", "DATABASE_URL", "DATABASE_AUTH_TOKEN", "BLOB_READ_WRITE_TOKEN"]
-    },
-    "@azertykeycaps-app/cms#build": {
-      "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$", ".env*", "src/migrations/**"],
-      "outputs": [".next/**"],
-      "env": ["PAYLOAD_SECRET", "DATABASE_URL", "DATABASE_AUTH_TOKEN", "BLOB_READ_WRITE_TOKEN"],
-      "passThroughEnv": [
-        "PAYLOAD_SECRET",
-        "DATABASE_URL",
-        "DATABASE_AUTH_TOKEN",
-        "BLOB_READ_WRITE_TOKEN"
-      ],
-      "cache": false
+      "outputs": ["dist/**", ".next/**", ".open-next/**"],
+      "env": ["PAYLOAD_SECRET"]
     },
     "lint": {
       "dependsOn": ["^lint"]
