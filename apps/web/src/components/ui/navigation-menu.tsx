@@ -82,7 +82,7 @@ function NavigationMenuTrigger(props: NavigationMenuPrimitive.Trigger.Props) {
       className={cn(
         "group inline-flex h-9 items-center justify-center gap-1 px-3 py-2 text-sm font-medium transition-colors",
         "text-muted-foreground hover:text-foreground",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
+        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
         "data-[popup-open]:text-foreground",
         className,
       )}
@@ -125,7 +125,7 @@ function NavigationMenuLink(props: NavigationMenuPrimitive.Link.Props) {
     <NavigationMenuPrimitive.Link
       data-slot="navigation-menu-link"
       className={cn(
-        "block select-none p-3 leading-none no-underline outline-none transition-colors",
+        "block p-3 leading-none no-underline transition-colors outline-none select-none",
         "hover:bg-accent hover:text-accent-foreground",
         "focus-visible:bg-accent focus-visible:text-accent-foreground focus-visible:outline-none",
         "data-[active]:text-foreground",

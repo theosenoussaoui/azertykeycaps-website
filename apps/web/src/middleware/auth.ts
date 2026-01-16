@@ -1,5 +1,5 @@
-import { createMiddleware } from "@tanstack/react-start";
 import { auth } from "@azertykeycaps-app/auth";
+import { createMiddleware } from "@tanstack/react-start";
 
 export const authMiddleware = createMiddleware().server(async ({ next, request }) => {
   // Use server-side auth API instead of client

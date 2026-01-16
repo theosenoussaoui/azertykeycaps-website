@@ -9,14 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from "./routes/__root";
-import { Route as LoginRouteImport } from "./routes/login";
-import { Route as DashboardRouteImport } from "./routes/dashboard";
 import { Route as AppRouteImport } from "./routes/_app";
-import { Route as AppIndexRouteImport } from "./routes/_app/index";
-import { Route as AppSuggestRouteImport } from "./routes/_app/suggest";
 import { Route as AppAboutRouteImport } from "./routes/_app/about";
-import { Route as AppProfileSlugRouteImport } from "./routes/_app/profile.$slug";
 import { Route as AppArticlesSlugRouteImport } from "./routes/_app/articles.$slug";
+import { Route as AppIndexRouteImport } from "./routes/_app/index";
+import { Route as AppProfileSlugRouteImport } from "./routes/_app/profile.$slug";
+import { Route as AppSuggestRouteImport } from "./routes/_app/suggest";
+import { Route as DashboardRouteImport } from "./routes/dashboard";
+import { Route as LoginRouteImport } from "./routes/login";
 
 const LoginRoute = LoginRouteImport.update({
   id: "/login",
@@ -205,8 +205,9 @@ export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>();
 
-import type { getRouter } from "./router.tsx";
 import type { createStart } from "@tanstack/react-start";
+
+import type { getRouter } from "./router.tsx";
 declare module "@tanstack/react-start" {
   interface Register {
     ssr: true;

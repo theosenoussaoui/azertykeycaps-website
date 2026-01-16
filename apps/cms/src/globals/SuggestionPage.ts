@@ -1,4 +1,5 @@
 import type { GlobalConfig } from "payload";
+
 import { isAuthenticated } from "../access/authenticated";
 import { globalAfterChangeHook } from "../hooks/cache-invalidation";
 

@@ -1,6 +1,7 @@
 import type { GlobalConfig } from "payload";
-import { globalAfterChangeHook } from "../hooks/cache-invalidation";
+
 import { isAuthenticated } from "../access/authenticated";
+import { globalAfterChangeHook } from "../hooks/cache-invalidation";
 
 export const SocialNetworks: GlobalConfig = {
   slug: "social-networks",

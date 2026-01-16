@@ -1,8 +1,8 @@
+import { ARTICLE_MATERIALS, ARTICLE_STATUS } from "@azertykeycaps-app/schemas";
 import type { CollectionConfig } from "payload";
 
-import { ARTICLE_MATERIALS, ARTICLE_STATUS } from "@azertykeycaps-app/schemas";
-import { collectionAfterChangeHook, collectionAfterDeleteHook } from "../hooks/cache-invalidation";
 import { isAuthenticated } from "../access/authenticated";
+import { collectionAfterChangeHook, collectionAfterDeleteHook } from "../hooks/cache-invalidation";
 
 export const Articles: CollectionConfig = {
   slug: "articles",

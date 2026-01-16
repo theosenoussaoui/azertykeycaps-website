@@ -1,9 +1,6 @@
-import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
 import type { Article } from "@azertykeycaps-app/schemas";
-
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { ArrowLeftIcon, ExternalLinkIcon, AlertTriangleIcon, AlertCircleIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -21,25 +18,14 @@ import { PageContainer, PageSection, PageSectionContent } from "@/components/ui/
 import { t } from "@/i18n";
 import { STATUS_VARIANTS } from "@/lib/article-utils";
 import { formatDate } from "@/lib/date-utils";
-import { serverEnv } from "@/lib/server-env";
-
-// Create a server-side tRPC client that calls the API server
-function createServerTRPCClient() {
-  return createTRPCClient<AppRouter>({
-    links: [
-      httpBatchLink({
-        url: `${serverEnv.SERVER_URL}/trpc`,
-      }),
-    ],
-  });
-}
+import { serverTRPCClient } from "@/lib/server-trpc";
 
 // Server function to fetch article by slug via API server
+// Uses module-scoped tRPC client for reduced cold start time
 const getArticleBySlug = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string }) => data)
   .handler(async ({ data }) => {
-    const client = createServerTRPCClient();
-    return await client.articles.bySlug.query({ slug: data.slug });
+    return await serverTRPCClient.articles.bySlug.query({ slug: data.slug });
   });
 
 export const Route = createFileRoute("/_app/articles/$slug")({

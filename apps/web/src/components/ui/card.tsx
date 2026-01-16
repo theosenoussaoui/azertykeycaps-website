@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 function Card({ className, render, ...props }: useRender.ComponentProps<"div">) {
   const defaultProps = {
     className: cn(
-      "relative flex flex-col gap-6 border bg-card not-dark:bg-clip-padding py-6 text-card-foreground shadow-xs/5 before:pointer-events-none before:absolute before:inset-0 before:shadow-[0_1px_--theme(--color-black/6%)] dark:before:shadow-[0_-1px_--theme(--color-white/6%)]",
+      "relative flex flex-col gap-6 border bg-card py-6 text-card-foreground shadow-xs/5 not-dark:bg-clip-padding before:pointer-events-none before:absolute before:inset-0 before:shadow-[0_1px_--theme(--color-black/6%)] dark:before:shadow-[0_-1px_--theme(--color-white/6%)]",
       className,
     ),
     "data-slot": "card",
@@ -39,7 +39,7 @@ function CardHeader({ className, render, ...props }: useRender.ComponentProps<"d
 
 function CardTitle({ className, render, ...props }: useRender.ComponentProps<"div">) {
   const defaultProps = {
-    className: cn("font-semibold text-lg leading-none", className),
+    className: cn("text-lg leading-none font-semibold", className),
     "data-slot": "card-title",
   };
 
@@ -52,7 +52,7 @@ function CardTitle({ className, render, ...props }: useRender.ComponentProps<"di
 
 function CardDescription({ className, render, ...props }: useRender.ComponentProps<"div">) {
   const defaultProps = {
-    className: cn("text-muted-foreground text-sm", className),
+    className: cn("text-sm text-muted-foreground", className),
     "data-slot": "card-description",
   };
 

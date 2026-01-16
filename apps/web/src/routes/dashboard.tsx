@@ -1,6 +1,6 @@
+import { appRouter } from "@azertykeycaps-app/api/routers/index";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { appRouter } from "@azertykeycaps-app/api/routers/index";
 
 import { getUser } from "@/functions/get-user";
 

@@ -1,5 +1,4 @@
 import type { Article } from "@azertykeycaps-app/schemas";
-
 import { Link } from "@tanstack/react-router";
 
 import { Badge } from "@/components/ui/badge";
@@ -39,7 +38,7 @@ export function ArticleCard({ article, preload = "intent" }: ArticleCardProps) {
             />
             {/* New Badge - Positioned over image */}
             {article.isNew && (
-              <Badge variant="default" className="absolute right-2 top-2">
+              <Badge variant="default" className="absolute top-2 right-2">
                 {i18n.common.new}
               </Badge>
             )}

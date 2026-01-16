@@ -1,8 +1,5 @@
-import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
-
 import { createFileRoute, Link, getRouteApi, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { AlertCircleIcon, InboxIcon } from "lucide-react";
 
 import { ArticleCard } from "@/components/article-card";
@@ -27,24 +24,12 @@ import {
   PageSectionContent,
 } from "@/components/ui/page-container";
 import { t } from "@/i18n";
-import { serverEnv } from "@/lib/server-env";
-
-// Create a server-side tRPC client
-function createServerTRPCClient() {
-  return createTRPCClient<AppRouter>({
-    links: [
-      httpBatchLink({
-        url: `${serverEnv.SERVER_URL}/trpc`,
-      }),
-    ],
-  });
-}
+import { serverTRPCClient } from "@/lib/server-trpc";
 
 // Server function to fetch latest articles for landing page
+// Uses module-scoped tRPC client for reduced cold start time
 const getLatestArticles = createServerFn({ method: "GET" }).handler(async () => {
-  const client = createServerTRPCClient();
-
-  const articles = await client.articles.list.query({
+  const articles = await serverTRPCClient.articles.list.query({
     page: 1,
     limit: 3,
   });

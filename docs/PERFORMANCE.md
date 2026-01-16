@@ -378,7 +378,120 @@ Test production site: https://pagespeed.web.dev/
 
 ---
 
-## 10. Future Optimizations
+## 10. TTFB / Cold Start Optimization (Cloudflare Workers)
+
+Cloudflare Workers can experience cold starts when the worker hasn't been invoked recently. This adds 200-500ms to the initial request.
+
+### 10.1 Cron Triggers (Keep Workers Warm)
+
+Add cron triggers to ping workers every minute, preventing cold starts:
+
+```typescript
+// packages/infra/alchemy.run.ts
+export const server = await Worker("server", {
+  // ... other config
+  crons: isProd ? ["* * * * *"] : undefined, // Run every minute in production
+});
+
+export const web = await TanStackStart("web", {
+  // ... other config
+  crons: isProd ? ["* * * * *"] : undefined,
+});
+```
+
+Then add a scheduled handler to your worker:
+
+```typescript
+// apps/server/src/index.ts
+export default {
+  fetch: app.fetch,
+
+  // Scheduled handler for cron triggers (keeps worker warm)
+  async scheduled(event: ScheduledEvent, env: unknown, ctx: ExecutionContext) {
+    console.log(`[cron] Warm-up at ${new Date(event.scheduledTime).toISOString()}`);
+
+    // Optionally pre-warm connections
+    ctx.waitUntil(
+      fetch(`${env.CMS_API_URL}/api/globals/social-networks`, {
+        method: "HEAD",
+      }).catch(() => {}),
+    );
+  },
+};
+```
+
+**Impact:** Eliminates cold starts for frequently visited sites
+
+### 10.2 Smart Placement
+
+Enable automatic network optimization to reduce latency:
+
+```typescript
+// packages/infra/alchemy.run.ts
+export const server = await Worker("server", {
+  // ... other config
+  placement: { mode: "smart" }, // Optimize network placement
+});
+```
+
+**Impact:** Reduced latency by placing workers closer to data sources
+
+### 10.3 Module-Scoped Client Initialization
+
+Initialize clients at module scope to reduce cold start time:
+
+```typescript
+// apps/web/src/lib/server-trpc.ts
+import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import { serverEnv } from "./server-env";
+
+// Initialized at module scope - reused across requests
+export const serverTRPCClient = createTRPCClient({
+  links: [
+    httpBatchLink({
+      url: `${serverEnv.SERVER_URL}/trpc`,
+    }),
+  ],
+});
+```
+
+```typescript
+// In route files - use the shared client
+import { serverTRPCClient } from "@/lib/server-trpc";
+
+const getData = createServerFn({ method: "GET" }).handler(async () => {
+  // Reuses the module-scoped client
+  return await serverTRPCClient.articles.list.query();
+});
+```
+
+**Why:** Creating clients inside handlers adds overhead on every request. Module-scoped clients are created once during worker initialization.
+
+**Impact:** -50-100ms per request
+
+### 10.4 Understanding the Request Chain
+
+```
+User Request
+    |
+    v  [~200-500ms cold start if cold]
+Web Worker (TanStack Start SSR)
+    |
+    | HTTP call to /trpc
+    v  [~200-500ms cold start if cold]
+API Server Worker (Hono)
+    |
+    | HTTP call to CMS
+    v  [~100-300ms]
+Payload CMS
+```
+
+**Worst case without optimization:** 1-1.5s TTFB
+**With cron triggers + smart placement:** <300ms TTFB
+
+---
+
+## 11. Future Optimizations
 
 Consider implementing these additional optimizations:
 
@@ -386,4 +499,4 @@ Consider implementing these additional optimizations:
 2. **Service Worker** - Cache static assets for repeat visits
 3. **Prefetch DNS** - Add `dns-prefetch` for external domains
 4. **HTTP/2 Push** - Server push critical resources
-5. **Edge Caching** - Cloudflare cache optimization
+5. **Edge Caching** - See `docs/CACHING.md` for CDN cache strategies

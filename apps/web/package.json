@@ -4,9 +4,9 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "serve": "vite preview",
+    "check-types": "tsc -b",
     "dev:bare": "vite dev",
-    "check-types": "tsc -b"
+    "serve": "vite preview"
   },
   "dependencies": {
     "@azertykeycaps-app/api": "workspace:*",

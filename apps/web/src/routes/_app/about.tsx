@@ -1,9 +1,5 @@
-import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
-
 import { createFileRoute, useRouter } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
-
 import { AlertCircleIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -23,23 +19,12 @@ import {
   PageSectionContent,
 } from "@/components/ui/page-container";
 import { t } from "@/i18n";
-import { serverEnv } from "@/lib/server-env";
-
-// Create a server-side tRPC client
-function createServerTRPCClient() {
-  return createTRPCClient<AppRouter>({
-    links: [
-      httpBatchLink({
-        url: `${serverEnv.SERVER_URL}/trpc`,
-      }),
-    ],
-  });
-}
+import { serverTRPCClient } from "@/lib/server-trpc";
 
 // Server function to fetch about page content
+// Uses module-scoped tRPC client for reduced cold start time
 const getAboutPageContent = createServerFn({ method: "GET" }).handler(async () => {
-  const client = createServerTRPCClient();
-  return await client.globals.informationsPage.query();
+  return await serverTRPCClient.globals.informationsPage.query();
 });
 
 export const Route = createFileRoute("/_app/about")({

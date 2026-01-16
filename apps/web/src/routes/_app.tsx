@@ -1,32 +1,17 @@
-import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
 import type { SocialNetworks, KeycapProfileRef } from "@azertykeycaps-app/schemas";
-
 import { createFileRoute, Outlet, ErrorComponent } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
 
-import Header from "@/components/header";
 import Footer from "@/components/footer";
-import { serverEnv } from "@/lib/server-env";
-
-// Create a server-side tRPC client
-function createServerTRPCClient() {
-  return createTRPCClient<AppRouter>({
-    links: [
-      httpBatchLink({
-        url: `${serverEnv.SERVER_URL}/trpc`,
-      }),
-    ],
-  });
-}
+import Header from "@/components/header";
+import { serverTRPCClient } from "@/lib/server-trpc";
 
 // Server function to fetch layout data (social networks + profiles for nav)
+// Uses module-scoped tRPC client for reduced cold start time
 const getLayoutData = createServerFn({ method: "GET" }).handler(async () => {
-  const client = createServerTRPCClient();
-
   const [socialNetworks, profiles] = await Promise.all([
-    client.globals.socialNetworks.query(),
-    client.articles.profiles.query({ limit: 100 }),
+    serverTRPCClient.globals.socialNetworks.query(),
+    serverTRPCClient.articles.profiles.query({ limit: 100 }),
   ]);
 
   return {

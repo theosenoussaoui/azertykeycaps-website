@@ -1,6 +1,3 @@
-import { TRPCError } from "@trpc/server";
-import { stringify } from "qs-esm";
-
 import {
   articleListInputSchema,
   articleBySlugInputSchema,
@@ -12,6 +9,8 @@ import {
   type ArticleListResponse,
   type KeycapProfileRef,
 } from "@azertykeycaps-app/schemas";
+import { TRPCError } from "@trpc/server";
+import { stringify } from "qs-esm";
 
 import { publicProcedure, router } from "../index";
 

@@ -1,13 +1,15 @@
-// v1.0.1
-import { trpcServer } from "@hono/trpc-server";
 import { createContext } from "@azertykeycaps-app/api/context";
 import { appRouter } from "@azertykeycaps-app/api/routers/index";
 import { auth } from "@azertykeycaps-app/auth";
 import { env } from "@azertykeycaps-app/env/server";
+// v1.0.2 - Added cron handler for cold start prevention
+import type { ScheduledEvent, ExecutionContext } from "@cloudflare/workers-types";
+import { trpcServer } from "@hono/trpc-server";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { secureHeaders } from "hono/secure-headers";
+
 import {
   mediaCacheMiddleware,
   invalidateCache,
@@ -205,4 +207,34 @@ app.get("/debug/cms", async (c) => {
   }
 });
 
-export default app;
+// Export worker with both fetch and scheduled handlers
+export default {
+  // HTTP request handler
+  fetch: app.fetch,
+
+  // Scheduled handler for cron triggers (keeps worker warm)
+  // Runs every minute in production to prevent cold starts
+  async scheduled(event: ScheduledEvent, env: unknown, ctx: ExecutionContext) {
+    // Log the cron execution for observability
+    console.log(`[cron] Warm-up triggered at ${new Date(event.scheduledTime).toISOString()}`);
+
+    // Optionally pre-warm CMS connection by making a lightweight request
+    // This ensures the next real request doesn't have to establish a new connection
+    try {
+      const cmsUrl = (env as { CMS_API_URL?: string }).CMS_API_URL;
+      if (cmsUrl) {
+        // Use waitUntil to not block the cron response
+        ctx.waitUntil(
+          fetch(`${cmsUrl}/api/globals/social-networks`, {
+            method: "HEAD",
+            headers: { "Content-Type": "application/json" },
+          }).catch(() => {
+            // Silently ignore errors - this is just a warm-up
+          }),
+        );
+      }
+    } catch {
+      // Ignore errors - the main goal is to keep the worker warm
+    }
+  },
+};

@@ -1,9 +1,8 @@
 import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
 import type { QueryClient } from "@tanstack/react-query";
-import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
-
-import { lazy, Suspense } from "react";
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
+import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
+import { lazy, Suspense } from "react";
 
 import appCss from "../index.css?url";
 
@@ -73,7 +72,7 @@ function RootDocument() {
         <HeadContent />
       </head>
       <body className="relative">
-        <div className="isolate relative flex min-h-svh flex-col">
+        <div className="relative isolate flex min-h-svh flex-col">
           <Outlet />
           <Suspense fallback={null}>
             <Toaster richColors />

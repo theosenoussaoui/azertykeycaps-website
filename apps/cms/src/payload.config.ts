@@ -1,23 +1,23 @@
-import { sqliteAdapter } from "@payloadcms/db-sqlite";
-import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
-import { lexicalEditor } from "@payloadcms/richtext-lexical";
-import { fr } from "@payloadcms/translations/languages/fr";
-import { en } from "@payloadcms/translations/languages/en";
 import path from "path";
-import { buildConfig } from "payload";
 import { fileURLToPath } from "url";
+
+import { sqliteAdapter } from "@payloadcms/db-sqlite";
+import { lexicalEditor } from "@payloadcms/richtext-lexical";
+import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
+import { en } from "@payloadcms/translations/languages/en";
+import { fr } from "@payloadcms/translations/languages/fr";
+import { buildConfig } from "payload";
 import sharp from "sharp";
 
-// Collections
-import { Users } from "./collections/Users";
-import { Media } from "./collections/Media";
 import { Articles } from "./collections/Articles";
 import { KeycapProfiles } from "./collections/KeycapProfiles";
-
+import { Media } from "./collections/Media";
+// Collections
+import { Users } from "./collections/Users";
 // Globals
 import { Homepage } from "./globals/Homepage";
-import { SocialNetworks } from "./globals/SocialNetworks";
 import { InformationsPage } from "./globals/InformationsPage";
+import { SocialNetworks } from "./globals/SocialNetworks";
 import { SuggestionPage } from "./globals/SuggestionPage";
 
 const filename = fileURLToPath(import.meta.url);

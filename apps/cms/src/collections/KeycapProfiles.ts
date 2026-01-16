@@ -1,8 +1,8 @@
+import { PROFILE_SHAPES } from "@azertykeycaps-app/schemas";
 import type { CollectionConfig } from "payload";
 
-import { PROFILE_SHAPES } from "@azertykeycaps-app/schemas";
-import { collectionAfterChangeHook, collectionAfterDeleteHook } from "../hooks/cache-invalidation";
 import { isAuthenticated } from "../access/authenticated";
+import { collectionAfterChangeHook, collectionAfterDeleteHook } from "../hooks/cache-invalidation";
 
 export const KeycapProfiles: CollectionConfig = {
   slug: "keycap-profiles",

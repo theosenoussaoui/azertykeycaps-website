@@ -1,7 +1,6 @@
-import type { Context as HonoContext } from "hono";
-
 import { auth } from "@azertykeycaps-app/auth";
 import { env } from "@azertykeycaps-app/env/server";
+import type { Context as HonoContext } from "hono";
 
 export type CreateContextOptions = {
   context: HonoContext<{ Bindings: Env }>;
