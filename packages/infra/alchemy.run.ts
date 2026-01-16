@@ -1,5 +1,5 @@
 import alchemy from "alchemy";
-import { TanStackStart, Worker, D1Database, R2Bucket, Nextjs } from "alchemy/cloudflare";
+import { TanStackStart, Worker, D1Database } from "alchemy/cloudflare";
 import { GitHubComment } from "alchemy/github";
 import { CloudflareStateStore } from "alchemy/state";
 import { config } from "dotenv";
@@ -34,11 +34,6 @@ const db = await D1Database("api-db", {
   migrationsDir: "../../packages/db/src/migrations",
 });
 
-// CMS database (for Payload CMS)
-const cmsDb = await D1Database("cms-db", {
-  migrationsDir: "../../apps/cms/src/migrations",
-});
-
 // Compute URLs based on environment
 // Local dev: use localhost
 // Prod with custom domains: use custom domains
@@ -55,13 +50,12 @@ const webUrl = isLocalDev
     ? `https://${WEB_DOMAIN}`
     : `https://azertykeycaps-app-web-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
 
-// CMS URL - now deployed to Cloudflare Workers
-// Note: In local dev, Alchemy runs Next.js on port 3000 (default)
+// CMS URL - deployed separately via opennextjs-cloudflare (not managed by Alchemy)
 const cmsUrl = isLocalDev
-  ? "http://localhost:3000"
+  ? "http://localhost:3002"
   : isProd && CMS_DOMAIN
     ? `https://${CMS_DOMAIN}`
-    : `https://azertykeycaps-app-cms-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
+    : `https://azertykeycaps-cms-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
 
 // Secrets - use process.env with defaults for dev, alchemy.env for prod (throws if missing)
 const getSecret = (name: string, devDefault: string = "dev-secret-placeholder") => {
@@ -71,26 +65,12 @@ const getSecret = (name: string, devDefault: string = "dev-secret-placeholder") 
   return process.env[name] ?? devDefault;
 };
 
-// CMS media storage (Cloudflare R2)
-const cmsBucket = await R2Bucket("cms-media", {
-  name: `azertykeycaps-cms-media-${stage}`,
-  cors: [
-    {
-      allowed: {
-        origins: isProd ? [webUrl, cmsUrl] : ["*"],
-        methods: ["GET", "PUT", "POST", "DELETE", "HEAD"],
-        headers: ["*"],
-      },
-    },
-  ],
-});
-
 export const server = await Worker("server", {
   cwd: "../../apps/server",
   entrypoint: "src/index.ts",
   compatibility: "node",
   domains: isProd && API_DOMAIN ? [API_DOMAIN] : undefined,
-  placement: { mode: "smart" }, // Optimize network placement for latency
+  placement: { mode: "smart" },
   bindings: {
     DB: db,
     CORS_ORIGIN: webUrl,
@@ -108,7 +88,7 @@ export const server = await Worker("server", {
 export const web = await TanStackStart("web", {
   cwd: "../../apps/web",
   domains: isProd && WEB_DOMAIN ? [WEB_DOMAIN] : undefined,
-  placement: { mode: "smart" }, // Optimize network placement for latency
+  placement: { mode: "smart" },
   bindings: {
     VITE_SERVER_URL: serverUrl,
     CORS_ORIGIN: webUrl,
@@ -118,28 +98,13 @@ export const web = await TanStackStart("web", {
   },
 });
 
-// CMS Worker (Payload CMS via OpenNext)
-export const cms = await Nextjs("cms", {
-  cwd: "../../apps/cms",
-  adopt: true,
-  domains: isProd && CMS_DOMAIN ? [CMS_DOMAIN] : undefined,
-  bindings: {
-    D1: cmsDb,
-    R2: cmsBucket,
-    PAYLOAD_SECRET: getSecret("PAYLOAD_SECRET"),
-    CACHE_INVALIDATION_URL: `${serverUrl}/api/cache/invalidate`,
-    CACHE_INVALIDATION_SECRET: getSecret("CACHE_INVALIDATION_SECRET"),
-    WEB_URL: webUrl,
-  },
-});
+// Note: CMS is deployed separately - see apps/cms/wrangler.toml
+// CMS manages its own D1 database and R2 bucket via wrangler
 
 console.log(`Stage  -> ${stage}`);
 console.log(`Web    -> ${webUrl}`);
 console.log(`Server -> ${serverUrl}`);
-console.log(`CMS    -> ${cmsUrl}`);
-console.log(
-  `CMS_API_KEY -> ${process.env.CMS_API_KEY ? "set (" + process.env.CMS_API_KEY.slice(0, 8) + "...)" : "NOT SET"}`,
-);
+console.log(`CMS    -> ${cmsUrl} (deployed separately)`);
 
 // GitHub PR comment for preview deployments
 if (process.env.PULL_REQUEST) {
@@ -153,7 +118,7 @@ if (process.env.PULL_REQUEST) {
 |-----|-----|
 | Web | ${web.url} |
 | Server | ${server.url} |
-| CMS | ${cms.url} |
+| CMS | ${cmsUrl} |
 
 Built from commit \`${process.env.GITHUB_SHA?.slice(0, 7) || "local"}\`
 

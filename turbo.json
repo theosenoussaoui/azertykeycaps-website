@@ -40,6 +40,29 @@
     },
     "destroy": {
       "cache": false
+    },
+    "deploy:database": {
+      "cache": false,
+      "env": ["CLOUDFLARE_ENV", "PAYLOAD_SECRET", "CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"]
+    },
+    "deploy:app": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "env": ["CLOUDFLARE_ENV", "CLOUDFLARE_API_TOKEN", "CLOUDFLARE_ACCOUNT_ID"]
+    },
+    "migrate:create": {
+      "cache": false
+    },
+    "migrate:status": {
+      "cache": false
+    },
+    "generate:types": {
+      "cache": false
+    },
+    "preview": {
+      "dependsOn": ["build"],
+      "cache": false,
+      "persistent": true
     }
   }
 }

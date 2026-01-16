@@ -18,7 +18,9 @@
 
 # OpenNext (Cloudflare Workers build output)
 /.open-next/
-wrangler.jsonc
+
+# Wrangler local state (do NOT ignore wrangler.jsonc - it's our config)
+.wrangler/
 
 # production
 /build
@@ -42,7 +44,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Payload generated (regenerated on build)
+# Payload generated (regenerated in CI before build)
 importMap.js
 
 .env

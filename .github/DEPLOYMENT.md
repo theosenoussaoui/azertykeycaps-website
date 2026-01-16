@@ -91,38 +91,161 @@ CMS:           https://cms.azertykeycaps.fr      (Payload on Vercel)
 ```
                     GitHub Actions
                           |
+                deploy-cloudflare.yml
+                          |
           +---------------+---------------+
           |                               |
-    deploy-cloudflare.yml           deploy-cms.yml
+     Alchemy Deploy                  Wrangler Deploy
+    (Web + Server)                      (CMS)
           |                               |
           v                               v
     +-----+-----+                   +-----+-----+
-    |  Alchemy  |                   |   Vercel  |
+    | Cloudflare|                   | Cloudflare|
+    |  Workers  |                   |  Workers  |
     +-----------+                   +-----------+
           |                               |
     +-----+-----+                   +-----+-----+
-    | Cloudflare|                   |   Turso   |
-    |  Workers  |                   |  + Blob   |
+    |    D1     |                   |  D1 + R2  |
+    | (api-db)  |                   | (cms-db)  |
     +-----------+                   +-----------+
-          |
-    +-----+-----+
-    |    D1     |
-    | Database  |
-    +-----------+
 ```
 
 **Deployments:**
 
 - **Web + Server** → Cloudflare Workers (via Alchemy)
-- **CMS** → Vercel (with Turso database + Vercel Blob storage)
+- **CMS** → Cloudflare Workers (via wrangler + opennextjs-cloudflare)
 
 ## Workflows
 
-| Workflow                | Trigger                                | Deploys                              |
-| ----------------------- | -------------------------------------- | ------------------------------------ |
-| `ci.yml`                | All pushes/PRs                         | Type check, lint, build verification |
-| `deploy-cloudflare.yml` | Push to main, PRs (web/server changes) | Web + Server to Cloudflare           |
-| `deploy-cms.yml`        | Push to main, PRs (cms changes)        | CMS to Vercel                        |
+| Workflow                | Trigger                                    | Deploys                                 |
+| ----------------------- | ------------------------------------------ | --------------------------------------- |
+| `ci.yml`                | All pushes/PRs                             | Type check, lint, build verification    |
+| `deploy-cloudflare.yml` | Push to main, PRs (web/server/cms changes) | Web + Server (Alchemy) + CMS (wrangler) |
+
+## CMS Deployment Setup (Cloudflare Workers)
+
+The CMS is deployed independently from Alchemy using the standard Payload + wrangler workflow.
+
+### Initial Setup (One-time)
+
+The D1 databases and R2 buckets need to be created manually before the first deployment:
+
+```bash
+cd apps/cms
+
+# Create production D1 database
+wrangler d1 create azertykeycaps-cms-db-prod
+# Output: database_id = "66c18deb-28f3-4a6f-aeeb-73886d495f76"
+
+# Create preview D1 database (shared for all PRs)
+wrangler d1 create azertykeycaps-cms-db-preview
+# Output: database_id = "5eb5f498-07dd-48a7-a2d9-094f1cfe2594"
+
+# Create production R2 bucket (media storage)
+wrangler r2 bucket create azertykeycaps-cms-media-prod
+
+# Create preview R2 bucket
+wrangler r2 bucket create azertykeycaps-cms-media-preview
+```
+
+After creating the resources, update `apps/cms/wrangler.jsonc` with the actual database IDs.
+
+### Configuration File
+
+The CMS uses `apps/cms/wrangler.jsonc` for all environments:
+
+- **Default (no env)**: Preview environment - used for PRs and CI
+- **prod**: Production environment - only for main branch deploys
+- Local dev uses Miniflare's local emulation automatically (when `remoteBindings: false`)
+
+### Deployment Commands
+
+```bash
+cd apps/cms
+
+# Deploy to production (main branch)
+CLOUDFLARE_ENV=prod bun run deploy
+
+# Deploy to preview (PRs) - uses default config
+bun run deploy
+
+# Run migrations only
+CLOUDFLARE_ENV=prod bun run deploy:database  # prod
+bun run deploy:database                       # preview (default)
+
+# Deploy app only (without migrations)
+CLOUDFLARE_ENV=prod bun run deploy:app
+bun run deploy:app
+```
+
+### How Migrations Work
+
+The `deploy:database` script runs:
+
+1. `payload migrate` - Applies Payload schema migrations to D1
+2. `wrangler d1 execute D1 --command 'PRAGMA optimize'` - Optimizes the database
+
+**Important:** The `"remote": true` flag in wrangler.jsonc ensures migrations run against the actual remote D1 database, not a local emulator.
+
+### Secrets Configuration
+
+CMS secrets are set via wrangler:
+
+```bash
+# Set production secrets
+wrangler secret put PAYLOAD_SECRET --env prod
+wrangler secret put CACHE_INVALIDATION_SECRET --env prod
+
+# Set preview secrets (default config)
+wrangler secret put PAYLOAD_SECRET
+wrangler secret put CACHE_INVALIDATION_SECRET
+```
+
+Or via CI environment variables (they're passed automatically in the workflow).
+
+### Local Development
+
+Local development uses Miniflare (Wrangler's local emulator) to provide D1 and R2 bindings without connecting to remote Cloudflare services.
+
+```bash
+# From root - starts all apps (web, server, cms)
+bun run dev
+
+# Start only CMS
+bun run dev:cms
+
+# Start web + server without CMS
+bun run dev:no-cms
+```
+
+The CMS runs at `http://localhost:3002/admin` in local dev.
+
+**How it works:**
+
+- `wrangler.jsonc` default config (no env) uses local D1/R2
+- `getPlatformProxy()` from wrangler creates local Miniflare bindings
+- Data is stored in `.wrangler/` directory (gitignored)
+- No Cloudflare authentication needed for local dev
+
+**Environment variables for local dev:**
+Create `apps/cms/.env` with:
+
+```
+PAYLOAD_SECRET=your-local-dev-secret
+```
+
+### Cloudflare Resources Summary
+
+| Resource              | Name                              | Purpose             |
+| --------------------- | --------------------------------- | ------------------- |
+| D1 Database (prod)    | `azertykeycaps-cms-db-prod`       | CMS data storage    |
+| D1 Database (preview) | `azertykeycaps-cms-db-preview`    | PR preview CMS data |
+| R2 Bucket (prod)      | `azertykeycaps-cms-media-prod`    | Media file storage  |
+| R2 Bucket (preview)   | `azertykeycaps-cms-media-preview` | PR preview media    |
+| Worker (prod)         | `azertykeycaps-cms-prod`          | CMS application     |
+| Worker (preview)      | `azertykeycaps-cms-preview`       | PR preview CMS      |
+
+---
 
 ## GitHub Secrets Configuration
 
@@ -154,20 +277,14 @@ Go to **Settings → Secrets and variables → Actions** in your GitHub reposito
 | `CACHE_INVALIDATION_SECRET` | Shared secret for cache purge | Generate: `openssl rand -base64 32`     |
 | `CMS_API_KEY`               | Payload CMS API key           | Generate in CMS admin panel (see below) |
 
-#### Vercel & CMS (10 secrets)
+#### CMS (Cloudflare Workers) (2 secrets)
 
-| Secret                   | Description            | How to Get                                                            |
-| ------------------------ | ---------------------- | --------------------------------------------------------------------- |
-| `VERCEL_TOKEN`           | Vercel API token       | [Vercel Settings → Tokens](https://vercel.com/account/tokens)         |
-| `VERCEL_ORG_ID`          | Vercel organization ID | Project Settings → General → Vercel ID                                |
-| `VERCEL_CMS_PROJECT_ID`  | CMS project ID         | Project Settings → General → Project ID                               |
-| `PAYLOAD_SECRET`         | CMS encryption key     | Generate: `openssl rand -base64 32`                                   |
-| `CMS_PUBLIC_URL`         | Public CMS URL         | `https://cms.azertykeycaps.fr`                                        |
-| `DATABASE_URL`           | Turso database URL     | `libsql://your-db-name.turso.io`                                      |
-| `DATABASE_AUTH_TOKEN`    | Turso auth token       | [Turso Dashboard](https://turso.tech/app) → Database → Generate Token |
-| `BLOB_READ_WRITE_TOKEN`  | Vercel Blob token      | Auto-set via Vercel Blob Integration, or create in Vercel Dashboard   |
-| `CACHE_INVALIDATION_URL` | Server cache endpoint  | `https://api.azertykeycaps.fr/api/cache/invalidate`                   |
-| `WEB_URL`                | Public website URL     | `https://azertykeycaps.fr`                                            |
+| Secret                      | Description                   | How to Get                          |
+| --------------------------- | ----------------------------- | ----------------------------------- |
+| `PAYLOAD_SECRET`            | CMS encryption key            | Generate: `openssl rand -base64 32` |
+| `CACHE_INVALIDATION_SECRET` | Shared secret for cache purge | Generate: `openssl rand -base64 32` |
+
+**Note:** Other CMS config (WEB_URL, CACHE_INVALIDATION_URL) is set in `apps/cms/wrangler.jsonc` vars.
 
 ### Complete Secrets Checklist
 

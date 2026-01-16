@@ -20,5 +20,4 @@ const nextConfig = {
 
 export default withPayload(nextConfig, { devBundleServerPackages: false });
 
-// Initialize OpenNext for local development with Cloudflare bindings
 initOpenNextCloudflareForDev();

@@ -1,0 +1,74 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "azertykeycaps-cms-preview",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-08-15",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1,
+    "logs": {
+      "enabled": true,
+      "head_sampling_rate": 1,
+      "invocation_logs": true,
+    },
+  },
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+
+  // Default config uses preview database with remote: true
+  // This ensures migrations in CI work correctly
+  // Local dev will use Miniflare's local emulation automatically
+  "d1_databases": [
+    {
+      "binding": "D1",
+      "database_id": "29ecbbda-5256-426b-9f5d-ffe6766089a2",
+      "database_name": "azertykeycaps-cms-db-preview",
+      "remote": true,
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "azertykeycaps-cms-media-preview",
+    },
+  ],
+  "vars": {
+    "WEB_URL": "https://azertykeycaps-app-web-preview.theosen95.workers.dev",
+    "CACHE_INVALIDATION_URL": "https://azertykeycaps-app-server-preview.theosen95.workers.dev/api/cache/invalidate",
+  },
+
+  // Production environment
+  // Deploy with: CLOUDFLARE_ENV=prod bun run deploy
+  "env": {
+    "prod": {
+      "name": "azertykeycaps-cms-prod",
+      "d1_databases": [
+        {
+          "binding": "D1",
+          "database_id": "66c18deb-28f3-4a6f-aeeb-73886d495f76",
+          "database_name": "azertykeycaps-cms-db-prod",
+          "remote": true,
+        },
+      ],
+      "r2_buckets": [
+        {
+          "binding": "R2",
+          "bucket_name": "azertykeycaps-cms-media-prod",
+        },
+      ],
+      "vars": {
+        "WEB_URL": "https://www.azertykeycaps.fr",
+        "CACHE_INVALIDATION_URL": "https://api.azertykeycaps.fr/api/cache/invalidate",
+      },
+      "routes": [
+        {
+          "pattern": "cms.azertykeycaps.fr/*",
+          "zone_name": "azertykeycaps.fr",
+        },
+      ],
+    },
+  },
+}

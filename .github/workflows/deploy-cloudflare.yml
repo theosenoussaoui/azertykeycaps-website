@@ -33,7 +33,8 @@ jobs:
     if: ${{ github.event.action != 'closed' }}
     uses: ./.github/workflows/ci.yml
 
-  deploy:
+  # Deploy Web + Server via Alchemy (runs in parallel with CMS)
+  deploy-apps:
     if: ${{ github.event.action != 'closed' }}
     needs: ci
     runs-on: ubuntu-latest
@@ -43,13 +44,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
 
       - name: Install dependencies
         run: bun install
 
-      - name: Deploy to Cloudflare
+      - name: Deploy Web + Server to Cloudflare
         run: bun alchemy deploy --stage ${{ env.STAGE }}
         working-directory: packages/infra
         env:
@@ -85,6 +91,50 @@ jobs:
           WEB_DOMAIN: ${{ secrets.WEB_DOMAIN }}
           API_DOMAIN: ${{ secrets.API_DOMAIN }}
           CMS_DOMAIN: ${{ secrets.CMS_DOMAIN }}
+
+  # Deploy CMS via Payload/wrangler (runs in parallel with Web + Server)
+  deploy-cms:
+    if: ${{ github.event.action != 'closed' }}
+    needs: ci
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Deploy CMS (Payload)
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            export CLOUDFLARE_ENV=prod
+          fi
+
+          # Generate importMap (required for Next.js build)
+          bun run generate:importmap
+
+          # Run database migrations (MUST succeed - migrations are source of truth)
+          bun run deploy:database
+
+          # Build and deploy the app
+          bun run deploy:app
+
+          # Set worker secrets (must be done after deploy creates the worker)
+          echo "${{ secrets.PAYLOAD_SECRET }}" | bunx wrangler secret put PAYLOAD_SECRET ${CLOUDFLARE_ENV:+--env=$CLOUDFLARE_ENV}
+          echo "${{ secrets.CACHE_INVALIDATION_SECRET }}" | bunx wrangler secret put CACHE_INVALIDATION_SECRET ${CLOUDFLARE_ENV:+--env=$CLOUDFLARE_ENV}
+        working-directory: apps/cms
+        env:
+          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
+          CACHE_INVALIDATION_SECRET: ${{ secrets.CACHE_INVALIDATION_SECRET }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
   cleanup:
     runs-on: ubuntu-latest
