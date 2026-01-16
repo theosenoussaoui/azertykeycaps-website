@@ -56,11 +56,13 @@ export const Articles: CollectionConfig = {
       type: "relationship",
       relationTo: "keycap-profiles",
       required: true,
+      index: true, // Indexed for faster filtering by profile
       label: { fr: "Profil", en: "Profile" },
     },
     {
       name: "material",
       type: "select",
+      index: true, // Indexed for faster filtering by material
       label: { fr: "Matériau", en: "Material" },
       options: [
         {
@@ -103,6 +105,7 @@ export const Articles: CollectionConfig = {
       type: "select",
       required: true,
       defaultValue: ARTICLE_STATUS.IN_STOCK,
+      index: true, // Indexed for faster filtering by status
       label: { fr: "Statut", en: "Status" },
       options: [
         {
@@ -194,6 +197,7 @@ export const Articles: CollectionConfig = {
       name: "isNew",
       type: "checkbox",
       defaultValue: false,
+      index: true, // Indexed for faster filtering by isNew
       label: { fr: "Nouveau", en: "New" },
       admin: {
         description: {

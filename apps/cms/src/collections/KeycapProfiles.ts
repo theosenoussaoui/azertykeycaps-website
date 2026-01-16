@@ -10,6 +10,16 @@ export const KeycapProfiles: CollectionConfig = {
     singular: { fr: "Profil de keycap", en: "Keycap Profile" },
     plural: { fr: "Profils de keycap", en: "Keycap Profiles" },
   },
+  // Only return essential fields when this collection is populated from relationships
+  // This reduces response size when profiles are embedded in articles
+  defaultPopulate: {
+    id: true,
+    title: true,
+    slug: true,
+    abbreviation: true,
+    navbarDescription: true,
+    shape: true,
+  },
   admin: {
     useAsTitle: "title",
     defaultColumns: ["title", "abbreviation", "shape"],

@@ -157,6 +157,7 @@ export const articlesRouter = router({
         }
 
         // Use qs-esm to properly format query string for Payload REST API
+        // Using select to only fetch fields needed for article cards (performance optimization)
         const queryString = stringify(
           {
             limit,
@@ -164,6 +165,16 @@ export const articlesRouter = router({
             depth: 1,
             sort: "-createdAt",
             ...(Object.keys(where).length > 0 && { where }),
+            // Only select fields needed for article list/cards
+            select: {
+              id: true,
+              title: true,
+              slug: true,
+              img: true,
+              profile: true,
+              status: true,
+              isNew: true,
+            },
           },
           { addQueryPrefix: true },
         );
@@ -227,6 +238,7 @@ export const articlesRouter = router({
 
       try {
         // Use qs-esm to properly format query string for Payload REST API
+        // Using limit: 1 + pagination: false for optimized unique field query
         const queryString = stringify(
           {
             where: {
@@ -234,6 +246,7 @@ export const articlesRouter = router({
             },
             depth: 1,
             limit: 1,
+            pagination: false, // Skip pagination overhead for unique queries
           },
           { addQueryPrefix: true },
         );

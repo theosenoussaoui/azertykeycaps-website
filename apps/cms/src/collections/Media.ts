@@ -9,6 +9,17 @@ export const Media: CollectionConfig = {
     // The actual file URLs are hidden behind the server's /api/media/* proxy
     read: () => true,
   },
+  // When media is populated from relationships, include filename for URL generation
+  // and sizes for responsive images
+  defaultPopulate: {
+    id: true,
+    alt: true,
+    url: true,
+    filename: true, // Required for Payload to construct correct URLs
+    width: true,
+    height: true,
+    sizes: true,
+  },
   hooks: {
     afterChange: [collectionAfterChangeHook],
     afterDelete: [collectionAfterDeleteHook],

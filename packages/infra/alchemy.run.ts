@@ -67,9 +67,7 @@ export const server = await Worker("server", {
   entrypoint: "src/index.ts",
   compatibility: "node",
   domains: isProd && API_DOMAIN ? [API_DOMAIN] : undefined,
-  // Performance optimizations for reduced cold starts
   placement: { mode: "smart" }, // Optimize network placement for latency
-  crons: isProd ? ["* * * * *"] : undefined, // Keep worker warm (every minute)
   bindings: {
     DB: db,
     CORS_ORIGIN: webUrl,
@@ -87,12 +85,9 @@ export const server = await Worker("server", {
 export const web = await TanStackStart("web", {
   cwd: "../../apps/web",
   domains: isProd && WEB_DOMAIN ? [WEB_DOMAIN] : undefined,
-  // Performance optimizations for reduced cold starts
   placement: { mode: "smart" }, // Optimize network placement for latency
-  crons: isProd ? ["* * * * *"] : undefined, // Keep worker warm (every minute)
   bindings: {
     VITE_SERVER_URL: serverUrl,
-    DB: db,
     CORS_ORIGIN: webUrl,
     BETTER_AUTH_SECRET: getSecret("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: serverUrl,
