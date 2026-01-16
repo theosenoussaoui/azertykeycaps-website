@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { articleSchema } from "./articles";
+import { articleCardSchema } from "./articles";
 import { keycapProfileRefSchema } from "./profiles";
 
 // ============================================
@@ -22,7 +22,8 @@ export const createPaginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema
 // SPECIFIC RESPONSE SCHEMAS
 // ============================================
 
-export const articleListResponseSchema = createPaginatedResponseSchema(articleSchema);
+// Uses articleCardSchema for list responses (only fields selected in list query)
+export const articleListResponseSchema = createPaginatedResponseSchema(articleCardSchema);
 
 export const profileListResponseSchema = z.array(keycapProfileRefSchema);
 

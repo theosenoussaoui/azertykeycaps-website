@@ -21,30 +21,30 @@
   },
   "dependencies": {
     "@azertykeycaps-app/schemas": "workspace:*",
-    "@opennextjs/cloudflare": "^1.11.0",
-    "@payloadcms/db-d1-sqlite": "3.70.0",
-    "@payloadcms/next": "3.70.0",
-    "@payloadcms/richtext-lexical": "3.70.0",
-    "@payloadcms/storage-r2": "3.70.0",
-    "@payloadcms/translations": "3.70.0",
-    "@payloadcms/ui": "3.70.0",
+    "@opennextjs/cloudflare": "^1.14.9",
+    "@payloadcms/db-d1-sqlite": "3.71.1",
+    "@payloadcms/next": "3.71.1",
+    "@payloadcms/richtext-lexical": "3.71.1",
+    "@payloadcms/storage-r2": "3.71.1",
+    "@payloadcms/translations": "3.71.1",
+    "@payloadcms/ui": "3.71.1",
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
     "graphql": "^16.8.1",
     "next": "15.4.10",
-    "payload": "3.70.0",
+    "payload": "3.71.1",
     "react": "19.2.1",
     "react-dom": "19.2.1"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20250109.0",
-    "@types/node": "^22.5.4",
+    "@cloudflare/workers-types": "^4.20260116.0",
+    "@types/node": "^25.0.9",
     "@types/react": "19.2.1",
     "@types/react-dom": "19.2.1",
     "eslint": "^9.16.0",
     "eslint-config-next": "15.4.7",
     "typescript": "5.7.3",
-    "wrangler": "~4.46.0"
+    "wrangler": "~4.59.2"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0"

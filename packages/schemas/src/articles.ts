@@ -57,6 +57,19 @@ export const articleMaterialSchema = z.enum([
   ARTICLE_MATERIALS.PBT_LASER_PRINTED,
 ]);
 
+// Schema for article list items (cards) - only fields selected in list query
+export const articleListItemSchema = z.object({
+  id: z.coerce.string(),
+  title: z.string(),
+  slug: z.string(),
+  img: mediaSchema,
+  profile: keycapProfileRefSchema,
+  status: articleStatusSchema,
+  isNew: z.boolean(),
+});
+
+// Schema for full article (detail page) - all fields
+// Full article schema - all fields from CMS
 export const articleSchema = z.object({
   id: z.coerce.string(),
   title: z.string(),
@@ -78,7 +91,23 @@ export const articleSchema = z.object({
 });
 
 // ============================================
+// UI SCHEMAS (derived from base schema)
+// ============================================
+
+// Article card schema - only fields needed for list/grid display
+export const articleCardSchema = articleSchema.pick({
+  id: true,
+  title: true,
+  slug: true,
+  img: true,
+  profile: true,
+  status: true,
+  isNew: true,
+});
+
+// ============================================
 // TYPES
 // ============================================
 
 export type Article = z.infer<typeof articleSchema>;
+export type ArticleCard = z.infer<typeof articleCardSchema>;

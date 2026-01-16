@@ -1,4 +1,4 @@
-import type { Article } from "@azertykeycaps-app/schemas";
+import type { ArticleCard as ArticleCardType } from "@azertykeycaps-app/schemas";
 import { Link } from "@tanstack/react-router";
 
 import { Badge } from "@/components/ui/badge";
@@ -8,7 +8,7 @@ import { t } from "@/i18n";
 import { STATUS_VARIANTS } from "@/lib/article-utils";
 
 interface ArticleCardProps {
-  article: Article;
+  article: ArticleCardType;
   preload?: "intent" | "viewport" | "render" | false;
 }
 
