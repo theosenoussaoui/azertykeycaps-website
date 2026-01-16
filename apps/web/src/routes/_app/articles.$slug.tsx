@@ -55,6 +55,13 @@ export const Route = createFileRoute("/_app/articles/$slug")({
   },
   head: ({ loaderData }) => {
     const article = loaderData?.article;
+    // Get the best available image URL for preloading (prefer hero > card > original)
+    // Note: 'hero' size will be added to CMS - using optional chaining for forward compatibility
+    const sizes = article?.img.sizes as
+      | Record<string, { url?: string | null } | null | undefined>
+      | undefined;
+    const heroImageUrl = sizes?.hero?.url ?? sizes?.card?.url ?? article?.img.url;
+
     return {
       meta: [
         {
@@ -65,6 +72,16 @@ export const Route = createFileRoute("/_app/articles/$slug")({
           content: article?.description ?? "Decouvrez ce keyset sur Azertykeycaps.",
         },
       ],
+      // Preload hero image for faster LCP
+      links: heroImageUrl
+        ? [
+            {
+              rel: "preload",
+              as: "image",
+              href: heroImageUrl,
+            },
+          ]
+        : [],
     };
   },
   headers: () => ({
@@ -126,15 +143,28 @@ function ArticleDetailPage() {
 }
 
 function ArticleContent({ article, i18n }: { article: Article; i18n: ReturnType<typeof t> }) {
+  // Get the best available image for hero (prefer hero > card > original)
+  const sizes = article.img.sizes as
+    | Record<
+        string,
+        { url?: string | null; width?: number | null; height?: number | null } | null | undefined
+      >
+    | undefined;
+  const heroImage = sizes?.hero ?? sizes?.card ?? article.img;
+
   return (
     <article>
-      {/* Hero Image */}
+      {/* Hero Image - LCP element with high priority */}
       <figure className="mb-8">
         <img
-          src={article.img.url ?? ""}
+          src={heroImage?.url ?? article.img.url ?? ""}
           alt={article.img.alt}
           className="aspect-video w-full object-cover"
           loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          width={1200}
+          height={675}
         />
       </figure>
 

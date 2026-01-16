@@ -20,4 +20,19 @@ export default defineConfig({
   server: {
     port: 3001,
   },
+  // Optimize dependencies for faster dev startup and smaller bundles
+  optimizeDeps: {
+    include: ["lucide-react"],
+  },
+  build: {
+    // Improve chunking for better caching
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Separate lucide icons into their own chunk for better caching
+          lucide: ["lucide-react"],
+        },
+      },
+    },
+  },
 });

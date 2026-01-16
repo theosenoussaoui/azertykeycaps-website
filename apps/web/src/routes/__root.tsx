@@ -2,13 +2,34 @@ import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
 import type { QueryClient } from "@tanstack/react-query";
 import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
 
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { lazy, Suspense } from "react";
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-
-import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../index.css?url";
+
+// Lazy load Toaster - toasts are rare, no need to block initial render
+const Toaster = lazy(() =>
+  import("@/components/ui/sonner").then((m) => ({
+    default: m.Toaster,
+  })),
+);
+
+// Lazy load devtools only in development - removes ~100KB from production bundle
+const TanStackRouterDevtools = import.meta.env.DEV
+  ? lazy(() =>
+      import("@tanstack/react-router-devtools").then((m) => ({
+        default: m.TanStackRouterDevtools,
+      })),
+    )
+  : () => null;
+
+const ReactQueryDevtools = import.meta.env.DEV
+  ? lazy(() =>
+      import("@tanstack/react-query-devtools").then((m) => ({
+        default: m.ReactQueryDevtools,
+      })),
+    )
+  : () => null;
 
 export interface RouterAppContext {
   trpc: TRPCOptionsProxy<AppRouter>;
@@ -34,22 +55,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
       },
     ],
     links: [
-      // Font preconnect for performance
-      {
-        rel: "preconnect",
-        href: "https://fonts.googleapis.com",
-      },
-      {
-        rel: "preconnect",
-        href: "https://fonts.gstatic.com",
-        crossOrigin: "anonymous",
-      },
-      // Space Mono font - mono aesthetic
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap",
-      },
-      // App styles
+      // App styles (includes self-hosted Space Mono font via Fontsource)
       {
         rel: "stylesheet",
         href: appCss,
@@ -69,9 +75,11 @@ function RootDocument() {
       <body className="relative">
         <div className="isolate relative flex min-h-svh flex-col">
           <Outlet />
-          <Toaster richColors />
-          <TanStackRouterDevtools position="bottom-left" />
-          <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
+          <Suspense fallback={null}>
+            <Toaster richColors />
+            <TanStackRouterDevtools position="bottom-left" />
+            <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
+          </Suspense>
           <Scripts />
         </div>
       </body>

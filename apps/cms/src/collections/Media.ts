@@ -33,6 +33,12 @@ export const Media: CollectionConfig = {
         height: 432, // 16:9 aspect ratio
         position: "centre",
       },
+      {
+        name: "hero",
+        width: 1200,
+        height: 675, // 16:9 aspect ratio - optimized for article detail pages
+        position: "centre",
+      },
     ],
     formatOptions: {
       format: "webp",

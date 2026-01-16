@@ -20,7 +20,7 @@ export function ArticleCard({ article, preload = "intent" }: ArticleCardProps) {
     <article>
       <Link to="/articles/$slug" params={{ slug: article.slug }} preload={preload}>
         <Card className="h-full transition-shadow hover:shadow-lg">
-          {/* Article Image */}
+          {/* Article Image - with explicit dimensions to prevent CLS */}
           <figure className="relative overflow-hidden">
             <img
               src={article.img.sizes?.card?.url ?? article.img.url ?? ""}
@@ -34,6 +34,8 @@ export function ArticleCard({ article, preload = "intent" }: ArticleCardProps) {
               className="aspect-video w-full object-cover"
               loading="lazy"
               decoding="async"
+              width={768}
+              height={432}
             />
             {/* New Badge - Positioned over image */}
             {article.isNew && (

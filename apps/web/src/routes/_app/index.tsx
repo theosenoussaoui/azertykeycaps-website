@@ -66,13 +66,27 @@ export const Route = createFileRoute("/_app/")({
   }),
   staleTime: 60_000,
   gcTime: 5 * 60_000,
-  head: () => {
+  head: ({ loaderData }) => {
     const i18n = t();
+    // Get the first article's image for LCP preloading
+    const firstArticle = loaderData?.articles?.docs?.[0];
+    const preloadImageUrl = firstArticle?.img.sizes?.card?.url ?? firstArticle?.img.url;
+
     return {
       meta: [
         { title: i18n.home.metaTitle },
         { name: "description", content: i18n.home.metaDescription },
       ],
+      // Preload first article image for faster LCP on homepage
+      links: preloadImageUrl
+        ? [
+            {
+              rel: "preload",
+              as: "image",
+              href: preloadImageUrl,
+            },
+          ]
+        : [],
     };
   },
   errorComponent: () => {
@@ -135,7 +149,7 @@ function HomeComponent() {
               </EmptyHeader>
             </Empty>
           ) : (
-            <ul className="grid gap-6 @sm:grid-cols-2 @lg:grid-cols-3" role="list">
+            <ul className="article-grid grid gap-6 @sm:grid-cols-2 @lg:grid-cols-3" role="list">
               {articles.docs.map((article) => (
                 <li key={article.id}>
                   <ArticleCard article={article} />
