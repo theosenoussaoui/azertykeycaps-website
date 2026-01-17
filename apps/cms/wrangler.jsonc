@@ -4,6 +4,8 @@
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-08-15",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "placement": { "mode": "smart" },
+  "workers_dev": true,
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1,
@@ -45,6 +47,8 @@
   "env": {
     "prod": {
       "name": "azertykeycaps-cms-prod",
+      "placement": { "mode": "smart" },
+      "workers_dev": true,
       "d1_databases": [
         {
           "binding": "D1",
@@ -60,13 +64,13 @@
         },
       ],
       "vars": {
-        "WEB_URL": "https://www.azertykeycaps.fr",
+        "WEB_URL": "https://staging.azertykeycaps.fr",
         "CACHE_INVALIDATION_URL": "https://api.azertykeycaps.fr/api/cache/invalidate",
       },
       "routes": [
         {
-          "pattern": "cms.azertykeycaps.fr/*",
-          "zone_name": "azertykeycaps.fr",
+          "pattern": "cms.azertykeycaps.fr",
+          "custom_domain": true,
         },
       ],
     },

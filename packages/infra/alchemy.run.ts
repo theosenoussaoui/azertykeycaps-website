@@ -104,7 +104,6 @@ export const web = await TanStackStart("web", {
 console.log(`Stage  -> ${stage}`);
 console.log(`Web    -> ${webUrl}`);
 console.log(`Server -> ${serverUrl}`);
-console.log(`CMS    -> ${cmsUrl} (deployed separately)`);
 
 // GitHub PR comment for preview deployments
 if (process.env.PULL_REQUEST) {
@@ -118,7 +117,6 @@ if (process.env.PULL_REQUEST) {
 |-----|-----|
 | Web | ${web.url} |
 | Server | ${server.url} |
-| CMS | ${cmsUrl} |
 
 Built from commit \`${process.env.GITHUB_SHA?.slice(0, 7) || "local"}\`
 

@@ -4,88 +4,6 @@ This document describes how to set up GitHub Actions deployments for the azertyk
 
 ---
 
-## DNS Setup (Cloudflare)
-
-### Prerequisites
-
-- Domain `azertykeycaps.fr` registered at OVH
-- Cloudflare account (free tier is fine)
-- Current site running on Vercel (will keep running during migration)
-
-### Step 1: Add Domain to Cloudflare
-
-1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com)
-2. Click **Add a site** → Enter `azertykeycaps.fr`
-3. Select **Free plan**
-4. Cloudflare will scan existing DNS records
-5. Click **Continue to activation**
-6. Copy the 2 nameservers Cloudflare provides (e.g., `adaline.ns.cloudflare.com`)
-
-### Step 2: Update OVH Nameservers
-
-1. Go to [OVH Dashboard](https://www.ovh.com/manager/)
-2. Navigate to **Web Cloud** → **Domain names** → `azertykeycaps.fr`
-3. Click **DNS Servers** tab → **Modify DNS servers**
-4. Replace OVH nameservers with Cloudflare's
-5. Save and wait 1-24 hours for propagation
-
-### Step 3: Configure DNS Records (Gradual Migration)
-
-After Cloudflare shows domain as **"Active"**, configure DNS:
-
-| Type  | Name      | Content                                     | Proxy            | Purpose                       |
-| ----- | --------- | ------------------------------------------- | ---------------- | ----------------------------- |
-| CNAME | `@`       | `cname.vercel-dns.com`                      | DNS only (gray)  | Keep current Vercel site live |
-| CNAME | `www`     | `azertykeycaps.fr`                          | Proxied (orange) | Redirect to root              |
-| CNAME | `staging` | `azertykeycaps-app-web-prod.workers.dev`    | Proxied (orange) | **NEW** - Test new site       |
-| CNAME | `api`     | `azertykeycaps-app-server-prod.workers.dev` | Proxied (orange) | **NEW** - Hono API            |
-| CNAME | `cms`     | `cname.vercel-dns.com`                      | DNS only (gray)  | **NEW** - Payload CMS         |
-
-> **Important:** Keep all MX records for email!
-
-### Step 4: Configure Vercel Custom Domain for CMS
-
-1. Vercel Dashboard → CMS Project → Settings → Domains
-2. Add `cms.azertykeycaps.fr`
-3. Vercel will verify the CNAME automatically
-
-### Step 5: Get Cloudflare IDs
-
-In Cloudflare Dashboard → Overview page (right sidebar):
-
-- **Account ID** - Under "API" section
-- **Zone ID** - Under "API" section
-
-### Going Live (When Ready)
-
-When you're ready to switch from Vercel to Cloudflare Workers:
-
-1. In Cloudflare DNS, change the `@` record:
-   - **From:** `cname.vercel-dns.com` (DNS only)
-   - **To:** `azertykeycaps-app-web-prod.workers.dev` (Proxied)
-2. Optionally delete or keep `staging` subdomain
-
-### Environment URLs Summary
-
-**During staging:**
-
-```
-Staging site:  https://staging.azertykeycaps.fr  (new TanStack Start)
-API:           https://api.azertykeycaps.fr      (new Hono server)
-CMS:           https://cms.azertykeycaps.fr      (Payload CMS)
-Current site:  https://azertykeycaps.fr          (old Vercel - still live)
-```
-
-**After going live:**
-
-```
-Website:       https://azertykeycaps.fr          (TanStack Start on Workers)
-API:           https://api.azertykeycaps.fr      (Hono on Workers)
-CMS:           https://cms.azertykeycaps.fr      (Payload on Vercel)
-```
-
----
-
 ## Architecture Overview
 
 ```
@@ -110,25 +28,79 @@ CMS:           https://cms.azertykeycaps.fr      (Payload on Vercel)
     +-----------+                   +-----------+
 ```
 
-**Deployments:**
+**All apps deploy to Cloudflare Workers:**
 
-- **Web + Server** → Cloudflare Workers (via Alchemy)
-- **CMS** → Cloudflare Workers (via wrangler + opennextjs-cloudflare)
+| App    | Deployment Tool | Database    | Storage | Custom Domain          |
+| ------ | --------------- | ----------- | ------- | ---------------------- |
+| Web    | Alchemy         | -           | -       | `www.azertykeycaps.fr` |
+| Server | Alchemy         | D1 (api-db) | -       | `api.azertykeycaps.fr` |
+| CMS    | Wrangler        | D1 (cms-db) | R2      | `cms.azertykeycaps.fr` |
+
+---
+
+## DNS Setup (Cloudflare)
+
+### Prerequisites
+
+- Domain `azertykeycaps.fr` registered at OVH
+- Cloudflare account (free tier is fine)
+- Nameservers pointed to Cloudflare
+
+### DNS Records
+
+| Type  | Name  | Content                                     | Proxy            | Purpose         |
+| ----- | ----- | ------------------------------------------- | ---------------- | --------------- |
+| CNAME | `@`   | `azertykeycaps-app-web-prod.workers.dev`    | Proxied (orange) | Main website    |
+| CNAME | `www` | `azertykeycaps-app-web-prod.workers.dev`    | Proxied (orange) | WWW redirect    |
+| CNAME | `api` | `azertykeycaps-app-server-prod.workers.dev` | Proxied (orange) | Hono API server |
+| CNAME | `cms` | `azertykeycaps-cms-prod.workers.dev`        | Proxied (orange) | Payload CMS     |
+
+> **Important:** Keep all MX records for email!
+
+### Get Cloudflare IDs
+
+In Cloudflare Dashboard → Overview page (right sidebar):
+
+- **Account ID** - Under "API" section
+- **Zone ID** - Under "API" section
+
+---
 
 ## Workflows
 
 | Workflow                | Trigger                                    | Deploys                                 |
 | ----------------------- | ------------------------------------------ | --------------------------------------- |
 | `ci.yml`                | All pushes/PRs                             | Type check, lint, build verification    |
-| `deploy-cloudflare.yml` | Push to main, PRs (web/server/cms changes) | Web + Server (Alchemy) + CMS (wrangler) |
+| `deploy-cloudflare.yml` | Push to main, PRs (web/server/cms changes) | Web + Server (Alchemy) + CMS (Wrangler) |
 
-## CMS Deployment Setup (Cloudflare Workers)
+### Deployment Flow
 
-The CMS is deployed independently from Alchemy using the standard Payload + wrangler workflow.
+```
+Push to main or PR
+        |
+        v
+   CI Checks (ci.yml)
+        |
+        +------ Pass ------+
+        |                  |
+        v                  v
+  deploy-apps         deploy-cms
+  (Alchemy)           (Wrangler)
+        |                  |
+        v                  v
+  Web + Server          CMS
+  to Workers          to Workers
+```
+
+---
+
+## CMS Deployment (Cloudflare Workers)
+
+The CMS is deployed independently using `opennextjs-cloudflare` and Wrangler.
 
 ### Initial Setup (One-time)
 
-The D1 databases and R2 buckets need to be created manually before the first deployment:
+Create D1 databases and R2 buckets before first deployment:
 
 ```bash
 cd apps/cms
@@ -139,7 +111,7 @@ wrangler d1 create azertykeycaps-cms-db-prod
 
 # Create preview D1 database (shared for all PRs)
 wrangler d1 create azertykeycaps-cms-db-preview
-# Output: database_id = "5eb5f498-07dd-48a7-a2d9-094f1cfe2594"
+# Output: database_id = "29ecbbda-5256-426b-9f5d-ffe6766089a2"
 
 # Create production R2 bucket (media storage)
 wrangler r2 bucket create azertykeycaps-cms-media-prod
@@ -148,15 +120,14 @@ wrangler r2 bucket create azertykeycaps-cms-media-prod
 wrangler r2 bucket create azertykeycaps-cms-media-preview
 ```
 
-After creating the resources, update `apps/cms/wrangler.jsonc` with the actual database IDs.
+Update `apps/cms/wrangler.jsonc` with the database IDs.
 
 ### Configuration File
 
-The CMS uses `apps/cms/wrangler.jsonc` for all environments:
+The CMS uses `apps/cms/wrangler.jsonc`:
 
-- **Default (no env)**: Preview environment - used for PRs and CI
-- **prod**: Production environment - only for main branch deploys
-- Local dev uses Miniflare's local emulation automatically (when `remoteBindings: false`)
+- **Default (no env)**: Preview environment - PRs and local dev
+- **prod env**: Production - main branch deploys only
 
 ### Deployment Commands
 
@@ -166,12 +137,12 @@ cd apps/cms
 # Deploy to production (main branch)
 CLOUDFLARE_ENV=prod bun run deploy
 
-# Deploy to preview (PRs) - uses default config
+# Deploy to preview (PRs)
 bun run deploy
 
 # Run migrations only
 CLOUDFLARE_ENV=prod bun run deploy:database  # prod
-bun run deploy:database                       # preview (default)
+bun run deploy:database                       # preview
 
 # Deploy app only (without migrations)
 CLOUDFLARE_ENV=prod bun run deploy:app
@@ -183,58 +154,23 @@ bun run deploy:app
 The `deploy:database` script runs:
 
 1. `payload migrate` - Applies Payload schema migrations to D1
-2. `wrangler d1 execute D1 --command 'PRAGMA optimize'` - Optimizes the database
+2. Uses `remote: true` flag to target actual Cloudflare D1
 
-**Important:** The `"remote": true` flag in wrangler.jsonc ensures migrations run against the actual remote D1 database, not a local emulator.
+**Important:** Never mix "push mode" and migrations on the same database. Use migrations for production.
 
-### Secrets Configuration
-
-CMS secrets are set via wrangler:
+### Setting Secrets
 
 ```bash
 # Set production secrets
-wrangler secret put PAYLOAD_SECRET --env prod
-wrangler secret put CACHE_INVALIDATION_SECRET --env prod
+echo "your-secret" | wrangler secret put PAYLOAD_SECRET --env prod
+echo "your-secret" | wrangler secret put CACHE_INVALIDATION_SECRET --env prod
 
-# Set preview secrets (default config)
-wrangler secret put PAYLOAD_SECRET
-wrangler secret put CACHE_INVALIDATION_SECRET
+# Set preview secrets
+echo "your-secret" | wrangler secret put PAYLOAD_SECRET
+echo "your-secret" | wrangler secret put CACHE_INVALIDATION_SECRET
 ```
 
-Or via CI environment variables (they're passed automatically in the workflow).
-
-### Local Development
-
-Local development uses Miniflare (Wrangler's local emulator) to provide D1 and R2 bindings without connecting to remote Cloudflare services.
-
-```bash
-# From root - starts all apps (web, server, cms)
-bun run dev
-
-# Start only CMS
-bun run dev:cms
-
-# Start web + server without CMS
-bun run dev:no-cms
-```
-
-The CMS runs at `http://localhost:3002/admin` in local dev.
-
-**How it works:**
-
-- `wrangler.jsonc` default config (no env) uses local D1/R2
-- `getPlatformProxy()` from wrangler creates local Miniflare bindings
-- Data is stored in `.wrangler/` directory (gitignored)
-- No Cloudflare authentication needed for local dev
-
-**Environment variables for local dev:**
-Create `apps/cms/.env` with:
-
-```
-PAYLOAD_SECRET=your-local-dev-secret
-```
-
-### Cloudflare Resources Summary
+### Cloudflare Resources
 
 | Resource              | Name                              | Purpose             |
 | --------------------- | --------------------------------- | ------------------- |
@@ -247,48 +183,107 @@ PAYLOAD_SECRET=your-local-dev-secret
 
 ---
 
+## Web + Server Deployment (Alchemy)
+
+Managed by `packages/infra/alchemy.run.ts`.
+
+### Resources Created
+
+| Resource        | Name                         | Purpose               |
+| --------------- | ---------------------------- | --------------------- |
+| D1 Database     | `azertykeycaps-app-api-db-*` | Better-Auth user data |
+| Worker (web)    | `azertykeycaps-app-web-*`    | TanStack Start SSR    |
+| Worker (server) | `azertykeycaps-app-server-*` | Hono API server       |
+
+### Custom Domains
+
+In production (`STAGE=prod`), custom domains are attached via Alchemy:
+
+- Web: `WEB_DOMAIN` env var → `www.azertykeycaps.fr`
+- Server: `API_DOMAIN` env var → `api.azertykeycaps.fr`
+
+---
+
+## Local Development
+
+```bash
+# From root - starts all apps (web, server, cms)
+bun run dev
+
+# Start only CMS
+bun run dev:cms
+
+# Start web + server without CMS
+bun run dev:no-cms
+```
+
+**Local URLs:**
+
+- Web: `http://localhost:3001`
+- Server: `http://localhost:1337`
+- CMS: `http://localhost:3002/admin`
+
+**Local environment:**
+
+- Uses Miniflare for D1/R2 emulation
+- Data stored in `.wrangler/` (gitignored)
+- No Cloudflare auth needed
+
+Create `apps/cms/.env` for local dev:
+
+```
+PAYLOAD_SECRET=your-local-dev-secret
+```
+
+---
+
 ## GitHub Secrets Configuration
 
 Go to **Settings → Secrets and variables → Actions** in your GitHub repository.
 
 ### Required Secrets
 
-#### Cloudflare & Alchemy (12 secrets)
+#### Cloudflare & Alchemy (6 secrets)
 
-| Secret                  | Description                     | How to Get                                                                                                             |
-| ----------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| `ALCHEMY_PASSWORD`      | Encrypts Alchemy state          | Generate: `openssl rand -base64 32`                                                                                    |
-| `ALCHEMY_STATE_TOKEN`   | Cloudflare R2 state store token | See [Alchemy State Store Guide](https://alchemy.run/guides/cloudflare-state-store)                                     |
-| `CLOUDFLARE_API_TOKEN`  | Cloudflare API access           | [Cloudflare Dashboard](https://dash.cloudflare.com/profile/api-tokens) - Create token with Workers, D1, R2 permissions |
-| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account         | [Find Account ID](https://developers.cloudflare.com/fundamentals/account/find-account-and-zone-ids/)                   |
-| `CLOUDFLARE_EMAIL`      | Cloudflare account email        | Your Cloudflare login email                                                                                            |
-| `CLOUDFLARE_ZONE_ID`    | Zone for CDN cache purge        | Cloudflare Dashboard → Your domain → Overview (right sidebar)                                                          |
+| Secret                  | Description                     | How to Get                                                                                      |
+| ----------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------- |
+| `ALCHEMY_PASSWORD`      | Encrypts Alchemy state          | Generate: `openssl rand -base64 32`                                                             |
+| `ALCHEMY_STATE_TOKEN`   | Cloudflare R2 state store token | See [Alchemy State Store Guide](https://alchemy.run/guides/cloudflare-state-store)              |
+| `CLOUDFLARE_API_TOKEN`  | Cloudflare API access           | [Create token](https://dash.cloudflare.com/profile/api-tokens) with Workers, D1, R2 permissions |
+| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account         | Cloudflare Dashboard → Overview (right sidebar)                                                 |
+| `CLOUDFLARE_EMAIL`      | Cloudflare account email        | Your login email                                                                                |
+| `CLOUDFLARE_ZONE_ID`    | Zone for CDN cache purge        | Cloudflare Dashboard → Your domain → Overview                                                   |
+
+#### Custom Domains (3 secrets)
+
+| Secret       | Description       | Example                |
+| ------------ | ----------------- | ---------------------- |
+| `WEB_DOMAIN` | Web app domain    | `www.azertykeycaps.fr` |
+| `API_DOMAIN` | API server domain | `api.azertykeycaps.fr` |
+| `CMS_DOMAIN` | CMS domain        | `cms.azertykeycaps.fr` |
 
 #### App Environment (7 secrets)
 
-| Secret                      | Description                   | Example                                 |
-| --------------------------- | ----------------------------- | --------------------------------------- |
-| `CORS_ORIGIN`               | Allowed CORS origin           | `https://azertykeycaps.fr`              |
-| `BETTER_AUTH_SECRET`        | Auth encryption key           | Generate: `openssl rand -base64 32`     |
-| `BETTER_AUTH_URL`           | Auth callback URL             | `https://api.azertykeycaps.fr`          |
-| `VITE_SERVER_URL`           | Server URL for web app        | `https://api.azertykeycaps.fr`          |
-| `CMS_API_URL`               | Payload CMS API URL           | `https://cms.azertykeycaps.fr`          |
-| `SERVER_URL`                | Server self-reference         | `https://api.azertykeycaps.fr`          |
-| `CACHE_INVALIDATION_SECRET` | Shared secret for cache purge | Generate: `openssl rand -base64 32`     |
-| `CMS_API_KEY`               | Payload CMS API key           | Generate in CMS admin panel (see below) |
+| Secret                      | Description                   | Example                           |
+| --------------------------- | ----------------------------- | --------------------------------- |
+| `CORS_ORIGIN`               | Allowed CORS origin           | `https://www.azertykeycaps.fr`    |
+| `BETTER_AUTH_SECRET`        | Auth encryption key           | `openssl rand -base64 32`         |
+| `BETTER_AUTH_URL`           | Auth callback URL             | `https://api.azertykeycaps.fr`    |
+| `VITE_SERVER_URL`           | Server URL for web app        | `https://api.azertykeycaps.fr`    |
+| `SERVER_URL`                | Server self-reference         | `https://api.azertykeycaps.fr`    |
+| `CACHE_INVALIDATION_SECRET` | Shared secret for cache purge | `openssl rand -base64 32`         |
+| `CMS_API_KEY`               | Payload CMS API key           | Generate in CMS admin (see below) |
 
-#### CMS (Cloudflare Workers) (2 secrets)
+#### CMS Secrets (2 secrets)
 
-| Secret                      | Description                   | How to Get                          |
-| --------------------------- | ----------------------------- | ----------------------------------- |
-| `PAYLOAD_SECRET`            | CMS encryption key            | Generate: `openssl rand -base64 32` |
-| `CACHE_INVALIDATION_SECRET` | Shared secret for cache purge | Generate: `openssl rand -base64 32` |
-
-**Note:** Other CMS config (WEB_URL, CACHE_INVALIDATION_URL) is set in `apps/cms/wrangler.jsonc` vars.
+| Secret                      | Description                   | How to Get                         |
+| --------------------------- | ----------------------------- | ---------------------------------- |
+| `PAYLOAD_SECRET`            | CMS encryption key            | `openssl rand -base64 32`          |
+| `CACHE_INVALIDATION_SECRET` | Shared secret for cache purge | Same as above (shared with Server) |
 
 ### Complete Secrets Checklist
 
-```
+```bash
 # Cloudflare & Alchemy
 ALCHEMY_PASSWORD=<openssl rand -base64 32>
 ALCHEMY_STATE_TOKEN=<from alchemy state store setup>
@@ -297,68 +292,69 @@ CLOUDFLARE_ACCOUNT_ID=<from cloudflare dashboard>
 CLOUDFLARE_EMAIL=<your-email@example.com>
 CLOUDFLARE_ZONE_ID=<from cloudflare dashboard>
 
-# App Environment (use staging URLs during migration, then switch to prod)
-# Staging:
-CORS_ORIGIN=https://staging.azertykeycaps.fr
+# Custom Domains
+WEB_DOMAIN=www.azertykeycaps.fr
+API_DOMAIN=api.azertykeycaps.fr
+CMS_DOMAIN=cms.azertykeycaps.fr
+
+# App Environment
+CORS_ORIGIN=https://www.azertykeycaps.fr
 BETTER_AUTH_SECRET=<openssl rand -base64 32>
 BETTER_AUTH_URL=https://api.azertykeycaps.fr
 VITE_SERVER_URL=https://api.azertykeycaps.fr
-CMS_API_URL=https://cms.azertykeycaps.fr
 SERVER_URL=https://api.azertykeycaps.fr
 CACHE_INVALIDATION_SECRET=<openssl rand -base64 32>
-CMS_API_KEY=<from cms admin panel - see instructions below>
-# After going live, change CORS_ORIGIN to: https://azertykeycaps.fr
+CMS_API_KEY=<from cms admin panel>
 
-# Vercel & CMS
-VERCEL_TOKEN=<from vercel dashboard>
-VERCEL_ORG_ID=<from vercel project settings>
-VERCEL_CMS_PROJECT_ID=<from vercel project settings>
+# CMS
 PAYLOAD_SECRET=<openssl rand -base64 32>
-CMS_PUBLIC_URL=https://cms.azertykeycaps.fr
-DATABASE_URL=libsql://your-db.turso.io
-DATABASE_AUTH_TOKEN=<from turso dashboard>
-BLOB_READ_WRITE_TOKEN=<from vercel blob integration>
-CACHE_INVALIDATION_URL=https://api.azertykeycaps.fr/api/cache/invalidate
-WEB_URL=https://azertykeycaps.fr
 ```
+
+---
 
 ## Generating CMS API Key
 
-After deploying the CMS, you need to generate an API key for the server to authenticate with the CMS:
+After deploying the CMS:
 
-1. Go to your CMS admin panel: `https://cms.azertykeycaps.fr/admin`
-2. Login with your admin account
+1. Go to CMS admin: `https://cms.azertykeycaps.fr/admin`
+2. Login with admin account
 3. Navigate to **Users** collection
 4. Click **Create New User**
 5. Fill in:
-   - Email: `api@azertykeycaps.fr` (or any email)
-   - Password: Generate a strong password
-   - Role: Select **API**
-6. Save the user
-7. Edit the user you just created
-8. Scroll down to find **Enable API Key** checkbox
-9. Check it and click **Save**
-10. Copy the generated API key
-11. Add it as `CMS_API_KEY` secret in GitHub Actions
+   - Email: `api@azertykeycaps.fr`
+   - Password: Strong password
+   - Role: **API**
+6. Save, then edit the user
+7. Check **Enable API Key** and save
+8. Copy the generated API key
+9. Add as `CMS_API_KEY` secret in GitHub
 
-**Important:** The API key is only shown once when generated. If you lose it, you'll need to regenerate it.
+**Note:** API key is only shown once. Regenerate if lost.
+
+---
 
 ## Preview Deployments
 
-### Cloudflare (Web + Server)
+### How It Works
 
 - **Stage naming**: `pr-{number}` for PRs, `prod` for main branch
-- **Preview URLs**: Auto-generated by Cloudflare Workers
-- **Cleanup**: Automatic when PR is closed/merged
+- **Preview URLs**: Auto-generated `*.workers.dev` URLs
+- **Cleanup**: Automatic when PR is closed/merged (Web + Server only)
 
-### Vercel (CMS)
+### PR Comment
 
-- **Preview URLs**: Generated by Vercel for each PR
-- **Comment**: Bot posts preview URL on PR
+Alchemy posts a comment on PRs with preview URLs:
+
+| App    | URL                                                 |
+| ------ | --------------------------------------------------- |
+| Web    | `https://azertykeycaps-app-web-pr-X.workers.dev`    |
+| Server | `https://azertykeycaps-app-server-pr-X.workers.dev` |
+
+---
 
 ## Cache Invalidation Flow
 
-When content changes in the CMS:
+When content changes in CMS:
 
 ```
 CMS Content Update
@@ -368,86 +364,115 @@ CMS Content Update
 | Payload Hook |
 +------+------+
        |
-       +---------------+
-       |               |
-       v               v
-Server Cache      Cloudflare CDN
-  Purge              Purge
-       |               |
-       v               v
-/api/cache/       Zone Cache
- invalidate         Purge API
+       v
+Server Cache Purge
+/api/cache/invalidate
+       |
+       v
+Cloudflare CDN Purge
+(via Zone API)
 ```
 
-**Required for cache invalidation:**
+**Required:**
 
 1. `CACHE_INVALIDATION_SECRET` - Shared between CMS and Server
-2. `CACHE_INVALIDATION_URL` - Server endpoint
-3. `CLOUDFLARE_ZONE_ID` + `CLOUDFLARE_API_TOKEN` - CDN purge
-4. `WEB_URL` - Target URLs to purge
+2. `CACHE_INVALIDATION_URL` - Set in `wrangler.jsonc` vars
+3. `CF_ZONE_ID` + `CF_API_TOKEN` - For CDN purge (Server bindings)
+
+---
+
+## Environment Variables Summary
+
+| Variable                    | Web | Server | CMS | Source             |
+| --------------------------- | --- | ------ | --- | ------------------ |
+| `VITE_SERVER_URL`           | ✅  | -      | -   | Alchemy binding    |
+| `SERVER_URL`                | -   | ✅     | -   | Alchemy binding    |
+| `CORS_ORIGIN`               | ✅  | ✅     | -   | Alchemy binding    |
+| `BETTER_AUTH_SECRET`        | ✅  | ✅     | -   | GitHub Secret      |
+| `BETTER_AUTH_URL`           | ✅  | ✅     | -   | Alchemy binding    |
+| `CMS_API_URL`               | -   | ✅     | -   | Alchemy binding    |
+| `CMS_API_KEY`               | -   | ✅     | -   | GitHub Secret      |
+| `CACHE_INVALIDATION_SECRET` | -   | ✅     | ✅  | GitHub Secret      |
+| `CACHE_INVALIDATION_URL`    | -   | -      | ✅  | wrangler.jsonc var |
+| `WEB_URL`                   | -   | -      | ✅  | wrangler.jsonc var |
+| `CF_ZONE_ID`                | -   | ✅     | -   | GitHub Secret      |
+| `CF_API_TOKEN`              | -   | ✅     | -   | GitHub Secret      |
+| `PAYLOAD_SECRET`            | -   | -      | ✅  | Wrangler secret    |
+| `D1` (binding)              | -   | ✅     | ✅  | Alchemy/Wrangler   |
+| `R2` (binding)              | -   | -      | ✅  | Wrangler           |
+
+---
 
 ## Troubleshooting
 
 ### Alchemy Deployment Fails
 
 ```bash
-# Check Alchemy state store token is valid
-curl -H "Authorization: Bearer $ALCHEMY_STATE_TOKEN" \
-  https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/r2/buckets
-
-# Verify Cloudflare API token permissions
+# Verify Cloudflare API token
 curl -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
   https://api.cloudflare.com/client/v4/user/tokens/verify
+
+# Check Alchemy state store
+curl -H "Authorization: Bearer $ALCHEMY_STATE_TOKEN" \
+  https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/r2/buckets
 ```
 
-### Vercel Deployment Fails
+### CMS Deployment Fails
 
 ```bash
-# Check Vercel token
-curl -H "Authorization: Bearer $VERCEL_TOKEN" \
-  https://api.vercel.com/v2/user
+cd apps/cms
+
+# Check wrangler auth
+wrangler whoami
+
+# Test D1 connection
+wrangler d1 execute azertykeycaps-cms-db-prod --command "SELECT 1"
+
+# View worker logs
+wrangler tail azertykeycaps-cms-prod
 ```
 
-### Database Connection Issues
+### Migration Errors
 
-```bash
-# Test Turso connection
-turso db shell your-db-name "SELECT 1"
-```
+If migrations fail due to schema conflicts:
+
+1. **For preview/dev:** Delete the D1 database and recreate
+
+   ```bash
+   wrangler d1 delete azertykeycaps-cms-db-preview
+   wrangler d1 create azertykeycaps-cms-db-preview
+   # Update database_id in wrangler.jsonc
+   ```
+
+2. **For production:** Never delete! Create a new migration to fix the issue
+   ```bash
+   cd apps/cms
+   bun run migrate:create
+   # Edit the generated migration file
+   ```
 
 ### Cache Invalidation Not Working
 
-1. Verify `CACHE_INVALIDATION_SECRET` matches in both CMS and Server
-2. Check Server logs for `/api/cache/invalidate` endpoint errors
-3. Verify `CLOUDFLARE_ZONE_ID` is correct for your domain
+1. Verify `CACHE_INVALIDATION_SECRET` matches in CMS and Server
+2. Check Server logs: `wrangler tail azertykeycaps-app-server-prod`
+3. Verify `CF_ZONE_ID` is correct for your domain
+
+### 522 Connection Error (Server → CMS)
+
+1. Verify CMS is deployed and accessible directly
+2. Check `CMS_API_URL` binding in Server worker
+3. Ensure CMS worker isn't hitting CPU/memory limits
+
+---
 
 ## Manual Deployment
 
 ```bash
-# Deploy Cloudflare (from root)
-STAGE=prod bun run deploy
+# Deploy Web + Server (from packages/infra)
+cd packages/infra
+STAGE=prod bun alchemy deploy
 
 # Deploy CMS (from apps/cms)
-cd apps/cms && vercel --prod
+cd apps/cms
+CLOUDFLARE_ENV=prod bun run deploy
 ```
-
-## Environment Variables Summary Table
-
-| Variable                    | Web | Server | CMS | GitHub Secret |
-| --------------------------- | --- | ------ | --- | ------------- |
-| `VITE_SERVER_URL`           | ✅  | -      | -   | ✅            |
-| `SERVER_URL`                | -   | ✅     | -   | ✅            |
-| `CORS_ORIGIN`               | ✅  | ✅     | -   | ✅            |
-| `BETTER_AUTH_SECRET`        | ✅  | ✅     | -   | ✅            |
-| `BETTER_AUTH_URL`           | ✅  | ✅     | -   | ✅            |
-| `CMS_API_URL`               | -   | ✅     | -   | ✅            |
-| `CMS_API_KEY`               | -   | ✅     | -   | ✅            |
-| `CACHE_INVALIDATION_SECRET` | -   | ✅     | ✅  | ✅            |
-| `CACHE_INVALIDATION_URL`    | -   | -      | ✅  | ✅            |
-| `CLOUDFLARE_ZONE_ID`        | -   | -      | ✅  | ✅            |
-| `CLOUDFLARE_API_TOKEN`      | -   | -      | ✅  | ✅            |
-| `WEB_URL`                   | -   | -      | ✅  | ✅            |
-| `DATABASE_URL`              | -   | -      | ✅  | ✅            |
-| `DATABASE_AUTH_TOKEN`       | -   | -      | ✅  | ✅            |
-| `PAYLOAD_SECRET`            | -   | -      | ✅  | ✅            |
-| `BLOB_READ_WRITE_TOKEN`     | -   | -      | ✅  | ✅            |
