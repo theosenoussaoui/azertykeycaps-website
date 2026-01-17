@@ -57,24 +57,52 @@ export const articleMaterialSchema = z.enum([
   ARTICLE_MATERIALS.PBT_LASER_PRINTED,
 ]);
 
+// Schema for article list items (cards) - only fields selected in list query
+export const articleListItemSchema = z.object({
+  id: z.coerce.string(),
+  title: z.string(),
+  slug: z.string(),
+  img: mediaSchema,
+  profile: keycapProfileRefSchema,
+  status: articleStatusSchema,
+  isNew: z.boolean(),
+});
+
+// Schema for full article (detail page) - all fields
+// Full article schema - all fields from CMS
 export const articleSchema = z.object({
   id: z.coerce.string(),
   title: z.string(),
   slug: z.string(),
   img: mediaSchema,
-  profile: keycapProfileRefSchema.nullable(),
-  material: articleMaterialSchema.nullable(),
-  description: z.string().nullable(),
+  profile: keycapProfileRefSchema,
+  material: articleMaterialSchema.nullish(),
+  description: z.string().nullish(),
   status: articleStatusSchema,
-  startDate: z.string().nullable(),
-  endDate: z.string().nullable(),
+  startDate: z.string().nullish(),
+  endDate: z.string().nullish(),
   url: z.string(),
-  additionalUrl: z.string().nullable(),
-  affiliateUrl: z.string().nullable(),
-  warningText: z.string().nullable(),
+  additionalUrl: z.string().nullish(),
+  affiliateUrl: z.string().nullish(),
+  warningText: z.string().nullish(),
   isNew: z.boolean(),
   createdAt: z.string(),
   updatedAt: z.string(),
+});
+
+// ============================================
+// UI SCHEMAS (derived from base schema)
+// ============================================
+
+// Article card schema - only fields needed for list/grid display
+export const articleCardSchema = articleSchema.pick({
+  id: true,
+  title: true,
+  slug: true,
+  img: true,
+  profile: true,
+  status: true,
+  isNew: true,
 });
 
 // ============================================
@@ -82,3 +110,4 @@ export const articleSchema = z.object({
 // ============================================
 
 export type Article = z.infer<typeof articleSchema>;
+export type ArticleCard = z.infer<typeof articleCardSchema>;

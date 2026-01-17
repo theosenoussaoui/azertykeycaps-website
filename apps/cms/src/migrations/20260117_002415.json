@@ -277,20 +277,6 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "focal_x": {
-          "name": "focal_x",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "focal_y": {
-          "name": "focal_y",
-          "type": "numeric",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
         }
       },
       "indexes": {
@@ -456,6 +442,21 @@
         "articles_profile_idx": {
           "name": "articles_profile_idx",
           "columns": ["profile_id"],
+          "isUnique": false
+        },
+        "articles_material_idx": {
+          "name": "articles_material_idx",
+          "columns": ["material"],
+          "isUnique": false
+        },
+        "articles_status_idx": {
+          "name": "articles_status_idx",
+          "columns": ["status"],
+          "isUnique": false
+        },
+        "articles_is_new_idx": {
+          "name": "articles_is_new_idx",
+          "columns": ["is_new"],
           "isUnique": false
         },
         "articles_updated_at_idx": {
@@ -1433,6 +1434,6 @@
   "internal": {
     "indexes": {}
   },
-  "id": "bd100a6e-f360-408b-8fdd-d27d100a64a8",
+  "id": "d1d9a227-70fc-492a-b69a-4f3146dc5914",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

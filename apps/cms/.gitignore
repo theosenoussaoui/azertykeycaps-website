@@ -16,6 +16,12 @@
 /.next/
 /out/
 
+# OpenNext (Cloudflare Workers build output)
+/.open-next/
+
+# Wrangler local state (do NOT ignore wrangler.jsonc - it's our config)
+.wrangler/
+
 # production
 /build
 
@@ -31,14 +37,14 @@ yarn-error.log*
 # local env files
 .env*.local
 
-# vercel
+# vercel (legacy - now using Cloudflare)
 .vercel
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 
-# Payload generated (regenerated on build)
+# Payload generated (regenerated in CI before build)
 importMap.js
 
 .env

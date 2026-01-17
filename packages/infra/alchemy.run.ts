@@ -19,8 +19,9 @@ const CLOUDFLARE_SUBDOMAIN = "theosen95"; // Your Cloudflare account subdomain
 
 // Custom domains from env (only used in prod)
 // Use process.env directly to avoid throwing in dev when not set
-const WEB_DOMAIN = process.env.WEB_DOMAIN; // e.g., "staging.azertykeycaps.fr"
+const WEB_DOMAIN = process.env.WEB_DOMAIN; // e.g., "www.azertykeycaps.fr"
 const API_DOMAIN = process.env.API_DOMAIN; // e.g., "api.azertykeycaps.fr"
+const CMS_DOMAIN = process.env.CMS_DOMAIN; // e.g., "cms.azertykeycaps.fr"
 
 const app = await alchemy("azertykeycaps-app", {
   stage,
@@ -49,10 +50,12 @@ const webUrl = isLocalDev
     ? `https://${WEB_DOMAIN}`
     : `https://azertykeycaps-app-web-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
 
-// CMS URL - required in prod, defaults to localhost in dev
-const cmsUrl = isProd
-  ? alchemy.env("CMS_API_URL")
-  : (process.env.CMS_API_URL ?? "http://localhost:3000");
+// CMS URL - deployed separately via opennextjs-cloudflare (not managed by Alchemy)
+const cmsUrl = isLocalDev
+  ? "http://localhost:3002"
+  : isProd && CMS_DOMAIN
+    ? `https://${CMS_DOMAIN}`
+    : `https://azertykeycaps-cms-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
 
 // Secrets - use process.env with defaults for dev, alchemy.env for prod (throws if missing)
 const getSecret = (name: string, devDefault: string = "dev-secret-placeholder") => {
@@ -67,7 +70,7 @@ export const server = await Worker("server", {
   entrypoint: "src/index.ts",
   compatibility: "node",
   domains: isProd && API_DOMAIN ? [API_DOMAIN] : undefined,
-  placement: { mode: "smart" }, // Optimize network placement for latency
+  placement: { mode: "smart" },
   bindings: {
     DB: db,
     CORS_ORIGIN: webUrl,
@@ -85,7 +88,7 @@ export const server = await Worker("server", {
 export const web = await TanStackStart("web", {
   cwd: "../../apps/web",
   domains: isProd && WEB_DOMAIN ? [WEB_DOMAIN] : undefined,
-  placement: { mode: "smart" }, // Optimize network placement for latency
+  placement: { mode: "smart" },
   bindings: {
     VITE_SERVER_URL: serverUrl,
     CORS_ORIGIN: webUrl,
@@ -95,13 +98,13 @@ export const web = await TanStackStart("web", {
   },
 });
 
+// Note: CMS is deployed separately - see apps/cms/wrangler.toml
+// CMS manages its own D1 database and R2 bucket via wrangler
+
 console.log(`Stage  -> ${stage}`);
 console.log(`Web    -> ${webUrl}`);
 console.log(`Server -> ${serverUrl}`);
-console.log(`CMS    -> ${cmsUrl}`);
-console.log(
-  `CMS_API_KEY -> ${process.env.CMS_API_KEY ? "set (" + process.env.CMS_API_KEY.slice(0, 8) + "...)" : "NOT SET"}`,
-);
+console.log(`CMS    -> ${cmsUrl} (deployed separately)`);
 
 // GitHub PR comment for preview deployments
 if (process.env.PULL_REQUEST) {
@@ -115,6 +118,7 @@ if (process.env.PULL_REQUEST) {
 |-----|-----|
 | Web | ${web.url} |
 | Server | ${server.url} |
+| CMS | ${cmsUrl} |
 
 Built from commit \`${process.env.GITHUB_SHA?.slice(0, 7) || "local"}\`
 
