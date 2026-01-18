@@ -20,6 +20,7 @@
     "@azertykeycaps-app/env": "workspace:*",
     "@azertykeycaps-app/schemas": "workspace:*",
     "@hono/trpc-server": "^0.4.2",
+    "@hono/zod-validator": "^0.7.6",
     "@trpc/server": "^11.8.1",
     "better-auth": "catalog:",
     "dotenv": "catalog:",

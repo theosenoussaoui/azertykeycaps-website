@@ -360,10 +360,18 @@ import { Badge } from "@/components/ui/badge";
 <Button variant="link">Link</Button>
 
 // Sizes
-<Button size="default" />  // h-9 (h-8 on sm)
+<Button size="xs" />       // h-7 (h-6 on sm)
 <Button size="sm" />       // h-8 (h-7 on sm)
+<Button size="default" />  // h-9 (h-8 on sm)
 <Button size="lg" />       // h-10 (h-9 on sm)
+<Button size="xl" />       // h-11 (h-10 on sm)
+
+// Icon sizes
+<Button size="icon-xs" />  // size-7 (size-6 on sm)
+<Button size="icon-sm" />  // size-8 (size-7 on sm)
 <Button size="icon" />     // size-9 (size-8 on sm)
+<Button size="icon-lg" />  // size-10 (size-9 on sm)
+<Button size="icon-xl" />  // size-11 (size-10 on sm)
 
 // With Link (render prop pattern)
 <Button render={<Link to="/about" />}>About</Button>
@@ -375,13 +383,16 @@ import { Badge } from "@/components/ui/badge";
 ```tsx
 <Card>
   <CardHeader>
-    <CardTitle>Title</CardTitle>
+    <CardTitle>Title</CardTitle> {/* Renders as <h3> by default */}
+    <CardTitle as="h2">Section Card</CardTitle> {/* Override heading level */}
     <CardDescription>Description</CardDescription>
   </CardHeader>
-  <CardContent>{/* Content */}</CardContent>
+  <CardContent>{/* Content */}</CardContent> {/* Alias for CardPanel */}
   <CardFooter>{/* Actions */}</CardFooter>
 </Card>
 ```
+
+**Note:** `CardContent` and `CardPanel` are the same component - use either name.
 
 #### Badge
 
@@ -489,7 +500,7 @@ import { Badge } from "@/components/ui/badge";
 
 ```tsx
 <Sheet>
-  <SheetTrigger render={<Button variant="ghost" size="icon" />}>
+  <SheetTrigger render={<Button variant="ghost" size="icon" />} aria-label="Open menu">
     <MenuIcon />
   </SheetTrigger>
   <SheetContent side="left">
@@ -792,8 +803,19 @@ materials: {
 
 ---
 
+## Additional Documentation
+
+| Document                                      | Description                                    |
+| --------------------------------------------- | ---------------------------------------------- |
+| [Z-Index Scale](./design/Z_INDEX.md)          | Fixed z-index tokens and layering rules        |
+| [Animation Guidelines](./design/ANIMATION.md) | Transition and animation best practices        |
+| [Component Reference](./design/COMPONENTS.md) | Detailed component variants, states, and sizes |
+
+---
+
 ## Version History
 
-| Version | Date       | Changes                             |
-| ------- | ---------- | ----------------------------------- |
-| 1.0     | 2026-01-16 | Initial design system documentation |
+| Version | Date       | Changes                                                                                                                          |
+| ------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| 1.1     | 2026-01-18 | Added semantic HTML props (CardTitle as, EmptyTitle as), oklch semantic colors, accessibility improvements, animation guidelines |
+| 1.0     | 2026-01-16 | Initial design system documentation                                                                                              |

@@ -51,6 +51,8 @@ function Toasts({ position = "bottom-right" }: { position: ToastPosition }) {
   return (
     <Toast.Portal data-slot="toast-portal">
       <Toast.Viewport
+        aria-atomic="true"
+        aria-live="polite"
         className={cn(
           "fixed z-50 mx-auto flex w-[calc(100%-var(--toast-inset)*2)] max-w-90 [--toast-inset:--spacing(4)] sm:[--toast-inset:--spacing(8)]",
           // Vertical positioning
@@ -63,6 +65,7 @@ function Toasts({ position = "bottom-right" }: { position: ToastPosition }) {
         )}
         data-position={position}
         data-slot="toast-viewport"
+        role="status"
       >
         {toasts.map((toast) => {
           const Icon = toast.type ? TOAST_ICONS[toast.type as keyof typeof TOAST_ICONS] : null;

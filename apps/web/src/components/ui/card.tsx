@@ -37,15 +37,22 @@ function CardHeader({ className, render, ...props }: useRender.ComponentProps<"d
   });
 }
 
-function CardTitle({ className, render, ...props }: useRender.ComponentProps<"div">) {
+type CardTitleElement = "h2" | "h3" | "h4" | "h5" | "h6" | "div";
+
+function CardTitle({
+  className,
+  render,
+  as: Comp = "h3",
+  ...props
+}: useRender.ComponentProps<"div"> & { as?: CardTitleElement }) {
   const defaultProps = {
     className: cn("text-lg leading-none font-semibold", className),
     "data-slot": "card-title",
   };
 
   return useRender({
-    defaultTagName: "div",
-    props: mergeProps<"div">(defaultProps, props),
+    defaultTagName: Comp,
+    props: mergeProps<typeof Comp>(defaultProps, props),
     render,
   });
 }

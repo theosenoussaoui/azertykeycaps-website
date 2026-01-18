@@ -75,15 +75,21 @@ function EmptyMedia({
   );
 }
 
-function EmptyTitle({ className, ...props }: React.ComponentProps<"div">) {
+type EmptyTitleElement = "h2" | "h3" | "h4" | "h5" | "h6" | "div";
+
+function EmptyTitle({
+  className,
+  as: Comp = "h2",
+  ...props
+}: React.ComponentProps<"div"> & { as?: EmptyTitleElement }) {
   return (
-    <div className={cn("font-heading text-xl", className)} data-slot="empty-title" {...props} />
+    <Comp className={cn("font-heading text-xl", className)} data-slot="empty-title" {...props} />
   );
 }
 
 function EmptyDescription({ className, ...props }: React.ComponentProps<"p">) {
   return (
-    <div
+    <p
       className={cn(
         "text-sm text-muted-foreground [&>a]:underline [&>a]:underline-offset-4 [&>a:hover]:text-primary [[data-slot=empty-title]+&]:mt-1",
         className,
