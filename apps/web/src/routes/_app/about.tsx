@@ -28,7 +28,8 @@ export const Route = createFileRoute("/_app/about")({
     };
   },
   headers: () => ({
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 60 * 60_000,
   gcTime: 24 * 60 * 60_000,
@@ -51,7 +52,9 @@ function AboutPage() {
             {content?.content ? (
               <RichTextContent content={content.content} />
             ) : (
-              <p className="text-muted-foreground">{i18n.pages.about.metaDescription}</p>
+              <p className="text-muted-foreground">
+                {i18n.pages.about.metaDescription}
+              </p>
             )}
           </PageSectionContent>
         </PageSection>

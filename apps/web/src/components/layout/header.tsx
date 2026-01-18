@@ -1,4 +1,7 @@
-import type { KeycapProfileRef, ProfileShape } from "@azertykeycaps-app/schemas";
+import type {
+  KeycapProfileRef,
+  ProfileShape,
+} from "@azertykeycaps-app/schemas";
 import { Link, useLocation } from "@tanstack/react-router";
 import { MenuIcon } from "lucide-react";
 
@@ -49,14 +52,22 @@ function groupProfilesByShape(profiles: KeycapProfileRef[]) {
 /**
  * Profile dropdown menu for a specific shape
  */
-function ProfileShapeMenu({ profiles, label }: { profiles: KeycapProfileRef[]; label: string }) {
+function ProfileShapeMenu({
+  profiles,
+  label,
+}: {
+  profiles: KeycapProfileRef[];
+  label: string;
+}) {
   const location = useLocation();
 
   if (profiles.length === 0) return null;
 
   return (
     <NavigationMenuItem>
-      <NavigationMenuTrigger render={<Button variant="ghost" />}>{label}</NavigationMenuTrigger>
+      <NavigationMenuTrigger render={<Button variant="ghost" />}>
+        {label}
+      </NavigationMenuTrigger>
       <NavigationMenuContent>
         <ul className="w-[280px] space-y-0.5 p-2">
           {profiles.map((profile) => (
@@ -64,7 +75,11 @@ function ProfileShapeMenu({ profiles, label }: { profiles: KeycapProfileRef[]; l
               <NavigationMenuLink
                 href={`/profile/${profile.slug}`}
                 render={
-                  <Link to="/profile/$slug" params={{ slug: profile.slug }} preload="viewport" />
+                  <Link
+                    to="/profile/$slug"
+                    params={{ slug: profile.slug }}
+                    preload="viewport"
+                  />
                 }
                 active={location.pathname === `/profile/${profile.slug}`}
                 closeOnClick
@@ -224,58 +239,62 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
               <hr className="border-border" />
               <div className="flex flex-col gap-4">
                 {/* Sculpted */}
-                {groupedProfiles.sculpted && groupedProfiles.sculpted.length > 0 && (
-                  <div className="flex flex-col gap-1">
-                    <h3 className="py-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                      {i18n.nav.profileShapes.sculpted}
-                    </h3>
-                    {groupedProfiles.sculpted.map((profile) => (
-                      <SheetClose
-                        key={profile.id}
-                        render={
-                          <Link
-                            to="/profile/$slug"
-                            params={{ slug: profile.slug }}
-                            preload="viewport"
-                            className="py-2 text-base font-medium text-foreground data-[active]:text-primary"
-                            data-active={
-                              location.pathname === `/profile/${profile.slug}` || undefined
-                            }
-                          />
-                        }
-                      >
-                        {profile.title}
-                      </SheetClose>
-                    ))}
-                  </div>
-                )}
+                {groupedProfiles.sculpted &&
+                  groupedProfiles.sculpted.length > 0 && (
+                    <div className="flex flex-col gap-1">
+                      <h3 className="py-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                        {i18n.nav.profileShapes.sculpted}
+                      </h3>
+                      {groupedProfiles.sculpted.map((profile) => (
+                        <SheetClose
+                          key={profile.id}
+                          render={
+                            <Link
+                              to="/profile/$slug"
+                              params={{ slug: profile.slug }}
+                              preload="viewport"
+                              className="py-2 text-base font-medium text-foreground data-[active]:text-primary"
+                              data-active={
+                                location.pathname ===
+                                  `/profile/${profile.slug}` || undefined
+                              }
+                            />
+                          }
+                        >
+                          {profile.title}
+                        </SheetClose>
+                      ))}
+                    </div>
+                  )}
 
                 {/* Uniform */}
-                {groupedProfiles.uniform && groupedProfiles.uniform.length > 0 && (
-                  <div className="flex flex-col gap-1">
-                    <h3 className="py-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
-                      {i18n.nav.profileShapes.uniform}
-                    </h3>
-                    {groupedProfiles.uniform.map((profile) => (
-                      <SheetClose
-                        key={profile.id}
-                        render={
-                          <Link
-                            to="/profile/$slug"
-                            params={{ slug: profile.slug }}
-                            preload="viewport"
-                            className="py-2 text-base font-medium text-foreground data-[active]:text-primary"
-                            data-active={
-                              location.pathname === `/profile/${profile.slug}` || undefined
-                            }
-                          />
-                        }
-                      >
-                        {profile.title}
-                      </SheetClose>
-                    ))}
-                  </div>
-                )}
+                {groupedProfiles.uniform &&
+                  groupedProfiles.uniform.length > 0 && (
+                    <div className="flex flex-col gap-1">
+                      <h3 className="py-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                        {i18n.nav.profileShapes.uniform}
+                      </h3>
+                      {groupedProfiles.uniform.map((profile) => (
+                        <SheetClose
+                          key={profile.id}
+                          render={
+                            <Link
+                              to="/profile/$slug"
+                              params={{ slug: profile.slug }}
+                              preload="viewport"
+                              className="py-2 text-base font-medium text-foreground data-[active]:text-primary"
+                              data-active={
+                                location.pathname ===
+                                  `/profile/${profile.slug}` || undefined
+                              }
+                            />
+                          }
+                        >
+                          {profile.title}
+                        </SheetClose>
+                      ))}
+                    </div>
+                  )}
               </div>
             </>
           )}

@@ -18,7 +18,10 @@ export type ProfileShape = (typeof PROFILE_SHAPES)[keyof typeof PROFILE_SHAPES];
 // SCHEMAS
 // ============================================
 
-export const profileShapeSchema = z.enum([PROFILE_SHAPES.SCULPTED, PROFILE_SHAPES.UNIFORM]);
+export const profileShapeSchema = z.enum([
+  PROFILE_SHAPES.SCULPTED,
+  PROFILE_SHAPES.UNIFORM,
+]);
 
 // Reference schema (when populated in relationships)
 export const keycapProfileRefSchema = z.object({

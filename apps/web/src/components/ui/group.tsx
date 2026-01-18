@@ -48,7 +48,11 @@ function Group({
   );
 }
 
-function GroupText({ className, render, ...props }: useRender.ComponentProps<"div">) {
+function GroupText({
+  className,
+  render,
+  ...props
+}: useRender.ComponentProps<"div">) {
   const defaultProps = {
     className: cn(
       "relative inline-flex items-center border border-input bg-muted px-[calc(--spacing(3)-1px)] text-base whitespace-nowrap text-muted-foreground shadow-xs/5 transition-shadow outline-none not-dark:bg-clip-padding before:pointer-events-none before:absolute before:inset-0 before:shadow-[0_1px_--theme(--color-black/6%)] sm:text-sm dark:bg-input/64 dark:before:shadow-[0_-1px_--theme(--color-white/6%)] [&_svg]:-mx-0.5 [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5 sm:[&_svg:not([class*='size-'])]:size-4",

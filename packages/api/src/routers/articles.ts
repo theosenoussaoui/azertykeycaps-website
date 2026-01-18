@@ -18,7 +18,10 @@ import { publicProcedure, router } from "../index";
 function transformMediaUrls<T>(data: T, serverUrl: string): T {
   const json = JSON.stringify(data);
   // Replace relative /api/media/ URLs with absolute server URLs
-  const transformed = json.replace(/"\/api\/media\//g, `"${serverUrl}/api/media/`);
+  const transformed = json.replace(
+    /"\/api\/media\//g,
+    `"${serverUrl}/api/media/`,
+  );
   return JSON.parse(transformed);
 }
 
@@ -28,7 +31,12 @@ function transformMediaUrls<T>(data: T, serverUrl: string): T {
 class CMSError extends Error {
   constructor(
     message: string,
-    public readonly code: "NETWORK_ERROR" | "AUTH_ERROR" | "NOT_FOUND" | "SERVER_ERROR" | "UNKNOWN",
+    public readonly code:
+      | "NETWORK_ERROR"
+      | "AUTH_ERROR"
+      | "NOT_FOUND"
+      | "SERVER_ERROR"
+      | "UNKNOWN",
     public readonly status?: number,
     public readonly url?: string,
   ) {
@@ -72,7 +80,9 @@ async function fetchCMS(
     const response = await fetch(url, fetchOptions);
 
     if (!response.ok) {
-      const errorBody = await response.text().catch(() => "Unable to read error body");
+      const errorBody = await response
+        .text()
+        .catch(() => "Unable to read error body");
       console.error("[CMS] Error response body:", errorBody);
 
       if (response.status === 401 || response.status === 403) {
@@ -84,10 +94,20 @@ async function fetchCMS(
         );
       }
       if (response.status === 404) {
-        throw new CMSError(`CMS endpoint not found: ${url}`, "NOT_FOUND", response.status, url);
+        throw new CMSError(
+          `CMS endpoint not found: ${url}`,
+          "NOT_FOUND",
+          response.status,
+          url,
+        );
       }
       if (response.status >= 500) {
-        throw new CMSError(`CMS server error: ${errorBody}`, "SERVER_ERROR", response.status, url);
+        throw new CMSError(
+          `CMS server error: ${errorBody}`,
+          "SERVER_ERROR",
+          response.status,
+          url,
+        );
       }
       throw new CMSError(
         `CMS request failed: ${response.status} - ${errorBody}`,
@@ -102,11 +122,17 @@ async function fetchCMS(
     if (error instanceof CMSError) throw error;
 
     // Network-level errors (connection refused, DNS failure, etc.)
-    const message = error instanceof Error ? error.message : "Unknown network error";
+    const message =
+      error instanceof Error ? error.message : "Unknown network error";
     console.error("[CMS] Network error:", message);
     console.error("[CMS] Full error:", error);
 
-    throw new CMSError(`CMS network error: ${message}`, "NETWORK_ERROR", undefined, url);
+    throw new CMSError(
+      `CMS network error: ${message}`,
+      "NETWORK_ERROR",
+      undefined,
+      url,
+    );
   }
 }
 
@@ -122,7 +148,10 @@ export const articlesRouter = router({
       // Safely parse and apply defaults from schema (limit: 12, page: 1)
       const parsed = articleListInputSchema.safeParse(input ?? {});
       if (!parsed.success) {
-        console.error("[articles.list] Input validation failed:", parsed.error.issues);
+        console.error(
+          "[articles.list] Input validation failed:",
+          parsed.error.issues,
+        );
         return {
           docs: [],
           totalDocs: 0,
@@ -133,7 +162,8 @@ export const articlesRouter = router({
           error: "Invalid input parameters",
         };
       }
-      const { limit, page, profile, status, material, isNew, search } = parsed.data;
+      const { limit, page, profile, status, material, isNew, search } =
+        parsed.data;
 
       try {
         // Build where clause using Payload query format
@@ -292,7 +322,10 @@ export const articlesRouter = router({
       // Safely parse and apply defaults from schema (limit: 100)
       const parsed = profileListInputSchema.safeParse(input ?? {});
       if (!parsed.success) {
-        console.error("[articles.profiles] Input validation failed:", parsed.error.issues);
+        console.error(
+          "[articles.profiles] Input validation failed:",
+          parsed.error.issues,
+        );
         return [];
       }
 

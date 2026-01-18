@@ -5,8 +5,14 @@ import { AlertTriangleIcon, ExternalLinkIcon } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { OptimizedImage, RESPONSIVE_WIDTHS } from "@/components/ui/optimized-image";
-import { PageSection, PageSectionContent } from "@/components/ui/page-container";
+import {
+  OptimizedImage,
+  RESPONSIVE_WIDTHS,
+} from "@/components/ui/optimized-image";
+import {
+  PageSection,
+  PageSectionContent,
+} from "@/components/ui/page-container";
 import { STATUS_VARIANTS } from "@/features/articles/utils/article-utils";
 import { t } from "@/i18n";
 import { formatDate } from "@/lib/date-utils";
@@ -42,16 +48,23 @@ export function ArticleContent({ article }: ArticleContentProps) {
       <header className="mb-8 space-y-4">
         {/* Badges */}
         <div className="flex flex-wrap items-center gap-2">
-          <Badge variant={STATUS_VARIANTS[article.status]}>{i18n.status[article.status]}</Badge>
+          <Badge variant={STATUS_VARIANTS[article.status]}>
+            {i18n.status[article.status]}
+          </Badge>
           {article.isNew && <Badge variant="default">{i18n.common.new}</Badge>}
           {article.profile && (
             <Link to="/profile/$slug" params={{ slug: article.profile.slug }}>
-              <Badge variant="outline" className="cursor-pointer hover:bg-accent">
+              <Badge
+                variant="outline"
+                className="cursor-pointer hover:bg-accent"
+              >
                 {article.profile.title}
               </Badge>
             </Link>
           )}
-          {article.material && <Badge variant="outline">{i18n.materials[article.material]}</Badge>}
+          {article.material && (
+            <Badge variant="outline">{i18n.materials[article.material]}</Badge>
+          )}
         </div>
 
         {/* Title */}
@@ -79,14 +92,28 @@ export function ArticleContent({ article }: ArticleContentProps) {
       <PageSection spacing="sm">
         <PageSectionContent>
           <div className="flex flex-wrap gap-3">
-            <Button render={<a href={article.url} target="_blank" rel="noopener noreferrer" />}>
+            <Button
+              render={
+                <a
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              }
+            >
               {i18n.articles.viewArticle}
               <ExternalLinkIcon />
             </Button>
             {article.affiliateUrl && (
               <Button
                 variant="secondary"
-                render={<a href={article.affiliateUrl} target="_blank" rel="noopener noreferrer" />}
+                render={
+                  <a
+                    href={article.affiliateUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                }
               >
                 {i18n.articles.affiliateLink}
                 <ExternalLinkIcon />
@@ -96,7 +123,11 @@ export function ArticleContent({ article }: ArticleContentProps) {
               <Button
                 variant="outline"
                 render={
-                  <a href={article.additionalUrl} target="_blank" rel="noopener noreferrer" />
+                  <a
+                    href={article.additionalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
                 }
               >
                 {i18n.articles.additionalLink}
@@ -114,17 +145,25 @@ export function ArticleContent({ article }: ArticleContentProps) {
             <dl className="grid gap-2 text-sm @xs:grid-cols-2">
               {article.startDate && (
                 <div>
-                  <dt className="text-muted-foreground">{i18n.articles.startDate}</dt>
+                  <dt className="text-muted-foreground">
+                    {i18n.articles.startDate}
+                  </dt>
                   <dd>
-                    <time dateTime={article.startDate}>{formatDate(article.startDate)}</time>
+                    <time dateTime={article.startDate}>
+                      {formatDate(article.startDate)}
+                    </time>
                   </dd>
                 </div>
               )}
               {article.endDate && (
                 <div>
-                  <dt className="text-muted-foreground">{i18n.articles.endDate}</dt>
+                  <dt className="text-muted-foreground">
+                    {i18n.articles.endDate}
+                  </dt>
                   <dd>
-                    <time dateTime={article.endDate}>{formatDate(article.endDate)}</time>
+                    <time dateTime={article.endDate}>
+                      {formatDate(article.endDate)}
+                    </time>
                   </dd>
                 </div>
               )}

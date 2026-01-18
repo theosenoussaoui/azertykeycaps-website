@@ -2,7 +2,10 @@ import type { CollectionConfig } from "payload";
 
 import { isAuthenticated } from "../access/authenticated";
 import { PROFILE_SHAPES } from "../constants";
-import { collectionAfterChangeHook, collectionAfterDeleteHook } from "../hooks/cache-invalidation";
+import {
+  collectionAfterChangeHook,
+  collectionAfterDeleteHook,
+} from "../hooks/cache-invalidation";
 
 export const KeycapProfiles: CollectionConfig = {
   slug: "keycap-profiles",

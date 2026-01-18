@@ -35,7 +35,10 @@ function NumberField({
   );
 }
 
-function NumberFieldGroup({ className, ...props }: NumberFieldPrimitive.Group.Props) {
+function NumberFieldGroup({
+  className,
+  ...props
+}: NumberFieldPrimitive.Group.Props) {
   return (
     <NumberFieldPrimitive.Group
       className={cn(
@@ -48,7 +51,10 @@ function NumberFieldGroup({ className, ...props }: NumberFieldPrimitive.Group.Pr
   );
 }
 
-function NumberFieldDecrement({ className, ...props }: NumberFieldPrimitive.Decrement.Props) {
+function NumberFieldDecrement({
+  className,
+  ...props
+}: NumberFieldPrimitive.Decrement.Props) {
   return (
     <NumberFieldPrimitive.Decrement
       className={cn(
@@ -63,7 +69,10 @@ function NumberFieldDecrement({ className, ...props }: NumberFieldPrimitive.Decr
   );
 }
 
-function NumberFieldIncrement({ className, ...props }: NumberFieldPrimitive.Increment.Props) {
+function NumberFieldIncrement({
+  className,
+  ...props
+}: NumberFieldPrimitive.Increment.Props) {
   return (
     <NumberFieldPrimitive.Increment
       className={cn(
@@ -78,7 +87,10 @@ function NumberFieldIncrement({ className, ...props }: NumberFieldPrimitive.Incr
   );
 }
 
-function NumberFieldInput({ className, ...props }: NumberFieldPrimitive.Input.Props) {
+function NumberFieldInput({
+  className,
+  ...props
+}: NumberFieldPrimitive.Input.Props) {
   return (
     <NumberFieldPrimitive.Input
       className={cn(

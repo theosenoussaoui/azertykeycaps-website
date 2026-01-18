@@ -18,12 +18,15 @@ const media = new Hono()
     const response = await proxy(cmsMediaUrl);
 
     if (!response.ok) {
-      console.error(`[media proxy] Failed: ${cmsMediaUrl} (status: ${response.status})`);
+      console.error(
+        `[media proxy] Failed: ${cmsMediaUrl} (status: ${response.status})`,
+      );
       throw new HTTPException(404, { message: "Media not found" });
     }
 
     const contentType = response.headers.get("content-type") || "image/jpeg";
-    const cacheControl = response.headers.get("cache-control") || "public, max-age=31536000";
+    const cacheControl =
+      response.headers.get("cache-control") || "public, max-age=31536000";
 
     return new Response(response.body, {
       headers: {

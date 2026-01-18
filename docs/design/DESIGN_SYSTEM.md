@@ -45,18 +45,22 @@
 
 ```css
 --font-sans:
-  "Space Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
-  monospace;
+  "Space Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+  "Liberation Mono", monospace;
 --font-mono:
-  "Space Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
-  monospace;
+  "Space Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+  "Liberation Mono", monospace;
 ```
 
 ### Loading Font (in `__root.tsx`)
 
 ```html
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link
+  rel="preconnect"
+  href="https://fonts.gstatic.com"
+  crossorigin="anonymous"
+/>
 <link
   href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap"
   rel="stylesheet"
@@ -306,7 +310,9 @@ import { PageSection } from "@/components/ui/page-container";
       <div>
         <dt className="text-muted-foreground">Start Date</dt>
         <dd>
-          <time dateTime={article.startDate}>{formatDate(article.startDate)}</time>
+          <time dateTime={article.startDate}>
+            {formatDate(article.startDate)}
+          </time>
         </dd>
       </div>
     </dl>
@@ -500,7 +506,10 @@ import { Badge } from "@/components/ui/badge";
 
 ```tsx
 <Sheet>
-  <SheetTrigger render={<Button variant="ghost" size="icon" />} aria-label="Open menu">
+  <SheetTrigger
+    render={<Button variant="ghost" size="icon" />}
+    aria-label="Open menu"
+  >
     <MenuIcon />
   </SheetTrigger>
   <SheetContent side="left">

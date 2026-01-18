@@ -154,7 +154,9 @@ const ReactQueryDevtools = import.meta.env.DEV
 Components that aren't always needed (toasts, modals, sheets) should be lazy loaded:
 
 ```tsx
-const Toaster = lazy(() => import("@/components/ui/sonner").then((m) => ({ default: m.Toaster })));
+const Toaster = lazy(() =>
+  import("@/components/ui/sonner").then((m) => ({ default: m.Toaster })),
+);
 
 // Wrap in Suspense
 <Suspense fallback={null}>
@@ -243,7 +245,8 @@ Set appropriate cache headers for SSR pages:
 ```typescript
 export const Route = createFileRoute("/_app/")({
   headers: () => ({
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 60_000, // Client considers data fresh for 1 minute
   gcTime: 5 * 60_000, // Keep in memory for 5 minutes
@@ -408,7 +411,9 @@ export default {
 
   // Scheduled handler for cron triggers (keeps worker warm)
   async scheduled(event: ScheduledEvent, env: unknown, ctx: ExecutionContext) {
-    console.log(`[cron] Warm-up at ${new Date(event.scheduledTime).toISOString()}`);
+    console.log(
+      `[cron] Warm-up at ${new Date(event.scheduledTime).toISOString()}`,
+    );
 
     // Optionally pre-warm connections
     ctx.waitUntil(

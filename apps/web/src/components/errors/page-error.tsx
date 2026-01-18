@@ -12,7 +12,11 @@ import {
   EmptyMedia,
   EmptyTitle,
 } from "../ui/empty";
-import { PageContainer, PageSection, PageSectionContent } from "../ui/page-container";
+import {
+  PageContainer,
+  PageSection,
+  PageSectionContent,
+} from "../ui/page-container";
 
 export interface PageErrorProps {
   /**
@@ -84,9 +88,13 @@ export function PageError({
         <PageSectionContent>
           <Empty>
             <EmptyHeader>
-              <EmptyMedia variant="icon">{icon ?? <AlertCircleIcon />}</EmptyMedia>
+              <EmptyMedia variant="icon">
+                {icon ?? <AlertCircleIcon />}
+              </EmptyMedia>
               <EmptyTitle>{title ?? i18n.errors.generic}</EmptyTitle>
-              <EmptyDescription>{description ?? i18n.errors.loadingFailed}</EmptyDescription>
+              <EmptyDescription>
+                {description ?? i18n.errors.loadingFailed}
+              </EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
               <Button variant="outline" onClick={() => router.invalidate()}>
@@ -104,6 +112,8 @@ export function PageError({
  * PageError with back button pre-configured.
  * Useful for detail pages (articles, profiles).
  */
-export function PageErrorWithBack(props: Omit<PageErrorProps, "showBackButton">) {
+export function PageErrorWithBack(
+  props: Omit<PageErrorProps, "showBackButton">,
+) {
   return <PageError showBackButton {...props} />;
 }

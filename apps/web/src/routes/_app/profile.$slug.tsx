@@ -47,12 +47,14 @@ export const Route = createFileRoute("/_app/profile/$slug")({
     return data;
   },
   headers: () => ({
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 5 * 60_000,
   gcTime: 30 * 60_000,
   head: ({ loaderData }) => {
-    const profileTitle = loaderData?.articles.docs[0]?.profile?.title ?? loaderData?.profileSlug;
+    const profileTitle =
+      loaderData?.articles.docs[0]?.profile?.title ?? loaderData?.profileSlug;
     const articleCount = loaderData?.articles.totalDocs ?? 0;
     return {
       meta: [
@@ -121,7 +123,9 @@ function ProfilePage() {
               <SearchXIcon />
             </EmptyMedia>
             <EmptyTitle>{i18n.pages.profile.noArticles}</EmptyTitle>
-            <EmptyDescription>{i18n.pages.profile.noArticlesDescription}</EmptyDescription>
+            <EmptyDescription>
+              {i18n.pages.profile.noArticlesDescription}
+            </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <Button variant="secondary" render={<Link to="/" />}>
@@ -179,7 +183,9 @@ function ProfilePage() {
                   <SearchXIcon />
                 </EmptyMedia>
                 <EmptyTitle>{i18n.common.noResults}</EmptyTitle>
-                <EmptyDescription>{i18n.pages.profile.noFilterResults}</EmptyDescription>
+                <EmptyDescription>
+                  {i18n.pages.profile.noFilterResults}
+                </EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
                 <Button variant="outline" onClick={handleClearFilters}>
@@ -188,7 +194,10 @@ function ProfilePage() {
               </EmptyContent>
             </Empty>
           ) : (
-            <ul className="grid gap-6 @sm:grid-cols-2 @lg:grid-cols-3" role="list">
+            <ul
+              className="grid gap-6 @sm:grid-cols-2 @lg:grid-cols-3"
+              role="list"
+            >
               {articles.docs.map((article) => (
                 <li key={article.id}>
                   <ArticleCard article={article} preload="viewport" />

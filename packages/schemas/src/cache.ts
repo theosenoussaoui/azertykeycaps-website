@@ -9,4 +9,6 @@ export const cacheInvalidationPayloadSchema = z.object({
   relatedArticleSlugs: z.array(z.string()).optional(),
 });
 
-export type CacheInvalidationPayload = z.infer<typeof cacheInvalidationPayloadSchema>;
+export type CacheInvalidationPayload = z.infer<
+  typeof cacheInvalidationPayloadSchema
+>;

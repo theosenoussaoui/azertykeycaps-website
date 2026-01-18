@@ -10,7 +10,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	FOREIGN KEY (\`_parent_id\`) REFERENCES \`users\`(\`id\`) ON UPDATE no action ON DELETE cascade
   );
   `);
-  await db.run(sql`CREATE INDEX \`users_sessions_order_idx\` ON \`users_sessions\` (\`_order\`);`);
+  await db.run(
+    sql`CREATE INDEX \`users_sessions_order_idx\` ON \`users_sessions\` (\`_order\`);`,
+  );
   await db.run(
     sql`CREATE INDEX \`users_sessions_parent_id_idx\` ON \`users_sessions\` (\`_parent_id\`);`,
   );
@@ -31,9 +33,15 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`lock_until\` text
   );
   `);
-  await db.run(sql`CREATE INDEX \`users_updated_at_idx\` ON \`users\` (\`updated_at\`);`);
-  await db.run(sql`CREATE INDEX \`users_created_at_idx\` ON \`users\` (\`created_at\`);`);
-  await db.run(sql`CREATE UNIQUE INDEX \`users_email_idx\` ON \`users\` (\`email\`);`);
+  await db.run(
+    sql`CREATE INDEX \`users_updated_at_idx\` ON \`users\` (\`updated_at\`);`,
+  );
+  await db.run(
+    sql`CREATE INDEX \`users_created_at_idx\` ON \`users\` (\`created_at\`);`,
+  );
+  await db.run(
+    sql`CREATE UNIQUE INDEX \`users_email_idx\` ON \`users\` (\`email\`);`,
+  );
   await db.run(sql`CREATE TABLE \`media\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`alt\` text NOT NULL,
@@ -48,9 +56,15 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`height\` numeric
   );
   `);
-  await db.run(sql`CREATE INDEX \`media_updated_at_idx\` ON \`media\` (\`updated_at\`);`);
-  await db.run(sql`CREATE INDEX \`media_created_at_idx\` ON \`media\` (\`created_at\`);`);
-  await db.run(sql`CREATE UNIQUE INDEX \`media_filename_idx\` ON \`media\` (\`filename\`);`);
+  await db.run(
+    sql`CREATE INDEX \`media_updated_at_idx\` ON \`media\` (\`updated_at\`);`,
+  );
+  await db.run(
+    sql`CREATE INDEX \`media_created_at_idx\` ON \`media\` (\`created_at\`);`,
+  );
+  await db.run(
+    sql`CREATE UNIQUE INDEX \`media_filename_idx\` ON \`media\` (\`filename\`);`,
+  );
   await db.run(sql`CREATE TABLE \`articles\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`title\` text NOT NULL,
@@ -73,14 +87,30 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	FOREIGN KEY (\`profile_id\`) REFERENCES \`keycap_profiles\`(\`id\`) ON UPDATE no action ON DELETE set null
   );
   `);
-  await db.run(sql`CREATE UNIQUE INDEX \`articles_slug_idx\` ON \`articles\` (\`slug\`);`);
-  await db.run(sql`CREATE INDEX \`articles_img_idx\` ON \`articles\` (\`img_id\`);`);
-  await db.run(sql`CREATE INDEX \`articles_profile_idx\` ON \`articles\` (\`profile_id\`);`);
-  await db.run(sql`CREATE INDEX \`articles_material_idx\` ON \`articles\` (\`material\`);`);
-  await db.run(sql`CREATE INDEX \`articles_status_idx\` ON \`articles\` (\`status\`);`);
-  await db.run(sql`CREATE INDEX \`articles_is_new_idx\` ON \`articles\` (\`is_new\`);`);
-  await db.run(sql`CREATE INDEX \`articles_updated_at_idx\` ON \`articles\` (\`updated_at\`);`);
-  await db.run(sql`CREATE INDEX \`articles_created_at_idx\` ON \`articles\` (\`created_at\`);`);
+  await db.run(
+    sql`CREATE UNIQUE INDEX \`articles_slug_idx\` ON \`articles\` (\`slug\`);`,
+  );
+  await db.run(
+    sql`CREATE INDEX \`articles_img_idx\` ON \`articles\` (\`img_id\`);`,
+  );
+  await db.run(
+    sql`CREATE INDEX \`articles_profile_idx\` ON \`articles\` (\`profile_id\`);`,
+  );
+  await db.run(
+    sql`CREATE INDEX \`articles_material_idx\` ON \`articles\` (\`material\`);`,
+  );
+  await db.run(
+    sql`CREATE INDEX \`articles_status_idx\` ON \`articles\` (\`status\`);`,
+  );
+  await db.run(
+    sql`CREATE INDEX \`articles_is_new_idx\` ON \`articles\` (\`is_new\`);`,
+  );
+  await db.run(
+    sql`CREATE INDEX \`articles_updated_at_idx\` ON \`articles\` (\`updated_at\`);`,
+  );
+  await db.run(
+    sql`CREATE INDEX \`articles_created_at_idx\` ON \`articles\` (\`created_at\`);`,
+  );
   await db.run(sql`CREATE TABLE \`keycap_profiles\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`title\` text NOT NULL,
@@ -114,7 +144,9 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`data\` text NOT NULL
   );
   `);
-  await db.run(sql`CREATE UNIQUE INDEX \`payload_kv_key_idx\` ON \`payload_kv\` (\`key\`);`);
+  await db.run(
+    sql`CREATE UNIQUE INDEX \`payload_kv_key_idx\` ON \`payload_kv\` (\`key\`);`,
+  );
   await db.run(sql`CREATE TABLE \`payload_locked_documents\` (
   	\`id\` integer PRIMARY KEY NOT NULL,
   	\`global_slug\` text,
@@ -239,11 +271,15 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	FOREIGN KEY (\`keycap_profiles_id\`) REFERENCES \`keycap_profiles\`(\`id\`) ON UPDATE no action ON DELETE cascade
   );
   `);
-  await db.run(sql`CREATE INDEX \`homepage_rels_order_idx\` ON \`homepage_rels\` (\`order\`);`);
+  await db.run(
+    sql`CREATE INDEX \`homepage_rels_order_idx\` ON \`homepage_rels\` (\`order\`);`,
+  );
   await db.run(
     sql`CREATE INDEX \`homepage_rels_parent_idx\` ON \`homepage_rels\` (\`parent_id\`);`,
   );
-  await db.run(sql`CREATE INDEX \`homepage_rels_path_idx\` ON \`homepage_rels\` (\`path\`);`);
+  await db.run(
+    sql`CREATE INDEX \`homepage_rels_path_idx\` ON \`homepage_rels\` (\`path\`);`,
+  );
   await db.run(
     sql`CREATE INDEX \`homepage_rels_keycap_profiles_id_idx\` ON \`homepage_rels\` (\`keycap_profiles_id\`);`,
   );
@@ -292,7 +328,11 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   `);
 }
 
-export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
+export async function down({
+  db,
+  payload,
+  req,
+}: MigrateDownArgs): Promise<void> {
   await db.run(sql`DROP TABLE \`users_sessions\`;`);
   await db.run(sql`DROP TABLE \`users\`;`);
   await db.run(sql`DROP TABLE \`media\`;`);

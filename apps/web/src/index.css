@@ -120,11 +120,11 @@
 @theme inline {
   /* Typography - Space Mono for brutalist mono aesthetic */
   --font-sans:
-    "Space Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
-    monospace;
+    "Space Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
   --font-mono:
-    "Space Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
-    monospace;
+    "Space Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
 
   /* Color mappings */
   --color-sidebar-ring: var(--sidebar-ring);

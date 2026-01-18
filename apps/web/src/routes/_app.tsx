@@ -1,5 +1,12 @@
-import type { KeycapProfileRef, SocialNetworks } from "@azertykeycaps-app/schemas";
-import { createFileRoute, ErrorComponent, Outlet } from "@tanstack/react-router";
+import type {
+  KeycapProfileRef,
+  SocialNetworks,
+} from "@azertykeycaps-app/schemas";
+import {
+  createFileRoute,
+  ErrorComponent,
+  Outlet,
+} from "@tanstack/react-router";
 
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
@@ -19,7 +26,8 @@ export const Route = createFileRoute("/_app")({
     };
   },
   headers: () => ({
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 10 * 60_000,
   gcTime: 60 * 60_000,

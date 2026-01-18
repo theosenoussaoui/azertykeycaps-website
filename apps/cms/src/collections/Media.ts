@@ -1,6 +1,9 @@
 import type { CollectionConfig } from "payload";
 
-import { collectionAfterChangeHook, collectionAfterDeleteHook } from "../hooks/cache-invalidation";
+import {
+  collectionAfterChangeHook,
+  collectionAfterDeleteHook,
+} from "../hooks/cache-invalidation";
 
 export const Media: CollectionConfig = {
   slug: "media",

@@ -98,7 +98,14 @@ export interface FileRouteTypes {
     | "/articles/$slug"
     | "/profile/$slug";
   fileRoutesByTo: FileRoutesByTo;
-  to: "/dashboard" | "/login" | "/about" | "/suggest" | "/" | "/articles/$slug" | "/profile/$slug";
+  to:
+    | "/dashboard"
+    | "/login"
+    | "/about"
+    | "/suggest"
+    | "/"
+    | "/articles/$slug"
+    | "/profile/$slug";
   id:
     | "__root__"
     | "/_app"

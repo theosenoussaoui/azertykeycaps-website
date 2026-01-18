@@ -59,7 +59,8 @@ export const en = {
     about: {
       title: "About",
       metaTitle: "Azertykeycaps - About",
-      metaDescription: "General technical information about the Azertykeycaps website.",
+      metaDescription:
+        "General technical information about the Azertykeycaps website.",
     },
     suggest: {
       title: "Suggest a keyset!",

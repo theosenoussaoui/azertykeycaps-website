@@ -4,7 +4,10 @@ import { HTTPException } from "hono/http-exception";
 import { logger } from "hono/logger";
 import { requestId } from "hono/request-id";
 
-import { createCorsMiddleware, createSecureHeadersMiddleware } from "./middleware";
+import {
+  createCorsMiddleware,
+  createSecureHeadersMiddleware,
+} from "./middleware";
 import routes from "./routes";
 
 const app = new Hono();
@@ -31,7 +34,9 @@ app.onError((err, c) => {
   const requestId = c.get("requestId");
 
   if (err instanceof HTTPException) {
-    console.error(`[error] ${err.status} ${err.message} (requestId: ${requestId})`);
+    console.error(
+      `[error] ${err.status} ${err.message} (requestId: ${requestId})`,
+    );
     return c.json(
       {
         error: err.message,

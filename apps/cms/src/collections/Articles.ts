@@ -2,7 +2,10 @@ import type { CollectionConfig } from "payload";
 
 import { isAuthenticated } from "../access/authenticated";
 import { ARTICLE_MATERIALS, ARTICLE_STATUS } from "../constants";
-import { collectionAfterChangeHook, collectionAfterDeleteHook } from "../hooks/cache-invalidation";
+import {
+  collectionAfterChangeHook,
+  collectionAfterDeleteHook,
+} from "../hooks/cache-invalidation";
 
 export const Articles: CollectionConfig = {
   slug: "articles",

@@ -66,5 +66,7 @@ When elements create new stacking contexts, their children's z-index values are 
 Use `isolate` when you need to contain z-index within a component:
 
 ```tsx
-<div className="isolate">{/* z-index values here won't affect outside elements */}</div>
+<div className="isolate">
+  {/* z-index values here won't affect outside elements */}
+</div>
 ```

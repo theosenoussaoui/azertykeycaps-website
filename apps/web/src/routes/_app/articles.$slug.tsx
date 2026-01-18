@@ -28,11 +28,14 @@ export const Route = createFileRoute("/_app/articles/$slug")({
     return {
       meta: [
         {
-          title: article ? `${article.title} - Azertykeycaps` : "Article - Azertykeycaps",
+          title: article
+            ? `${article.title} - Azertykeycaps`
+            : "Article - Azertykeycaps",
         },
         {
           name: "description",
-          content: article?.description ?? "Decouvrez ce keyset sur Azertykeycaps.",
+          content:
+            article?.description ?? "Decouvrez ce keyset sur Azertykeycaps.",
         },
       ],
       links: heroImageUrl
@@ -47,7 +50,8 @@ export const Route = createFileRoute("/_app/articles/$slug")({
     };
   },
   headers: () => ({
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 5 * 60_000,
   gcTime: 30 * 60_000,

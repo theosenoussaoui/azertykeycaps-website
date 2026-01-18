@@ -64,7 +64,8 @@ export default buildConfig({
   collections: [Users, Media, Articles, KeycapProfiles],
   globals: [Homepage, SocialNetworks, InformationsPage, SuggestionPage],
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || (cloudflare.env as any).PAYLOAD_SECRET || "",
+  secret:
+    process.env.PAYLOAD_SECRET || (cloudflare.env as any).PAYLOAD_SECRET || "",
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
@@ -90,12 +91,13 @@ export default buildConfig({
 function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
   // Dynamic import to avoid bundling wrangler in production
   // The string manipulation prevents webpack from resolving this at build time
-  return import(/* webpackIgnore: true */ `${"__wrangler".replaceAll("_", "")}`).then(
-    ({ getPlatformProxy }) =>
-      getPlatformProxy({
-        environment: process.env.CLOUDFLARE_ENV,
-        // Use remote bindings in production mode (for migrations against deployed D1)
-        remoteBindings: isProduction,
-      } satisfies GetPlatformProxyOptions),
+  return import(
+    /* webpackIgnore: true */ `${"__wrangler".replaceAll("_", "")}`
+  ).then(({ getPlatformProxy }) =>
+    getPlatformProxy({
+      environment: process.env.CLOUDFLARE_ENV,
+      // Use remote bindings in production mode (for migrations against deployed D1)
+      remoteBindings: isProduction,
+    } satisfies GetPlatformProxyOptions),
   );
 }

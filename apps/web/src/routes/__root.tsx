@@ -1,5 +1,10 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
+import {
+  HeadContent,
+  Outlet,
+  Scripts,
+  createRootRouteWithContext,
+} from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 
 import appCss from "@/index.css?url";
@@ -74,7 +79,10 @@ function RootDocument() {
           <Suspense fallback={null}>
             <Toaster richColors />
             <TanStackRouterDevtools position="bottom-left" />
-            <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
+            <ReactQueryDevtools
+              position="bottom"
+              buttonPosition="bottom-right"
+            />
           </Suspense>
           <Scripts />
         </div>

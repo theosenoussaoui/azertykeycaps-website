@@ -86,8 +86,12 @@ export interface Config {
     "payload-locked-documents":
       | PayloadLockedDocumentsSelect<false>
       | PayloadLockedDocumentsSelect<true>;
-    "payload-preferences": PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
-    "payload-migrations": PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
+    "payload-preferences":
+      | PayloadPreferencesSelect<false>
+      | PayloadPreferencesSelect<true>;
+    "payload-migrations":
+      | PayloadMigrationsSelect<false>
+      | PayloadMigrationsSelect<true>;
   };
   db: {
     defaultIDType: number;
@@ -102,7 +106,9 @@ export interface Config {
   globalsSelect: {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
     "social-networks": SocialNetworksSelect<false> | SocialNetworksSelect<true>;
-    "informations-page": InformationsPageSelect<false> | InformationsPageSelect<true>;
+    "informations-page":
+      | InformationsPageSelect<false>
+      | InformationsPageSelect<true>;
     "suggestion-page": SuggestionPageSelect<false> | SuggestionPageSelect<true>;
   };
   locale: null;

@@ -178,7 +178,8 @@ export const Route = createFileRoute("/_app/")({
   loader: async () => getLatestArticles(),
   errorComponent: PageError,
   headers: () => ({
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
 });
 
@@ -203,13 +204,15 @@ import { serverTRPCClient } from "@/lib/server-trpc";
  * Server function to fetch latest articles.
  * Runs ONLY on the server - not exposed to browser.
  */
-export const getLatestArticles = createServerFn({ method: "GET" }).handler(async () => {
-  const articles = await serverTRPCClient.articles.list.query({
-    page: 1,
-    limit: 3,
-  });
-  return { articles };
-});
+export const getLatestArticles = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const articles = await serverTRPCClient.articles.list.query({
+      page: 1,
+      limit: 3,
+    });
+    return { articles };
+  },
+);
 ```
 
 ### With Input Validation

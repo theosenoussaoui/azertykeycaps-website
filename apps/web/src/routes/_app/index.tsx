@@ -3,7 +3,12 @@ import { AlertCircleIcon, InboxIcon } from "lucide-react";
 
 import { PageError } from "@/components/errors/page-error";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Empty,
   EmptyDescription,
@@ -32,7 +37,8 @@ export const Route = createFileRoute("/_app/")({
   component: HomeComponent,
   loader: async () => getLatestArticles(),
   headers: () => ({
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 60_000,
   gcTime: 5 * 60_000,
@@ -71,7 +77,9 @@ function HomeComponent() {
       {/* Hero Section */}
       <PageHeader className="text-center">
         <PageTitle>{i18n.home.title}</PageTitle>
-        <PageDescription className="mx-auto">{i18n.home.subtitle}</PageDescription>
+        <PageDescription className="mx-auto">
+          {i18n.home.subtitle}
+        </PageDescription>
       </PageHeader>
 
       {/* Latest Articles Section */}
@@ -94,11 +102,16 @@ function HomeComponent() {
                   <InboxIcon />
                 </EmptyMedia>
                 <EmptyTitle>{i18n.common.noResults}</EmptyTitle>
-                <EmptyDescription>{i18n.pages.profile.noArticlesDescription}</EmptyDescription>
+                <EmptyDescription>
+                  {i18n.pages.profile.noArticlesDescription}
+                </EmptyDescription>
               </EmptyHeader>
             </Empty>
           ) : (
-            <ul className="article-grid grid gap-6 @sm:grid-cols-2 @lg:grid-cols-3" role="list">
+            <ul
+              className="article-grid grid gap-6 @sm:grid-cols-2 @lg:grid-cols-3"
+              role="list"
+            >
               {articles.docs.map((article) => (
                 <li key={article.id}>
                   <ArticleCard article={article} />
@@ -115,7 +128,10 @@ function HomeComponent() {
           <PageSectionTitle>{i18n.home.browseByProfile}</PageSectionTitle>
         </PageSectionHeader>
         <PageSectionContent>
-          <ul className="grid gap-4 @xs:grid-cols-2 @sm:grid-cols-3 @lg:grid-cols-4" role="list">
+          <ul
+            className="grid gap-4 @xs:grid-cols-2 @sm:grid-cols-3 @lg:grid-cols-4"
+            role="list"
+          >
             {profiles.map((profile) => (
               <li key={profile.slug}>
                 <Link
@@ -132,7 +148,9 @@ function HomeComponent() {
                           {profile.abbreviation}
                         </span>
                       </CardTitle>
-                      <CardDescription>{profile.navbarDescription}</CardDescription>
+                      <CardDescription>
+                        {profile.navbarDescription}
+                      </CardDescription>
                     </CardHeader>
                   </Card>
                 </Link>

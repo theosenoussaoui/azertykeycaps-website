@@ -9,7 +9,10 @@ import { cn } from "@/lib/utils";
 // ROOT
 // ============================================
 
-function NavigationMenu({ className, ...props }: NavigationMenuPrimitive.Root.Props) {
+function NavigationMenu({
+  className,
+  ...props
+}: NavigationMenuPrimitive.Root.Props) {
   return (
     <NavigationMenuPrimitive.Root
       data-slot="navigation-menu"
@@ -141,10 +144,17 @@ function NavigationMenuLink(props: NavigationMenuPrimitive.Link.Props) {
 // ============================================
 
 function NavigationMenuPortal(props: NavigationMenuPrimitive.Portal.Props) {
-  return <NavigationMenuPrimitive.Portal data-slot="navigation-menu-portal" {...props} />;
+  return (
+    <NavigationMenuPrimitive.Portal
+      data-slot="navigation-menu-portal"
+      {...props}
+    />
+  );
 }
 
-function NavigationMenuPositioner(props: NavigationMenuPrimitive.Positioner.Props) {
+function NavigationMenuPositioner(
+  props: NavigationMenuPrimitive.Positioner.Props,
+) {
   const {
     className,
     sideOffset = 8,

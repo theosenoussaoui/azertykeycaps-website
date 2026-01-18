@@ -2,8 +2,17 @@ import type { ArticleCard as ArticleCardType } from "@azertykeycaps-app/schemas"
 import { Link } from "@tanstack/react-router";
 
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { OptimizedImage, RESPONSIVE_WIDTHS } from "@/components/ui/optimized-image";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  OptimizedImage,
+  RESPONSIVE_WIDTHS,
+} from "@/components/ui/optimized-image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { STATUS_VARIANTS } from "@/features/articles/utils/article-utils";
 import { t } from "@/i18n";
@@ -18,7 +27,11 @@ export function ArticleCard({ article, preload = "intent" }: ArticleCardProps) {
 
   return (
     <article>
-      <Link to="/articles/$slug" params={{ slug: article.slug }} preload={preload}>
+      <Link
+        to="/articles/$slug"
+        params={{ slug: article.slug }}
+        preload={preload}
+      >
         <Card className="h-full transition-shadow hover:shadow-lg">
           {/* Article Image - optimized with Cloudflare Images */}
           <figure className="relative overflow-hidden">
@@ -45,12 +58,16 @@ export function ArticleCard({ article, preload = "intent" }: ArticleCardProps) {
 
           <CardContent className="flex-1">
             {article.profile && (
-              <p className="text-xs text-muted-foreground">{article.profile.title}</p>
+              <p className="text-xs text-muted-foreground">
+                {article.profile.title}
+              </p>
             )}
           </CardContent>
 
           <CardFooter className="justify-between">
-            <Badge variant={STATUS_VARIANTS[article.status]}>{i18n.status[article.status]}</Badge>
+            <Badge variant={STATUS_VARIANTS[article.status]}>
+              {i18n.status[article.status]}
+            </Badge>
           </CardFooter>
         </Card>
       </Link>

@@ -18,7 +18,8 @@ export const ARTICLE_STATUS = {
 } as const;
 
 export const ARTICLE_STATUS_VALUES = Object.values(ARTICLE_STATUS);
-export type ArticleStatus = (typeof ARTICLE_STATUS)[keyof typeof ARTICLE_STATUS];
+export type ArticleStatus =
+  (typeof ARTICLE_STATUS)[keyof typeof ARTICLE_STATUS];
 
 export const ARTICLE_MATERIALS = {
   ABS_DOUBLE_SHOT: "abs_double_shot",
@@ -31,7 +32,8 @@ export const ARTICLE_MATERIALS = {
 } as const;
 
 export const ARTICLE_MATERIAL_VALUES = Object.values(ARTICLE_MATERIALS);
-export type ArticleMaterial = (typeof ARTICLE_MATERIALS)[keyof typeof ARTICLE_MATERIALS];
+export type ArticleMaterial =
+  (typeof ARTICLE_MATERIALS)[keyof typeof ARTICLE_MATERIALS];
 
 // ============================================
 // SCHEMAS

@@ -21,7 +21,8 @@ export const Route = createFileRoute("/_app/suggest")({
     return { content };
   },
   headers: () => ({
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 60 * 60_000,
   gcTime: 24 * 60 * 60_000,
@@ -45,7 +46,9 @@ function SuggestPage() {
     <PageContainer size="md">
       <PageHeader>
         <PageTitle>{content?.title ?? i18n.pages.suggest.title}</PageTitle>
-        <PageDescription>{content?.description ?? i18n.pages.suggest.description}</PageDescription>
+        <PageDescription>
+          {content?.description ?? i18n.pages.suggest.description}
+        </PageDescription>
       </PageHeader>
 
       <PageSection>

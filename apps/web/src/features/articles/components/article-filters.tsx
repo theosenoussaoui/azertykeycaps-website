@@ -75,7 +75,9 @@ export function ArticleFilters({
       >
         <SelectTrigger className="w-40">
           <SelectValue>
-            {selectedStatus ? i18n.status[selectedStatus] : i18n.articles.filters.status}
+            {selectedStatus
+              ? i18n.status[selectedStatus]
+              : i18n.articles.filters.status}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
@@ -91,11 +93,15 @@ export function ArticleFilters({
       {/* Material filter */}
       <Select
         value={selectedMaterial ?? ""}
-        onValueChange={(v) => onMaterialChange((v as ArticleMaterial) || undefined)}
+        onValueChange={(v) =>
+          onMaterialChange((v as ArticleMaterial) || undefined)
+        }
       >
         <SelectTrigger className="w-40">
           <SelectValue>
-            {selectedMaterial ? i18n.materials[selectedMaterial] : i18n.articles.filters.material}
+            {selectedMaterial
+              ? i18n.materials[selectedMaterial]
+              : i18n.articles.filters.material}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
