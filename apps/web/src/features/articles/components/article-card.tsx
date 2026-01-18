@@ -3,9 +3,10 @@ import { Link } from "@tanstack/react-router";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { OptimizedImage, RESPONSIVE_WIDTHS } from "@/components/ui/optimized-image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { STATUS_VARIANTS } from "@/features/articles/utils/article-utils";
 import { t } from "@/i18n";
-import { STATUS_VARIANTS } from "@/lib/article-utils";
 
 interface ArticleCardProps {
   article: ArticleCardType;
@@ -19,20 +20,14 @@ export function ArticleCard({ article, preload = "intent" }: ArticleCardProps) {
     <article>
       <Link to="/articles/$slug" params={{ slug: article.slug }} preload={preload}>
         <Card className="h-full transition-shadow hover:shadow-lg">
-          {/* Article Image - with explicit dimensions to prevent CLS */}
+          {/* Article Image - optimized with Cloudflare Images */}
           <figure className="relative overflow-hidden">
-            <img
-              src={article.img.sizes?.card?.url ?? article.img.url ?? ""}
-              srcSet={
-                article.img.sizes
-                  ? `${article.img.sizes.thumbnail?.url ?? article.img.url} 400w, ${article.img.sizes.card?.url ?? article.img.url} 768w`
-                  : undefined
-              }
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            <OptimizedImage
+              src={article.img.url}
               alt={article.img.alt}
+              widths={RESPONSIVE_WIDTHS.card}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               className="aspect-video w-full object-cover"
-              loading="lazy"
-              decoding="async"
               width={768}
               height={432}
             />

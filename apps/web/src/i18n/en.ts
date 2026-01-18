@@ -73,6 +73,7 @@ export const en = {
       noArticles: "No articles for this profile",
       noArticlesDescription:
         "We don't have any keysets for this particular profile yet, please try again later.",
+      noFilterResults: "Try modifying your filters to find articles.",
     },
   },
   status: {

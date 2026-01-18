@@ -1,12 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 
-import SignInForm from "@/components/sign-in-form";
-import SignUpForm from "@/components/sign-up-form";
+import SignInForm from "@/features/auth/components/sign-in-form";
+import SignUpForm from "@/features/auth/components/sign-up-form";
 
 export const Route = createFileRoute("/login")({
   component: RouteComponent,
-  // No cache: Auth page with sensitive forms
   headers: () => ({
     "Cache-Control": "private, no-cache, no-store, must-revalidate",
   }),

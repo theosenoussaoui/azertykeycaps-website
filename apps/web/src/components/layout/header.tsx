@@ -2,9 +2,7 @@ import type { KeycapProfileRef, ProfileShape } from "@azertykeycaps-app/schemas"
 import { Link, useLocation } from "@tanstack/react-router";
 import { MenuIcon } from "lucide-react";
 
-import { t } from "@/i18n";
-
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -16,8 +14,16 @@ import {
   NavigationMenuPositioner,
   NavigationMenuTrigger,
   NavigationMenuViewport,
-} from "./ui/navigation-menu";
-import { Sheet, SheetClose, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
+} from "@/components/ui/navigation-menu";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { t } from "@/i18n";
 
 interface HeaderProps {
   profiles?: KeycapProfileRef[];

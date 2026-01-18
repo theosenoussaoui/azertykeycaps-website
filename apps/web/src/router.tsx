@@ -1,16 +1,11 @@
-import "./index.css";
+import "@/index.css";
 
-import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
-import { env } from "@azertykeycaps-app/env/web";
 import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
-import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { toast } from "sonner";
 
-import Loader from "./components/loader";
-import { TRPCProvider } from "./lib/trpc";
-import { routeTree } from "./routeTree.gen";
+import Loader from "@/components/layout/loader";
+import { routeTree } from "@/routeTree.gen";
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -26,25 +21,6 @@ export const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 60 * 1000 } },
 });
 
-const trpcClient = createTRPCClient<AppRouter>({
-  links: [
-    httpBatchLink({
-      url: `${env.VITE_SERVER_URL}/trpc`,
-      fetch(url, options) {
-        return fetch(url, {
-          ...options,
-          credentials: "include",
-        });
-      },
-    }),
-  ],
-});
-
-const trpc = createTRPCOptionsProxy({
-  client: trpcClient,
-  queryClient: queryClient,
-});
-
 export const getRouter = () => {
   const router = createTanStackRouter({
     routeTree,
@@ -52,15 +28,11 @@ export const getRouter = () => {
     defaultPreload: "intent",
     defaultPreloadDelay: 50,
     defaultPreloadStaleTime: 0,
-    context: { trpc, queryClient },
+    context: { queryClient },
     defaultPendingComponent: () => <Loader />,
     defaultNotFoundComponent: () => <div>Not Found</div>,
     Wrap: ({ children }) => (
-      <QueryClientProvider client={queryClient}>
-        <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
-          {children}
-        </TRPCProvider>
-      </QueryClientProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
     ),
   });
   return router;

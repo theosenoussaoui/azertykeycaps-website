@@ -1,58 +1,34 @@
 import {
   profilePageFiltersSchema,
-  type ProfilePageFilters,
   type ArticleMaterial,
   type ArticleStatus,
 } from "@azertykeycaps-app/schemas";
-import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { ArrowLeftIcon, SearchXIcon, AlertCircleIcon } from "lucide-react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { ArrowLeftIcon, SearchXIcon } from "lucide-react";
 
-import { ArticleCard } from "@/components/article-card";
-import { ArticleFilters } from "@/components/article-filters";
-import { ArticlesPagination } from "@/components/articles-pagination";
+import { PageErrorWithBack } from "@/components/errors/page-error";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
+  EmptyContent,
+  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-  EmptyDescription,
-  EmptyContent,
 } from "@/components/ui/empty";
 import {
   PageContainer,
-  PageHeader,
-  PageTitle,
   PageDescription,
+  PageHeader,
   PageSection,
   PageSectionContent,
+  PageTitle,
 } from "@/components/ui/page-container";
+import { getArticlesByProfile } from "@/features/articles/api/get-articles-by-profile";
+import { ArticleCard } from "@/features/articles/components/article-card";
+import { ArticleFilters } from "@/features/articles/components/article-filters";
+import { ArticlesPagination } from "@/features/articles/components/articles-pagination";
 import { t } from "@/i18n";
-import { serverTRPCClient } from "@/lib/server-trpc";
-
-type ProfilePageInput = { slug: string } & ProfilePageFilters;
-
-// Server function to fetch articles by profile
-// Uses module-scoped tRPC client for reduced cold start time
-const getArticlesByProfile = createServerFn({ method: "GET" })
-  .inputValidator((data: ProfilePageInput) => data)
-  .handler(async ({ data }) => {
-    const articlesResponse = await serverTRPCClient.articles.list.query({
-      profile: data.slug,
-      page: data.page ?? 1,
-      limit: 12,
-      status: data.status,
-      material: data.material,
-      isNew: data.isNew,
-      search: data.search,
-    });
-
-    return {
-      articles: articlesResponse,
-      profileSlug: data.slug,
-    };
-  });
 
 export const Route = createFileRoute("/_app/profile/$slug")({
   component: ProfilePage,
@@ -80,9 +56,7 @@ export const Route = createFileRoute("/_app/profile/$slug")({
     const articleCount = loaderData?.articles.totalDocs ?? 0;
     return {
       meta: [
-        {
-          title: `${profileTitle} - Azertykeycaps`,
-        },
+        { title: `${profileTitle} - Azertykeycaps` },
         {
           name: "description",
           content: `Decouvrez ${articleCount} keyset${articleCount > 1 ? "s" : ""} avec le profil ${profileTitle} sur Azertykeycaps.`,
@@ -90,38 +64,7 @@ export const Route = createFileRoute("/_app/profile/$slug")({
       ],
     };
   },
-  errorComponent: () => {
-    const router = useRouter();
-    const i18n = t();
-    return (
-      <PageContainer size="md">
-        <nav className="py-4">
-          <Button variant="ghost" size="sm" render={<Link to="/" />}>
-            <ArrowLeftIcon />
-            {i18n.common.back}
-          </Button>
-        </nav>
-        <PageSection>
-          <PageSectionContent>
-            <Empty>
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <AlertCircleIcon />
-                </EmptyMedia>
-                <EmptyTitle>{i18n.errors.generic}</EmptyTitle>
-                <EmptyDescription>{i18n.errors.loadingFailed}</EmptyDescription>
-              </EmptyHeader>
-              <EmptyContent>
-                <Button variant="outline" onClick={() => router.invalidate()}>
-                  {i18n.common.retry}
-                </Button>
-              </EmptyContent>
-            </Empty>
-          </PageSectionContent>
-        </PageSection>
-      </PageContainer>
-    );
-  },
+  errorComponent: PageErrorWithBack,
 });
 
 function ProfilePage() {
@@ -236,9 +179,7 @@ function ProfilePage() {
                   <SearchXIcon />
                 </EmptyMedia>
                 <EmptyTitle>{i18n.common.noResults}</EmptyTitle>
-                <EmptyDescription>
-                  Essayez de modifier vos filtres pour trouver des articles.
-                </EmptyDescription>
+                <EmptyDescription>{i18n.pages.profile.noFilterResults}</EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
                 <Button variant="outline" onClick={handleClearFilters}>

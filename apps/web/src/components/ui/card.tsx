@@ -57,15 +57,15 @@ function CardTitle({
   });
 }
 
-function CardDescription({ className, render, ...props }: useRender.ComponentProps<"div">) {
+function CardDescription({ className, render, ...props }: useRender.ComponentProps<"p">) {
   const defaultProps = {
     className: cn("text-sm text-muted-foreground", className),
     "data-slot": "card-description",
   };
 
   return useRender({
-    defaultTagName: "div",
-    props: mergeProps<"div">(defaultProps, props),
+    defaultTagName: "p",
+    props: mergeProps<"p">(defaultProps, props),
     render,
   });
 }

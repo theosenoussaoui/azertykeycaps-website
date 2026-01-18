@@ -1,85 +1,40 @@
-import { createFileRoute, useRouter } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
-import { ClockIcon, AlertCircleIcon } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { ClockIcon } from "lucide-react";
 
+import { PageError } from "@/components/errors/page-error";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import {
-  Empty,
-  EmptyHeader,
-  EmptyMedia,
-  EmptyTitle,
-  EmptyDescription,
-  EmptyContent,
-} from "@/components/ui/empty";
 import {
   PageContainer,
-  PageHeader,
-  PageTitle,
   PageDescription,
+  PageHeader,
   PageSection,
   PageSectionContent,
+  PageTitle,
 } from "@/components/ui/page-container";
+import { getSuggestContent } from "@/features/globals/api/get-suggest-content";
 import { t } from "@/i18n";
-import { serverTRPCClient } from "@/lib/server-trpc";
-
-// Server function to fetch suggestion page content
-// Uses module-scoped tRPC client for reduced cold start time
-const getSuggestPageContent = createServerFn({ method: "GET" }).handler(async () => {
-  return await serverTRPCClient.globals.suggestionPage.query();
-});
 
 export const Route = createFileRoute("/_app/suggest")({
   component: SuggestPage,
   loader: async () => {
-    const content = await getSuggestPageContent();
+    const content = await getSuggestContent();
     return { content };
   },
   headers: () => ({
     "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
-  staleTime: 60 * 60_000, // Client considers data fresh for 1 hour
-  gcTime: 24 * 60 * 60_000, // Keep in memory for 24 hours
+  staleTime: 60 * 60_000,
+  gcTime: 24 * 60 * 60_000,
   head: () => {
     const i18n = t();
     return {
       meta: [
-        {
-          title: i18n.pages.suggest.metaTitle,
-        },
-        {
-          name: "description",
-          content: i18n.pages.suggest.metaDescription,
-        },
+        { title: i18n.pages.suggest.metaTitle },
+        { name: "description", content: i18n.pages.suggest.metaDescription },
       ],
     };
   },
-  errorComponent: () => {
-    const router = useRouter();
-    const i18n = t();
-    return (
-      <PageContainer size="md">
-        <PageSection>
-          <PageSectionContent>
-            <Empty>
-              <EmptyHeader>
-                <EmptyMedia variant="icon">
-                  <AlertCircleIcon />
-                </EmptyMedia>
-                <EmptyTitle>{i18n.errors.generic}</EmptyTitle>
-                <EmptyDescription>{i18n.errors.loadingFailed}</EmptyDescription>
-              </EmptyHeader>
-              <EmptyContent>
-                <Button variant="outline" onClick={() => router.invalidate()}>
-                  {i18n.common.retry}
-                </Button>
-              </EmptyContent>
-            </Empty>
-          </PageSectionContent>
-        </PageSection>
-      </PageContainer>
-    );
-  },
+  errorComponent: PageError,
 });
 
 function SuggestPage() {

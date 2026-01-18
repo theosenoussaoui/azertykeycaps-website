@@ -1,10 +1,8 @@
-import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
 import type { QueryClient } from "@tanstack/react-query";
 import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
-import type { TRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import { lazy, Suspense } from "react";
 
-import appCss from "../index.css?url";
+import appCss from "@/index.css?url";
 
 // Lazy load Toaster - toasts are rare, no need to block initial render
 const Toaster = lazy(() =>
@@ -31,7 +29,6 @@ const ReactQueryDevtools = import.meta.env.DEV
   : () => null;
 
 export interface RouterAppContext {
-  trpc: TRPCOptionsProxy<AppRouter>;
   queryClient: QueryClient;
 }
 

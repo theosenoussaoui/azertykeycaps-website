@@ -1,51 +1,36 @@
-import { createFileRoute, Link, getRouteApi, useRouter } from "@tanstack/react-router";
-import { createServerFn } from "@tanstack/react-start";
+import { createFileRoute, getRouteApi, Link } from "@tanstack/react-router";
 import { AlertCircleIcon, InboxIcon } from "lucide-react";
 
-import { ArticleCard } from "@/components/article-card";
+import { PageError } from "@/components/errors/page-error";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Empty,
+  EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
-  EmptyDescription,
 } from "@/components/ui/empty";
 import {
   PageContainer,
-  PageHeader,
-  PageTitle,
   PageDescription,
+  PageHeader,
   PageSection,
+  PageSectionContent,
   PageSectionHeader,
   PageSectionTitle,
-  PageSectionContent,
+  PageTitle,
 } from "@/components/ui/page-container";
+import { getLatestArticles } from "@/features/articles/api/get-latest-articles";
+import { ArticleCard } from "@/features/articles/components/article-card";
 import { t } from "@/i18n";
-import { serverTRPCClient } from "@/lib/server-trpc";
+import { getPreloadImageUrl } from "@/lib/image-utils";
 
-// Server function to fetch latest articles for landing page
-// Uses module-scoped tRPC client for reduced cold start time
-const getLatestArticles = createServerFn({ method: "GET" }).handler(async () => {
-  const articles = await serverTRPCClient.articles.list.query({
-    page: 1,
-    limit: 3,
-  });
-
-  return { articles };
-});
-
-// Get parent route API to access profiles from layout
 const appRouteApi = getRouteApi("/_app");
 
 export const Route = createFileRoute("/_app/")({
   component: HomeComponent,
-  loader: async () => {
-    const data = await getLatestArticles();
-    return data;
-  },
+  loader: async () => getLatestArticles(),
   headers: () => ({
     "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
@@ -53,16 +38,15 @@ export const Route = createFileRoute("/_app/")({
   gcTime: 5 * 60_000,
   head: ({ loaderData }) => {
     const i18n = t();
-    // Get the first article's image for LCP preloading
     const firstArticle = loaderData?.articles?.docs?.[0];
-    const preloadImageUrl = firstArticle?.img.sizes?.card?.url ?? firstArticle?.img.url;
+    // Use optimized image URL for preloading (matches what OptimizedImage renders)
+    const preloadImageUrl = getPreloadImageUrl(firstArticle?.img.url, "card");
 
     return {
       meta: [
         { title: i18n.home.metaTitle },
         { name: "description", content: i18n.home.metaDescription },
       ],
-      // Preload first article image for faster LCP on homepage
       links: preloadImageUrl
         ? [
             {
@@ -74,27 +58,7 @@ export const Route = createFileRoute("/_app/")({
         : [],
     };
   },
-  errorComponent: () => {
-    const router = useRouter();
-    const i18n = t();
-    return (
-      <PageContainer size="md">
-        <PageSection>
-          <PageSectionContent>
-            <Alert variant="error">
-              <AlertCircleIcon className="size-4" />
-              <AlertDescription>{i18n.errors.loadingFailed}</AlertDescription>
-            </Alert>
-            <div className="mt-4 text-center">
-              <Button variant="outline" onClick={() => router.invalidate()}>
-                {i18n.common.retry}
-              </Button>
-            </div>
-          </PageSectionContent>
-        </PageSection>
-      </PageContainer>
-    );
-  },
+  errorComponent: PageError,
 });
 
 function HomeComponent() {
@@ -130,7 +94,7 @@ function HomeComponent() {
                   <InboxIcon />
                 </EmptyMedia>
                 <EmptyTitle>{i18n.common.noResults}</EmptyTitle>
-                <EmptyDescription>Aucun article disponible pour le moment.</EmptyDescription>
+                <EmptyDescription>{i18n.pages.profile.noArticlesDescription}</EmptyDescription>
               </EmptyHeader>
             </Empty>
           ) : (

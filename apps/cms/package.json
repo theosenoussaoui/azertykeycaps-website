@@ -25,6 +25,8 @@
     "wrangler": "wrangler"
   },
   "dependencies": {
+    "@fontsource/geist-mono": "^5.2.7",
+    "@fontsource/geist-sans": "^5.2.5",
     "@opennextjs/cloudflare": "^1.14.9",
     "@payloadcms/db-d1-sqlite": "3.71.1",
     "@payloadcms/next": "3.71.1",
