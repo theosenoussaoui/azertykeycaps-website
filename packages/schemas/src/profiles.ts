@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { payloadIdSchema } from "./common";
 import { mediaSchema } from "./media";
 
 // ============================================
@@ -18,11 +19,14 @@ export type ProfileShape = (typeof PROFILE_SHAPES)[keyof typeof PROFILE_SHAPES];
 // SCHEMAS
 // ============================================
 
-export const profileShapeSchema = z.enum([PROFILE_SHAPES.SCULPTED, PROFILE_SHAPES.UNIFORM]);
+export const profileShapeSchema = z.enum([
+  PROFILE_SHAPES.SCULPTED,
+  PROFILE_SHAPES.UNIFORM,
+]);
 
 // Reference schema (when populated in relationships)
 export const keycapProfileRefSchema = z.object({
-  id: z.coerce.string(),
+  id: payloadIdSchema,
   title: z.string(),
   slug: z.string(),
   abbreviation: z.string(),
@@ -32,7 +36,7 @@ export const keycapProfileRefSchema = z.object({
 
 // Full profile schema
 export const keycapProfileSchema = z.object({
-  id: z.coerce.string(),
+  id: payloadIdSchema,
   title: z.string(),
   slug: z.string(),
   description: z.string().nullable(),

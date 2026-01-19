@@ -14,5 +14,9 @@ export function RichTextContent({ content }: { content: unknown }) {
 
   // If it's Lexical JSON, we need to parse it
   // For now, display a message that content is available
-  return <p className="text-muted-foreground">Le contenu de cette page est gere via le CMS.</p>;
+  return (
+    <p className="text-muted-foreground">
+      Le contenu de cette page est gere via le CMS.
+    </p>
+  );
 }

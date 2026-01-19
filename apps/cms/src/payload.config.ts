@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import type { CloudflareContext } from "@opennextjs/cloudflare";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { sqliteD1Adapter } from "@payloadcms/db-d1-sqlite";
+import { searchPlugin } from "@payloadcms/plugin-search";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { r2Storage } from "@payloadcms/storage-r2";
 import { en } from "@payloadcms/translations/languages/en";
@@ -64,7 +65,8 @@ export default buildConfig({
   collections: [Users, Media, Articles, KeycapProfiles],
   globals: [Homepage, SocialNetworks, InformationsPage, SuggestionPage],
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || (cloudflare.env as any).PAYLOAD_SECRET || "",
+  secret:
+    process.env.PAYLOAD_SECRET || (cloudflare.env as any).PAYLOAD_SECRET || "",
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),
   },
@@ -80,6 +82,29 @@ export default buildConfig({
       bucket: (cloudflare.env as any).R2,
       collections: { media: true },
     }),
+    searchPlugin({
+      collections: ["articles", "keycap-profiles"],
+      defaultPriorities: {
+        articles: 10,
+        "keycap-profiles": 20, // Profiles appear first in results
+      },
+      // Store slug directly in search records for navigation
+      beforeSync: ({ originalDoc, searchDoc }) => ({
+        ...searchDoc,
+        slug: originalDoc.slug,
+      }),
+      // Add slug field to search collection
+      searchOverrides: {
+        fields: ({ defaultFields }) => [
+          ...defaultFields,
+          {
+            name: "slug",
+            type: "text",
+            index: true,
+          },
+        ],
+      },
+    }),
   ],
 });
 
@@ -90,12 +115,13 @@ export default buildConfig({
 function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
   // Dynamic import to avoid bundling wrangler in production
   // The string manipulation prevents webpack from resolving this at build time
-  return import(/* webpackIgnore: true */ `${"__wrangler".replaceAll("_", "")}`).then(
-    ({ getPlatformProxy }) =>
-      getPlatformProxy({
-        environment: process.env.CLOUDFLARE_ENV,
-        // Use remote bindings in production mode (for migrations against deployed D1)
-        remoteBindings: isProduction,
-      } satisfies GetPlatformProxyOptions),
+  return import(
+    /* webpackIgnore: true */ `${"__wrangler".replaceAll("_", "")}`
+  ).then(({ getPlatformProxy }) =>
+    getPlatformProxy({
+      environment: process.env.CLOUDFLARE_ENV,
+      // Use remote bindings in production mode (for migrations against deployed D1)
+      remoteBindings: isProduction,
+    } satisfies GetPlatformProxyOptions),
   );
 }

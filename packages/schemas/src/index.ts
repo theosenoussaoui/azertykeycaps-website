@@ -1,3 +1,6 @@
+// Common utilities
+export * from "./common";
+
 // Media
 export * from "./media";
 
@@ -18,3 +21,6 @@ export * from "./responses";
 
 // Cache Schemas
 export * from "./cache";
+
+// Search Schemas
+export * from "./search";

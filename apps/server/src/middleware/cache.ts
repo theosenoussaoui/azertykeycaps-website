@@ -8,14 +8,18 @@ export const CACHE_NAMES = {
 
 function isDevMode(): boolean {
   try {
-    const hasCacheApi = typeof caches !== "undefined" && typeof caches.open === "function";
+    const hasCacheApi =
+      typeof caches !== "undefined" && typeof caches.open === "function";
     return !hasCacheApi;
   } catch {
     return true;
   }
 }
 
-function createDevCacheLogger(cacheName: string, cacheControl: string): MiddlewareHandler {
+function createDevCacheLogger(
+  cacheName: string,
+  cacheControl: string,
+): MiddlewareHandler {
   return async (c, next) => {
     const startTime = Date.now();
     await next();
@@ -32,7 +36,8 @@ function createDevCacheLogger(cacheName: string, cacheControl: string): Middlewa
   };
 }
 
-const MEDIA_CACHE_CONTROL = "public, max-age=604800, stale-while-revalidate=86400";
+const MEDIA_CACHE_CONTROL =
+  "public, max-age=604800, stale-while-revalidate=86400";
 
 export const mediaCacheMiddleware: MiddlewareHandler = isDevMode()
   ? createDevCacheLogger(CACHE_NAMES.MEDIA, MEDIA_CACHE_CONTROL)

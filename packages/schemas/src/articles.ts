@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { payloadIdSchema } from "./common";
 import { mediaSchema } from "./media";
 import { keycapProfileRefSchema } from "./profiles";
 
@@ -18,7 +19,8 @@ export const ARTICLE_STATUS = {
 } as const;
 
 export const ARTICLE_STATUS_VALUES = Object.values(ARTICLE_STATUS);
-export type ArticleStatus = (typeof ARTICLE_STATUS)[keyof typeof ARTICLE_STATUS];
+export type ArticleStatus =
+  (typeof ARTICLE_STATUS)[keyof typeof ARTICLE_STATUS];
 
 export const ARTICLE_MATERIALS = {
   ABS_DOUBLE_SHOT: "abs_double_shot",
@@ -31,7 +33,8 @@ export const ARTICLE_MATERIALS = {
 } as const;
 
 export const ARTICLE_MATERIAL_VALUES = Object.values(ARTICLE_MATERIALS);
-export type ArticleMaterial = (typeof ARTICLE_MATERIALS)[keyof typeof ARTICLE_MATERIALS];
+export type ArticleMaterial =
+  (typeof ARTICLE_MATERIALS)[keyof typeof ARTICLE_MATERIALS];
 
 // ============================================
 // SCHEMAS
@@ -59,7 +62,7 @@ export const articleMaterialSchema = z.enum([
 
 // Schema for article list items (cards) - only fields selected in list query
 export const articleListItemSchema = z.object({
-  id: z.coerce.string(),
+  id: payloadIdSchema,
   title: z.string(),
   slug: z.string(),
   img: mediaSchema,
@@ -71,7 +74,7 @@ export const articleListItemSchema = z.object({
 // Schema for full article (detail page) - all fields
 // Full article schema - all fields from CMS
 export const articleSchema = z.object({
-  id: z.coerce.string(),
+  id: payloadIdSchema,
   title: z.string(),
   slug: z.string(),
   img: mediaSchema,

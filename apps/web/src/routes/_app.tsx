@@ -1,8 +1,16 @@
-import type { KeycapProfileRef, SocialNetworks } from "@azertykeycaps-app/schemas";
-import { createFileRoute, ErrorComponent, Outlet } from "@tanstack/react-router";
+import type {
+  KeycapProfileRef,
+  SocialNetworks,
+} from "@azertykeycaps-app/schemas";
+import {
+  createFileRoute,
+  ErrorComponent,
+  Outlet,
+} from "@tanstack/react-router";
 
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
+import { GridLines } from "@/components/ui/grid-lines";
 import { getLayoutData } from "@/features/globals/api/get-layout-data";
 
 export interface AppLayoutContext {
@@ -19,7 +27,8 @@ export const Route = createFileRoute("/_app")({
     };
   },
   headers: () => ({
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 10 * 60_000,
   gcTime: 60 * 60_000,
@@ -35,9 +44,10 @@ function AppLayout() {
   const { socialNetworks, profiles } = Route.useLoaderData();
 
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="relative flex min-h-svh flex-col">
+      <GridLines />
       <Header profiles={profiles} />
-      <main className="flex-1">
+      <main className="relative z-10 flex-1">
         <Outlet />
       </main>
       <Footer socialNetworks={socialNetworks} />

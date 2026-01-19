@@ -7,7 +7,9 @@ import { keycapProfileRefSchema } from "./profiles";
 // PAGINATED RESPONSE FACTORY
 // ============================================
 
-export const createPaginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
+export const createPaginatedResponseSchema = <T extends z.ZodTypeAny>(
+  itemSchema: T,
+) =>
   z.object({
     docs: z.array(itemSchema),
     totalDocs: z.number(),
@@ -23,7 +25,8 @@ export const createPaginatedResponseSchema = <T extends z.ZodTypeAny>(itemSchema
 // ============================================
 
 // Uses articleCardSchema for list responses (only fields selected in list query)
-export const articleListResponseSchema = createPaginatedResponseSchema(articleCardSchema);
+export const articleListResponseSchema =
+  createPaginatedResponseSchema(articleCardSchema);
 
 export const profileListResponseSchema = z.array(keycapProfileRefSchema);
 

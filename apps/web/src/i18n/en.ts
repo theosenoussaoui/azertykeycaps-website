@@ -59,7 +59,8 @@ export const en = {
     about: {
       title: "About",
       metaTitle: "Azertykeycaps - About",
-      metaDescription: "General technical information about the Azertykeycaps website.",
+      metaDescription:
+        "General technical information about the Azertykeycaps website.",
     },
     suggest: {
       title: "Suggest a keyset!",
@@ -93,5 +94,14 @@ export const en = {
     pbt_double_shot: "PBT Double-shot",
     pbt_dye_sub: "PBT Dye-sub",
     pbt_laser_printed: "PBT Laser-printed",
+  },
+  search: {
+    placeholder: "Search keysets...",
+    noResults: "No keysets found",
+    searching: "Searching...",
+    hint: "Type to search",
+    shortcut: "Ctrl K",
+    articles: "Keysets",
+    profiles: "Profiles",
   },
 } as const;

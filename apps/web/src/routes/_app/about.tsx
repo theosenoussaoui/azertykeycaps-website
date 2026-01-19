@@ -11,6 +11,12 @@ import {
 import { getAboutContent } from "@/features/globals/api/get-about-content";
 import { RichTextContent } from "@/features/globals/components/rich-text-content";
 import { t } from "@/i18n";
+import {
+  generateAboutPageSchema,
+  generateCanonical,
+  generateJsonLd,
+  generateMeta,
+} from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/about")({
   component: AboutPage,
@@ -21,14 +27,25 @@ export const Route = createFileRoute("/_app/about")({
   head: () => {
     const i18n = t();
     return {
-      meta: [
-        { title: i18n.pages.about.metaTitle },
-        { name: "description", content: i18n.pages.about.metaDescription },
-      ],
+      meta: generateMeta({
+        title: i18n.pages.about.title,
+        description: i18n.pages.about.metaDescription,
+        path: "/about",
+      }),
+      links: [generateCanonical("/about")],
+      scripts: [
+        generateJsonLd(
+          generateAboutPageSchema({
+            name: i18n.pages.about.title,
+            description: i18n.pages.about.metaDescription,
+          }),
+        ),
+      ].filter(Boolean),
     };
   },
   headers: () => ({
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 60 * 60_000,
   gcTime: 24 * 60 * 60_000,
@@ -40,7 +57,7 @@ function AboutPage() {
   const i18n = t();
 
   return (
-    <PageContainer size="md">
+    <PageContainer>
       <article>
         <PageHeader>
           <PageTitle>{content?.title ?? i18n.pages.about.title}</PageTitle>
@@ -51,7 +68,9 @@ function AboutPage() {
             {content?.content ? (
               <RichTextContent content={content.content} />
             ) : (
-              <p className="text-muted-foreground">{i18n.pages.about.metaDescription}</p>
+              <p className="text-muted-foreground">
+                {i18n.pages.about.metaDescription}
+              </p>
             )}
           </PageSectionContent>
         </PageSection>

@@ -8,6 +8,7 @@ import { ArrowLeftIcon, SearchXIcon } from "lucide-react";
 
 import { PageErrorWithBack } from "@/components/errors/page-error";
 import { Button } from "@/components/ui/button";
+import { CardGrid, GridCard } from "@/components/ui/card-grid";
 import {
   Empty,
   EmptyContent,
@@ -29,6 +30,12 @@ import { ArticleCard } from "@/features/articles/components/article-card";
 import { ArticleFilters } from "@/features/articles/components/article-filters";
 import { ArticlesPagination } from "@/features/articles/components/articles-pagination";
 import { t } from "@/i18n";
+import {
+  generateCanonical,
+  generateCollectionPageSchema,
+  generateJsonLd,
+  generateMeta,
+} from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/profile/$slug")({
   component: ProfilePage,
@@ -47,21 +54,38 @@ export const Route = createFileRoute("/_app/profile/$slug")({
     return data;
   },
   headers: () => ({
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 5 * 60_000,
   gcTime: 30 * 60_000,
-  head: ({ loaderData }) => {
-    const profileTitle = loaderData?.articles.docs[0]?.profile?.title ?? loaderData?.profileSlug;
+  head: ({ loaderData, params }) => {
+    const i18n = t();
+    const articles = loaderData?.articles.docs ?? [];
+    const profileTitle =
+      articles[0]?.profile?.title ?? loaderData?.profileSlug ?? params.slug;
     const articleCount = loaderData?.articles.totalDocs ?? 0;
+    const path = `/profile/${params.slug}`;
+    const description = `${i18n.home.metaDescription} ${articleCount} keyset${articleCount > 1 ? "s" : ""} ${profileTitle}.`;
+
     return {
-      meta: [
-        { title: `${profileTitle} - Azertykeycaps` },
-        {
-          name: "description",
-          content: `Decouvrez ${articleCount} keyset${articleCount > 1 ? "s" : ""} avec le profil ${profileTitle} sur Azertykeycaps.`,
-        },
-      ],
+      meta: generateMeta({
+        title: profileTitle,
+        description,
+        path,
+        image: articles[0]?.img.url,
+      }),
+      links: [generateCanonical(path)],
+      scripts: [
+        generateJsonLd(
+          generateCollectionPageSchema({
+            name: profileTitle,
+            description,
+            path,
+            items: articles.map((a) => ({ slug: a.slug, title: a.title })),
+          }),
+        ),
+      ].filter(Boolean),
     };
   },
   errorComponent: PageErrorWithBack,
@@ -114,14 +138,16 @@ function ProfilePage() {
   // Empty state when no articles exist for this profile (not filtered)
   if (articles.docs.length === 0 && !hasActiveFilters) {
     return (
-      <PageContainer size="md">
+      <PageContainer>
         <Empty className="py-16">
           <EmptyHeader>
             <EmptyMedia variant="icon">
               <SearchXIcon />
             </EmptyMedia>
             <EmptyTitle>{i18n.pages.profile.noArticles}</EmptyTitle>
-            <EmptyDescription>{i18n.pages.profile.noArticlesDescription}</EmptyDescription>
+            <EmptyDescription>
+              {i18n.pages.profile.noArticlesDescription}
+            </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
             <Button variant="secondary" render={<Link to="/" />}>
@@ -135,7 +161,7 @@ function ProfilePage() {
   }
 
   return (
-    <PageContainer size="lg">
+    <PageContainer>
       {/* Back Navigation */}
       <nav className="py-4">
         <Button variant="ghost" size="sm" render={<Link to="/" />}>
@@ -179,7 +205,9 @@ function ProfilePage() {
                   <SearchXIcon />
                 </EmptyMedia>
                 <EmptyTitle>{i18n.common.noResults}</EmptyTitle>
-                <EmptyDescription>{i18n.pages.profile.noFilterResults}</EmptyDescription>
+                <EmptyDescription>
+                  {i18n.pages.profile.noFilterResults}
+                </EmptyDescription>
               </EmptyHeader>
               <EmptyContent>
                 <Button variant="outline" onClick={handleClearFilters}>
@@ -188,13 +216,21 @@ function ProfilePage() {
               </EmptyContent>
             </Empty>
           ) : (
-            <ul className="grid gap-6 @sm:grid-cols-2 @lg:grid-cols-3" role="list">
+            <CardGrid as="ul">
               {articles.docs.map((article) => (
-                <li key={article.id}>
-                  <ArticleCard article={article} preload="viewport" />
-                </li>
+                <GridCard
+                  key={article.id}
+                  as="li"
+                  className="col-span-2 md:col-span-2"
+                >
+                  <ArticleCard
+                    article={article}
+                    preload="viewport"
+                    variant="grid"
+                  />
+                </GridCard>
               ))}
-            </ul>
+            </CardGrid>
           )}
         </PageSectionContent>
       </PageSection>

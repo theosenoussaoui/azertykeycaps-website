@@ -121,4 +121,8 @@ export function OptimizedImage({
 }
 
 // Re-export utilities and constants for convenience
-export { RESPONSIVE_WIDTHS, getOptimizedImageUrl, generateSrcSet } from "@/lib/image-utils";
+export {
+  RESPONSIVE_WIDTHS,
+  getOptimizedImageUrl,
+  generateSrcSet,
+} from "@/lib/image-utils";

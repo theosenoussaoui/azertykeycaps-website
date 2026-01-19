@@ -1,18 +1,22 @@
 # Azertykeycaps Design System
 
-> **Brutalist, monospace aesthetic with sharp corners and cool-tinted grays.**
+> **Clean, modern aesthetic with sharp corners and cool-tinted grays.**
 
 ## Quick Reference
 
-| Aspect              | Value                        |
-| ------------------- | ---------------------------- |
-| **Font**            | Space Mono (monospace)       |
-| **Border Radius**   | 0 (sharp corners everywhere) |
-| **Color Hue**       | 250 (cool blue-tinted grays) |
-| **Color Space**     | oklch                        |
-| **UI Library**      | Base UI (`@base-ui/react`)   |
-| **Styling Pattern** | coss.com/ui                  |
-| **CSS Framework**   | Tailwind CSS v4              |
+| Aspect              | Value                                     |
+| ------------------- | ----------------------------------------- |
+| **Font (Sans)**     | Geist Sans (body text)                    |
+| **Font (Mono)**     | Geist Mono (headings, badges, nav links)  |
+| **Font (Heading)**  | Geist Mono (`font-heading`)               |
+| **Border Radius**   | 0 (sharp corners everywhere)              |
+| **Color Hue**       | 250 (cool blue-tinted grays)              |
+| **Color Space**     | oklch                                     |
+| **UI Library**      | Base UI (`@base-ui/react`)                |
+| **Styling Pattern** | coss.com/ui                               |
+| **CSS Framework**   | Tailwind CSS v4                           |
+| **Container Width** | max-w-7xl (1280px)                        |
+| **Grid System**     | Responsive: 2 cols mobile, 8 cols desktop |
 
 ---
 
@@ -45,30 +49,46 @@
 
 ```css
 --font-sans:
-  "Space Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
-  monospace;
+  "Geist Variable", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+  "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 --font-mono:
-  "Space Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
-  monospace;
+  "Geist Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+  Consolas, "Liberation Mono", monospace;
+--font-heading:
+  "Geist Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+  Consolas, "Liberation Mono", monospace;
 ```
 
-### Loading Font (in `__root.tsx`)
+### Loading Font (via Fontsource in `index.css`)
 
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
-<link
-  href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap"
-  rel="stylesheet"
-/>
+```css
+/* Self-hosted Geist fonts - no external requests */
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
 ```
 
 ### Typography Rules
 
-- **Headings**: `font-bold tracking-tight`
+- **Headings**: `font-heading font-bold tracking-tight` (uses Geist Mono)
+- **Body text**: `font-sans` (uses Geist Sans)
+- **Badges**: `font-mono` (uses Geist Mono)
+- **Nav links**: `font-mono` (uses Geist Mono)
 - **h1**: `text-wrap: balance` (prevents orphans)
 - **h2, h3**: `text-wrap: pretty`
 - **Body**: `font-variant-numeric: tabular-nums` (aligned numbers)
+
+### Font Usage Guidelines
+
+| Element        | Font Class     | Font Family |
+| -------------- | -------------- | ----------- |
+| Page titles    | `font-heading` | Geist Mono  |
+| Section titles | `font-heading` | Geist Mono  |
+| Card titles    | `font-heading` | Geist Mono  |
+| Body text      | `font-sans`    | Geist Sans  |
+| Badges         | `font-mono`    | Geist Mono  |
+| Navigation     | `font-mono`    | Geist Mono  |
+| Code           | `font-mono`    | Geist Mono  |
+| Footer links   | `font-mono`    | Geist Mono  |
 
 ### Heading Sizes (with Container Queries)
 
@@ -215,13 +235,17 @@ Use `@container` queries for component-level responsiveness.
 ```tsx
 import { PageContainer } from "@/components/ui/page-container";
 
+<PageContainer />                // max-w-7xl (1280px) - DEFAULT
 <PageContainer size="full" />    // No max-width
-<PageContainer size="lg" />      // max-w-7xl (1280px)
-<PageContainer size="default" /> // max-w-5xl (1024px) - DEFAULT
+<PageContainer size="7xl" />     // max-w-7xl (1280px) - same as default
+<PageContainer size="6xl" />     // max-w-6xl (1152px)
+<PageContainer size="lg" />      // max-w-5xl (1024px)
 <PageContainer size="md" />      // max-w-3xl (768px)
 <PageContainer size="sm" />      // max-w-xl (576px)
 <PageContainer size="narrow" />  // max-w-md (448px)
 ```
+
+**Important:** All pages should use the default `max-w-7xl` container for visual consistency. The header and footer also use this width to ensure alignment with the 8-column grid lines.
 
 ### Section Spacing
 
@@ -306,7 +330,9 @@ import { PageSection } from "@/components/ui/page-container";
       <div>
         <dt className="text-muted-foreground">Start Date</dt>
         <dd>
-          <time dateTime={article.startDate}>{formatDate(article.startDate)}</time>
+          <time dateTime={article.startDate}>
+            {formatDate(article.startDate)}
+          </time>
         </dd>
       </div>
     </dl>
@@ -500,7 +526,10 @@ import { Badge } from "@/components/ui/badge";
 
 ```tsx
 <Sheet>
-  <SheetTrigger render={<Button variant="ghost" size="icon" />} aria-label="Open menu">
+  <SheetTrigger
+    render={<Button variant="ghost" size="icon" />}
+    aria-label="Open menu"
+  >
     <MenuIcon />
   </SheetTrigger>
   <SheetContent side="left">
@@ -653,6 +682,7 @@ apps/web/src/
 - [ ] Uses semantic HTML elements
 - [ ] Has proper `data-slot` attribute
 - [ ] Uses `render` prop for composition with Link
+- [ ] No inline `style` prop (use `cn()` with Tailwind classes)
 
 ---
 
@@ -738,6 +768,28 @@ apps/web/src/
 </ul>
 ```
 
+### 7. Using inline `style` prop
+
+**The `style` prop is strictly forbidden.** Always use Tailwind classes with `cn()` for dynamic properties.
+
+```tsx
+// Bad - inline style
+<div style={{ marginTop: spacing }}>
+<div style={{ borderRightWidth: "1px" }}>
+<div style={{ "--x": x, "--y": y }}>
+
+// Good - use cn() with conditional classes
+<div className={cn("mt-4", isLarge && "mt-8")}>
+<div className={cn("border-l", isLast && "border-r")}>
+
+// Good - use Tailwind arbitrary values if needed
+<div className="mt-[var(--spacing)]">
+```
+
+**Why:** Tailwind classes are optimized, tree-shaken, and maintain design system consistency. Inline styles bypass the design system and can't be purged.
+
+**Exception:** Only use `style` when a CSS property has no Tailwind equivalent AND cannot be expressed with arbitrary values (extremely rare).
+
 ---
 
 ## i18n Keys
@@ -803,19 +855,372 @@ materials: {
 
 ---
 
+## Forms & Inputs
+
+### Input Behavior
+
+- **Hydration-safe**: Inputs must not lose focus or value during hydration
+- **Never block paste**: All inputs and textareas must allow paste
+- **Accept free text**: Validate after input, don't block typing
+- **Trim values**: Handle trailing spaces from text expansion
+
+### Submit Behavior
+
+- **Enter submits**: Enter key submits focused input
+- **Textarea exception**: Use Cmd/Ctrl+Enter to submit in textareas
+- **Loading state**: Keep original label + show spinner, then disable
+- **Enable until request**: Submit button stays enabled until request starts
+
+### Validation
+
+- **Inline errors**: Display errors next to the field that caused them
+- **Focus first error**: On submit with errors, focus the first invalid field
+- **Allow incomplete submit**: Let users submit to surface all validation errors
+
+### Autocomplete & Input Types
+
+```tsx
+// Always set meaningful autocomplete and name attributes
+<input
+  type="email"
+  name="email"
+  autoComplete="email"
+  inputMode="email"
+  spellCheck={false}  // Disable for emails, codes, usernames
+/>
+
+// Use correct inputMode for mobile keyboards
+<input type="text" inputMode="numeric" />  // Numbers only
+<input type="text" inputMode="tel" />      // Phone number
+<input type="text" inputMode="url" />      // URL input
+```
+
+### Password & 2FA
+
+- Compatible with password managers
+- Allow pasting codes (never block paste)
+- Support browser autofill
+
+### Unsaved Changes
+
+- Warn users before navigation when form has unsaved changes
+- Use `beforeunload` event or router guards
+
+---
+
+## URL State Management
+
+### State Reflection
+
+The URL must reflect application state for:
+
+- Filters and search queries
+- Pagination (current page)
+- Tab selection
+- Expanded/collapsed panels
+- Sort order
+
+```tsx
+// Example: Filters in URL search params
+// URL: /profile/cherry?status=in_stock&page=2
+const search = Route.useSearch(); // { status: "in_stock", page: 2 }
+```
+
+### Back/Forward Navigation
+
+- Back/Forward buttons must restore previous state
+- Scroll position should be restored
+- TanStack Router handles this automatically with `staleTime` and `gcTime`
+
+### Link Behavior
+
+- **Use `<Link>` or `<a>`** for navigation (supports Cmd/Ctrl+click, middle-click)
+- **Never use `<div onClick>`** for navigation
+
+---
+
+## Content Handling
+
+### Text Truncation
+
+```tsx
+// Single line truncation
+<p className="truncate">Long text that will be cut off...</p>
+
+// Multi-line truncation
+<p className="line-clamp-2">Long text that spans multiple lines...</p>
+
+// Allow wrapping for long words
+<p className="break-words">Superlongwordthatneedstowrap</p>
+
+// Flex children need min-w-0 to allow truncation
+<div className="flex">
+  <span className="min-w-0 truncate">Truncatable flex child</span>
+</div>
+```
+
+### Empty States
+
+- Always design empty states (no data, no results)
+- Provide a clear next action (e.g., "Add your first item")
+- Use the `Empty` component with icon, title, description, and action
+
+### User-Generated Content
+
+- Handle short, average, and very long content
+- Test with edge cases (empty strings, single characters, paragraphs)
+- Use `max-w-prose` or explicit max-widths for readability
+
+### Numbers & Dates
+
+```tsx
+// Always use tabular-nums for number columns
+<td className="tabular-nums">1,234.56</td>;
+
+// Use Intl for locale-aware formatting
+const formatter = new Intl.NumberFormat("fr-FR");
+const dateFormatter = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" });
+
+// Use <time> element for dates
+<time dateTime={article.startDate}>{formatDate(article.startDate)}</time>;
+```
+
+### Non-Breaking Spaces
+
+Use `&nbsp;` to prevent awkward line breaks:
+
+```tsx
+// Units
+<span>10&nbsp;MB</span>
+<span>5&nbsp;kg</span>
+
+// Keyboard shortcuts
+<span>Cmd&nbsp;K</span>
+
+// Brand names
+<span>Azertykeycaps&nbsp;FR</span>
+```
+
+---
+
+## Dark Mode
+
+### Required Setup
+
+```tsx
+// In __root.tsx or HTML template
+<html className={isDark ? 'dark' : ''}>
+```
+
+The `.dark` class triggers CSS custom property overrides defined in `index.css`.
+
+### Color Scheme Declaration
+
+```css
+.dark {
+  color-scheme: dark;
+}
+```
+
+This tells the browser to use dark mode for native controls (scrollbars, form elements).
+
+### Theme Color Meta Tag
+
+```tsx
+// Match theme-color to page background
+<meta name="theme-color" content={isDark ? "#1a1a1a" : "#ffffff"} />
+```
+
+### Native Select Fix (Windows)
+
+Native `<select>` elements on Windows need explicit colors:
+
+```css
+select {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+```
+
+---
+
+## Hydration Safety
+
+### Controlled Inputs
+
+```tsx
+// Wrong - will lose value on hydration
+<input value={value} />
+
+// Correct - controlled with onChange
+<input value={value} onChange={(e) => setValue(e.target.value)} />
+
+// Correct - uncontrolled with defaultValue
+<input defaultValue={initialValue} />
+```
+
+### Date/Time Rendering
+
+Guard against hydration mismatch for dates (server vs client timezone):
+
+```tsx
+// Use suppressHydrationWarning for dynamic dates
+<time suppressHydrationWarning>{new Date().toLocaleDateString()}</time>;
+
+// Or render only on client
+const [mounted, setMounted] = useState(false);
+useEffect(() => setMounted(true), []);
+if (!mounted) return <Skeleton />;
+return <time>{formatDate(date)}</time>;
+```
+
+---
+
+## Performance
+
+### Re-render Tracking
+
+- Use React DevTools Profiler to track re-renders
+- Use React Scan for visual re-render indicators
+- Minimize controlled inputs; prefer uncontrolled when possible
+
+### Virtualization
+
+Lists with >50 items should be virtualized:
+
+```tsx
+import { useVirtualizer } from "@tanstack/react-virtual";
+
+// Virtual list for large datasets
+const virtualizer = useVirtualizer({
+  count: items.length,
+  getScrollElement: () => parentRef.current,
+  estimateSize: () => 80,
+});
+```
+
+### Image Optimization
+
+```tsx
+// Preload above-fold images
+<img loading="eager" fetchPriority="high" />
+
+// Lazy-load below-fold images
+<img loading="lazy" decoding="async" />
+
+// Always set dimensions to prevent CLS
+<img width={768} height={432} />
+```
+
+### Preconnect & Preload
+
+```html
+<!-- Preconnect to CDN domains -->
+<link rel="preconnect" href="https://images.azertykeycaps.fr" />
+
+<!-- Preload critical fonts -->
+<link
+  rel="preload"
+  href="/fonts/space-mono.woff2"
+  as="font"
+  type="font/woff2"
+  crossorigin
+/>
+```
+
+### Mutation Performance
+
+- Target <500ms for POST/PATCH/DELETE operations
+- Show optimistic UI for instant feedback
+- Reconcile with server response
+
+---
+
+## Grid Lines
+
+### Visual Grid System
+
+The site uses a responsive visual grid overlay for design consistency:
+
+```tsx
+// GridLines component renders full-height vertical lines
+<GridLines />
+
+// Responsive columns:
+// - Mobile: 2 columns (3 vertical lines)
+// - Desktop (md+): 8 columns (9 vertical lines)
+// Lines align with max-w-7xl container (1280px)
+// Uses var(--color-border) at opacity-30 for subtle effect
+```
+
+### Grid Alignment
+
+- All content containers use `max-w-7xl` (1280px)
+- Header and footer match this width
+- Grid lines span full viewport height
+- Lines are decorative (`aria-hidden="true"`, `pointer-events-none`)
+- Mobile-ready: same padding as content containers (`px-4 sm:px-6 lg:px-8`)
+
+**Important:** GridLines uses **media queries** (`md:`), not container queries (`@md:`), because it's a fixed-position element that needs to respond to viewport width.
+
+### Content Grid Patterns (CardGrid)
+
+The `CardGrid` component uses a responsive 2/8 column system:
+
+| Breakpoint    | Grid Columns | Typical Card Span                                    |
+| ------------- | ------------ | ---------------------------------------------------- |
+| Mobile        | 2 columns    | `col-span-2` (full width)                            |
+| Desktop (md+) | 8 columns    | `col-span-2` (1/4 width) or `col-span-4` (1/2 width) |
+
+```tsx
+// CardGrid with responsive columns (no columns prop needed)
+<CardGrid as="ul">
+  {/* Article cards: span 2 of 8 columns on desktop (1/4 width) */}
+  <GridCard as="li" className="col-span-2 md:col-span-2">
+    <ArticleCard article={article} variant="grid" />
+  </GridCard>
+
+  {/* Featured cards: span 4 of 8 columns on desktop (1/2 width) */}
+  <GridCard as="li" className="col-span-2 md:col-span-4">
+    <FeaturedCard item={item} />
+  </GridCard>
+</CardGrid>
+```
+
+### SectionDivider
+
+Full-width horizontal lines that extend beyond the container:
+
+```tsx
+import { SectionDivider } from "@/components/ui/section-divider";
+
+// Wrap content sections with dividers
+<SectionDivider />
+<CardGrid>...</CardGrid>
+<SectionDivider />
+```
+
+The divider spans 100vw using the `left-1/2 -ml-[50vw]` technique and uses `opacity-30` to match grid line subtlety.
+
+---
+
 ## Additional Documentation
 
-| Document                                      | Description                                    |
-| --------------------------------------------- | ---------------------------------------------- |
-| [Z-Index Scale](./design/Z_INDEX.md)          | Fixed z-index tokens and layering rules        |
-| [Animation Guidelines](./design/ANIMATION.md) | Transition and animation best practices        |
-| [Component Reference](./design/COMPONENTS.md) | Detailed component variants, states, and sizes |
+| Document                               | Description                                    |
+| -------------------------------------- | ---------------------------------------------- |
+| [Z-Index Scale](./Z_INDEX.md)          | Fixed z-index tokens and layering rules        |
+| [Animation Guidelines](./ANIMATION.md) | Transition and animation best practices        |
+| [Component Reference](./COMPONENTS.md) | Detailed component variants, states, and sizes |
+| [AGENTS.md](../../apps/web/AGENTS.md)  | Web Interface Guidelines for AI agents         |
 
 ---
 
 ## Version History
 
-| Version | Date       | Changes                                                                                                                          |
-| ------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| 1.1     | 2026-01-18 | Added semantic HTML props (CardTitle as, EmptyTitle as), oklch semantic colors, accessibility improvements, animation guidelines |
-| 1.0     | 2026-01-16 | Initial design system documentation                                                                                              |
+| Version | Date       | Changes                                                                                                                                                                            |
+| ------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.4     | 2026-01-19 | Changed grid system from 6 to 8 columns on desktop                                                                                                                                 |
+| 1.3     | 2026-01-19 | Updated container to max-w-7xl (1280px), responsive 2/6 column grid system, SectionDivider component, Geist Mono for headings/badges/nav, DitherShader hover effect on ArticleCard |
+| 1.2     | 2026-01-18 | Added forms, URL state, content handling, dark mode, hydration, performance, grid lines sections. Unified container to max-w-6xl                                                   |
+| 1.1     | 2026-01-18 | Added semantic HTML props (CardTitle as, EmptyTitle as), oklch semantic colors, accessibility improvements, animation guidelines                                                   |
+| 1.0     | 2026-01-16 | Initial design system documentation                                                                                                                                                |

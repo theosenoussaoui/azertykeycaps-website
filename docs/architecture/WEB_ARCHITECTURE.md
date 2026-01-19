@@ -178,7 +178,8 @@ export const Route = createFileRoute("/_app/")({
   loader: async () => getLatestArticles(),
   errorComponent: PageError,
   headers: () => ({
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
 });
 
@@ -203,13 +204,15 @@ import { serverTRPCClient } from "@/lib/server-trpc";
  * Server function to fetch latest articles.
  * Runs ONLY on the server - not exposed to browser.
  */
-export const getLatestArticles = createServerFn({ method: "GET" }).handler(async () => {
-  const articles = await serverTRPCClient.articles.list.query({
-    page: 1,
-    limit: 3,
-  });
-  return { articles };
-});
+export const getLatestArticles = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const articles = await serverTRPCClient.articles.list.query({
+      page: 1,
+      limit: 3,
+    });
+    return { articles };
+  },
+);
 ```
 
 ### With Input Validation
@@ -233,6 +236,144 @@ loader: async ({ params }) => {
   return { article };
 },
 ```
+
+## Streaming Data from Server Functions
+
+Server functions support streaming data to the client using `ReadableStream` or async generators. This is particularly useful for AI applications or progressive data loading.
+
+### Typed Readable Streams
+
+Stream typed data chunks to the client:
+
+```typescript
+// features/ai/api/stream-messages.ts
+import { createServerFn } from "@tanstack/react-start";
+
+type Message = {
+  content: string;
+};
+
+/**
+ * Server function that streams Message chunks to the client.
+ * The ReadableStream is fully typed.
+ */
+export const streamMessages = createServerFn({ method: "GET" }).handler(
+  async () => {
+    const messages: Message[] = await generateMessages();
+
+    const stream = new ReadableStream<Message>({
+      async start(controller) {
+        for (const message of messages) {
+          controller.enqueue(message);
+        }
+        controller.close();
+      },
+    });
+
+    return stream;
+  },
+);
+```
+
+**Consuming the stream in a component:**
+
+```typescript
+// features/ai/components/message-stream.tsx
+import { useState, useCallback } from "react";
+import { streamMessages } from "@/features/ai/api/stream-messages";
+
+export function MessageStream() {
+  const [message, setMessage] = useState("");
+
+  const handleStream = useCallback(async () => {
+    const response = await streamMessages();
+    if (!response) return;
+
+    const reader = response.getReader();
+    let done = false;
+
+    while (!done) {
+      const { value, done: doneReading } = await reader.read();
+      done = doneReading;
+      if (value) {
+        // `value` is typed as `Message | undefined`
+        setMessage((prev) => prev + value.content);
+      }
+    }
+  }, []);
+
+  return (
+    <div>
+      <button onClick={handleStream}>Start Stream</button>
+      <p>{message}</p>
+    </div>
+  );
+}
+```
+
+### Async Generators (Recommended)
+
+A cleaner approach using async generator functions:
+
+```typescript
+// features/ai/api/stream-with-generator.ts
+import { createServerFn } from "@tanstack/react-start";
+
+type Message = {
+  content: string;
+};
+
+/**
+ * Server function using async generator for streaming.
+ * Cleaner syntax with the same type safety.
+ */
+export const streamWithGenerator = createServerFn({ method: "GET" }).handler(
+  async function* () {
+    const messages: Message[] = await generateMessages();
+
+    for (const msg of messages) {
+      await sleep(500); // Simulate processing delay
+      yield msg; // Streamed chunks are typed as `Message`
+    }
+  },
+);
+```
+
+**Consuming with for-await-of:**
+
+```typescript
+// features/ai/components/generator-stream.tsx
+import { useState, useCallback } from "react";
+import { streamWithGenerator } from "@/features/ai/api/stream-with-generator";
+
+export function GeneratorStream() {
+  const [messages, setMessages] = useState("");
+
+  const handleStream = useCallback(async () => {
+    for await (const msg of await streamWithGenerator()) {
+      setMessages((prev) => prev + msg.content);
+    }
+  }, []);
+
+  return (
+    <div>
+      <button onClick={handleStream}>Start Stream</button>
+      <p>{messages}</p>
+    </div>
+  );
+}
+```
+
+### When to Use Streaming
+
+| Use Case                 | Recommended Approach |
+| ------------------------ | -------------------- |
+| AI text generation       | Async generators     |
+| Large dataset loading    | ReadableStream       |
+| Real-time updates        | Async generators     |
+| File processing progress | ReadableStream       |
+
+**Note:** Async generators provide cleaner syntax and are recommended for most use cases. Use `ReadableStream` when you need more control over the stream lifecycle.
 
 ## Error Handling
 

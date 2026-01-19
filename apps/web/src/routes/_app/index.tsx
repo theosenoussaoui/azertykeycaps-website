@@ -3,7 +3,13 @@ import { AlertCircleIcon, InboxIcon } from "lucide-react";
 
 import { PageError } from "@/components/errors/page-error";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { CardGrid, GridCard } from "@/components/ui/card-grid";
 import {
   Empty,
   EmptyDescription,
@@ -21,10 +27,17 @@ import {
   PageSectionTitle,
   PageTitle,
 } from "@/components/ui/page-container";
+import { SectionDivider } from "@/components/ui/section-divider";
 import { getLatestArticles } from "@/features/articles/api/get-latest-articles";
 import { ArticleCard } from "@/features/articles/components/article-card";
 import { t } from "@/i18n";
 import { getPreloadImageUrl } from "@/lib/image-utils";
+import {
+  generateCanonical,
+  generateItemListSchema,
+  generateJsonLd,
+  generateMeta,
+} from "@/lib/seo";
 
 const appRouteApi = getRouteApi("/_app");
 
@@ -32,30 +45,44 @@ export const Route = createFileRoute("/_app/")({
   component: HomeComponent,
   loader: async () => getLatestArticles(),
   headers: () => ({
-    "Cache-Control": "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
+    "Cache-Control":
+      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
   }),
   staleTime: 60_000,
   gcTime: 5 * 60_000,
   head: ({ loaderData }) => {
     const i18n = t();
-    const firstArticle = loaderData?.articles?.docs?.[0];
+    const articles = loaderData?.articles?.docs ?? [];
+    const firstArticle = articles[0];
     // Use optimized image URL for preloading (matches what OptimizedImage renders)
     const preloadImageUrl = getPreloadImageUrl(firstArticle?.img.url, "card");
 
     return {
-      meta: [
-        { title: i18n.home.metaTitle },
-        { name: "description", content: i18n.home.metaDescription },
+      meta: generateMeta({
+        title: i18n.home.metaTitle,
+        description: i18n.home.metaDescription,
+        path: "/",
+        image: firstArticle?.img.url,
+      }),
+      links: [
+        generateCanonical("/"),
+        ...(preloadImageUrl
+          ? [
+              {
+                rel: "preload",
+                as: "image",
+                href: preloadImageUrl,
+              },
+            ]
+          : []),
       ],
-      links: preloadImageUrl
-        ? [
-            {
-              rel: "preload",
-              as: "image",
-              href: preloadImageUrl,
-            },
-          ]
-        : [],
+      scripts: [
+        generateJsonLd(
+          generateItemListSchema(
+            articles.map((a) => ({ slug: a.slug, title: a.title })),
+          ),
+        ),
+      ].filter(Boolean),
     };
   },
   errorComponent: PageError,
@@ -67,11 +94,13 @@ function HomeComponent() {
   const i18n = t();
 
   return (
-    <PageContainer size="lg">
-      {/* Hero Section */}
-      <PageHeader className="text-center">
-        <PageTitle>{i18n.home.title}</PageTitle>
-        <PageDescription className="mx-auto">{i18n.home.subtitle}</PageDescription>
+    <PageContainer>
+      {/* Hero Section - left aligned, bigger title */}
+      <PageHeader>
+        <PageTitle className="text-4xl @sm:text-5xl @md:text-6xl @lg:text-7xl">
+          {i18n.home.title}
+        </PageTitle>
+        <PageDescription>{i18n.home.subtitle}</PageDescription>
       </PageHeader>
 
       {/* Latest Articles Section */}
@@ -94,17 +123,27 @@ function HomeComponent() {
                   <InboxIcon />
                 </EmptyMedia>
                 <EmptyTitle>{i18n.common.noResults}</EmptyTitle>
-                <EmptyDescription>{i18n.pages.profile.noArticlesDescription}</EmptyDescription>
+                <EmptyDescription>
+                  {i18n.pages.profile.noArticlesDescription}
+                </EmptyDescription>
               </EmptyHeader>
             </Empty>
           ) : (
-            <ul className="article-grid grid gap-6 @sm:grid-cols-2 @lg:grid-cols-3" role="list">
-              {articles.docs.map((article) => (
-                <li key={article.id}>
-                  <ArticleCard article={article} />
-                </li>
-              ))}
-            </ul>
+            <>
+              <SectionDivider />
+              <CardGrid as="ul">
+                {articles.docs.map((article) => (
+                  <GridCard
+                    key={article.id}
+                    as="li"
+                    className="col-span-2 md:col-span-2"
+                  >
+                    <ArticleCard article={article} variant="grid" />
+                  </GridCard>
+                ))}
+              </CardGrid>
+              <SectionDivider />
+            </>
           )}
         </PageSectionContent>
       </PageSection>
@@ -115,16 +154,21 @@ function HomeComponent() {
           <PageSectionTitle>{i18n.home.browseByProfile}</PageSectionTitle>
         </PageSectionHeader>
         <PageSectionContent>
-          <ul className="grid gap-4 @xs:grid-cols-2 @sm:grid-cols-3 @lg:grid-cols-4" role="list">
+          <SectionDivider />
+          <CardGrid as="ul">
             {profiles.map((profile) => (
-              <li key={profile.slug}>
+              <GridCard
+                key={profile.slug}
+                as="li"
+                className="col-span-1 md:col-span-2"
+              >
                 <Link
                   to="/profile/$slug"
                   params={{ slug: profile.slug }}
                   preload="viewport"
-                  className="block"
+                  className="block h-full"
                 >
-                  <Card className="h-full transition-colors hover:bg-accent">
+                  <Card className="h-full border-0 shadow-none transition-colors hover:bg-accent">
                     <CardHeader>
                       <CardTitle className="flex items-center justify-between">
                         <span>{profile.title}</span>
@@ -132,13 +176,16 @@ function HomeComponent() {
                           {profile.abbreviation}
                         </span>
                       </CardTitle>
-                      <CardDescription>{profile.navbarDescription}</CardDescription>
+                      <CardDescription>
+                        {profile.navbarDescription}
+                      </CardDescription>
                     </CardHeader>
                   </Card>
                 </Link>
-              </li>
+              </GridCard>
             ))}
-          </ul>
+          </CardGrid>
+          <SectionDivider />
         </PageSectionContent>
       </PageSection>
     </PageContainer>

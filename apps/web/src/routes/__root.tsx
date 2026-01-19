@@ -1,8 +1,14 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { HeadContent, Outlet, Scripts, createRootRouteWithContext } from "@tanstack/react-router";
+import {
+  HeadContent,
+  Outlet,
+  Scripts,
+  createRootRouteWithContext,
+} from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 
 import appCss from "@/index.css?url";
+import { siteConfig } from "@/lib/seo";
 
 // Lazy load Toaster - toasts are rare, no need to block initial render
 const Toaster = lazy(() =>
@@ -44,19 +50,25 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
       },
       {
         name: "theme-color",
-        content: "#f8fafc",
+        content: siteConfig.themeColor,
       },
       {
-        title: "Azertykeycaps - Annuaire de keycaps françaises",
+        title: `${siteConfig.name} - ${siteConfig.description}`,
       },
+      // Default Open Graph for pages that don't override
+      { property: "og:site_name", content: siteConfig.name },
+      { property: "og:locale", content: siteConfig.locale },
+      { property: "og:type", content: "website" },
     ],
     links: [
-      // App styles (includes self-hosted Space Mono font via Fontsource)
+      // App styles (includes self-hosted Geist font via Fontsource)
       {
         rel: "stylesheet",
         href: appCss,
       },
     ],
+    // Note: JSON-LD is added per-page for better specificity
+    // WebSite schema is not critical - page-specific schemas are more important
   }),
 
   component: RootDocument,
@@ -74,7 +86,10 @@ function RootDocument() {
           <Suspense fallback={null}>
             <Toaster richColors />
             <TanStackRouterDevtools position="bottom-left" />
-            <ReactQueryDevtools position="bottom" buttonPosition="bottom-right" />
+            <ReactQueryDevtools
+              position="bottom"
+              buttonPosition="bottom-right"
+            />
           </Suspense>
           <Scripts />
         </div>

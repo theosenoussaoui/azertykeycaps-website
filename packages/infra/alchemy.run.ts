@@ -26,7 +26,9 @@ const CMS_DOMAIN = process.env.CMS_DOMAIN; // e.g., "cms.azertykeycaps.fr"
 const app = await alchemy("azertykeycaps-app", {
   stage,
   // Use CloudflareStateStore in CI for shared state, local file store in dev
-  stateStore: process.env.CI ? (scope) => new CloudflareStateStore(scope) : undefined,
+  stateStore: process.env.CI
+    ? (scope) => new CloudflareStateStore(scope)
+    : undefined,
 });
 
 // API database (for Better-Auth used by web/server)
@@ -58,7 +60,10 @@ const cmsUrl = isLocalDev
     : `https://azertykeycaps-cms-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
 
 // Secrets - use process.env with defaults for dev, alchemy.env for prod (throws if missing)
-const getSecret = (name: string, devDefault: string = "dev-secret-placeholder") => {
+const getSecret = (
+  name: string,
+  devDefault: string = "dev-secret-placeholder",
+) => {
   if (isProd) {
     return alchemy.env(name);
   }
@@ -91,6 +96,7 @@ export const web = await TanStackStart("web", {
   placement: { mode: "smart" },
   bindings: {
     VITE_SERVER_URL: serverUrl,
+    VITE_SITE_URL: webUrl,
     CORS_ORIGIN: webUrl,
     BETTER_AUTH_SECRET: getSecret("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: serverUrl,

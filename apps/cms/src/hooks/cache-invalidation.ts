@@ -20,7 +20,11 @@ async function getProfileSlug(
 ): Promise<string | undefined> {
   if (!profileField) return undefined;
 
-  if (typeof profileField === "object" && profileField !== null && "slug" in profileField) {
+  if (
+    typeof profileField === "object" &&
+    profileField !== null &&
+    "slug" in profileField
+  ) {
     return (profileField as { slug: string }).slug;
   }
 
@@ -50,13 +54,17 @@ async function getRelatedArticleSlugs(
       limit: 500,
       depth: 0,
     });
-    return articles.docs.map((a) => a.slug).filter((slug): slug is string => !!slug);
+    return articles.docs
+      .map((a) => a.slug)
+      .filter((slug): slug is string => !!slug);
   } catch {
     return [];
   }
 }
 
-async function sendInvalidationToServer(payload: CacheInvalidationPayload): Promise<void> {
+async function sendInvalidationToServer(
+  payload: CacheInvalidationPayload,
+): Promise<void> {
   const invalidationUrl = process.env.CACHE_INVALIDATION_URL;
   const invalidationSecret = process.env.CACHE_INVALIDATION_SECRET;
 
@@ -83,14 +91,20 @@ async function sendInvalidationToServer(payload: CacheInvalidationPayload): Prom
         `[cache-invalidation] Server invalidation failed: ${response.status} - ${errorText}`,
       );
     } else {
-      console.log(`[cache-invalidation] Server invalidation sent for ${payload.slug}`);
+      console.log(
+        `[cache-invalidation] Server invalidation sent for ${payload.slug}`,
+      );
     }
   } catch (error) {
     console.error("[cache-invalidation] Failed to send invalidation:", error);
   }
 }
 
-export const collectionAfterChangeHook: CollectionAfterChangeHook = ({ collection, doc, req }) => {
+export const collectionAfterChangeHook: CollectionAfterChangeHook = ({
+  collection,
+  doc,
+  req,
+}) => {
   const buildAndSendPayload = async () => {
     const payload: CacheInvalidationPayload = {
       type: "collection",
@@ -111,13 +125,19 @@ export const collectionAfterChangeHook: CollectionAfterChangeHook = ({ collectio
     await sendInvalidationToServer(payload);
   };
 
-  console.log(`[cache-invalidation] Collection ${collection.slug} changed: ${doc.id}`);
+  console.log(
+    `[cache-invalidation] Collection ${collection.slug} changed: ${doc.id}`,
+  );
   void buildAndSendPayload();
 
   return doc;
 };
 
-export const collectionAfterDeleteHook: CollectionAfterDeleteHook = ({ collection, doc, req }) => {
+export const collectionAfterDeleteHook: CollectionAfterDeleteHook = ({
+  collection,
+  doc,
+  req,
+}) => {
   const buildAndSendPayload = async () => {
     const payload: CacheInvalidationPayload = {
       type: "collection",
@@ -137,13 +157,18 @@ export const collectionAfterDeleteHook: CollectionAfterDeleteHook = ({ collectio
     await sendInvalidationToServer(payload);
   };
 
-  console.log(`[cache-invalidation] Collection ${collection.slug} deleted: ${doc.id}`);
+  console.log(
+    `[cache-invalidation] Collection ${collection.slug} deleted: ${doc.id}`,
+  );
   void buildAndSendPayload();
 
   return doc;
 };
 
-export const globalAfterChangeHook: GlobalAfterChangeHook = ({ global, doc }) => {
+export const globalAfterChangeHook: GlobalAfterChangeHook = ({
+  global,
+  doc,
+}) => {
   const payload: CacheInvalidationPayload = {
     type: "global",
     slug: global.slug,

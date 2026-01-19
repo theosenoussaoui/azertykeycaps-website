@@ -1,10 +1,18 @@
 import "@/index.css";
 
-import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { AppRouter } from "@azertykeycaps-app/api/routers/index";
+import { env } from "@azertykeycaps-app/env/web";
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
+import { createTRPCClient, httpBatchLink } from "@trpc/client";
 import { toast } from "sonner";
 
 import Loader from "@/components/layout/loader";
+import { TRPCProvider } from "@/lib/trpc";
 import { routeTree } from "@/routeTree.gen";
 
 export const queryClient = new QueryClient({
@@ -21,6 +29,24 @@ export const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 60 * 1000 } },
 });
 
+/**
+ * Client-side tRPC client for React Query integration.
+ * Uses httpBatchLink for efficient request batching.
+ */
+const trpcClient = createTRPCClient<AppRouter>({
+  links: [
+    httpBatchLink({
+      url: `${env.VITE_SERVER_URL}/trpc`,
+      fetch(url, options) {
+        return fetch(url, {
+          ...options,
+          credentials: "include",
+        });
+      },
+    }),
+  ],
+});
+
 export const getRouter = () => {
   const router = createTanStackRouter({
     routeTree,
@@ -32,7 +58,11 @@ export const getRouter = () => {
     defaultPendingComponent: () => <Loader />,
     defaultNotFoundComponent: () => <div>Not Found</div>,
     Wrap: ({ children }) => (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
+          {children}
+        </TRPCProvider>
+      </QueryClientProvider>
     ),
   });
   return router;

@@ -103,7 +103,9 @@ export function ArticlesPagination({
               if (currentPage < totalPages) onPageChange(currentPage + 1);
             }}
             aria-disabled={currentPage >= totalPages}
-            className={currentPage >= totalPages ? "pointer-events-none opacity-50" : ""}
+            className={
+              currentPage >= totalPages ? "pointer-events-none opacity-50" : ""
+            }
           />
         </PaginationItem>
       </PaginationContent>

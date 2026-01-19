@@ -1,7 +1,7 @@
 import type { GlobalConfig } from "payload";
 
-import { isAuthenticated } from "../access/authenticated";
-import { globalAfterChangeHook } from "../hooks/cache-invalidation";
+import { isAuthenticated } from "@/access/authenticated";
+import { globalAfterChangeHook } from "@/hooks/cache-invalidation";
 
 export const InformationsPage: GlobalConfig = {
   slug: "informations-page",
@@ -17,32 +17,60 @@ export const InformationsPage: GlobalConfig = {
   },
   fields: [
     {
-      name: "title",
-      type: "text",
-      required: true,
-      label: { fr: "Titre", en: "Title" },
-      defaultValue: "Informations",
-    },
-    {
-      name: "content",
-      type: "richText",
-      required: true,
-      label: { fr: "Contenu", en: "Content" },
-    },
-    {
-      name: "seo",
-      type: "group",
-      label: { fr: "SEO", en: "SEO" },
-      fields: [
+      type: "tabs",
+      tabs: [
         {
-          name: "metaTitle",
-          type: "text",
-          label: { fr: "Titre Meta", en: "Meta Title" },
+          label: { fr: "Contenu", en: "Content" },
+          fields: [
+            {
+              name: "title",
+              type: "text",
+              required: true,
+              label: { fr: "Titre", en: "Title" },
+              defaultValue: "Informations",
+            },
+            {
+              name: "content",
+              type: "richText",
+              required: true,
+              label: { fr: "Contenu", en: "Content" },
+            },
+          ],
         },
         {
-          name: "metaDescription",
-          type: "textarea",
-          label: { fr: "Description Meta", en: "Meta Description" },
+          label: { fr: "SEO", en: "SEO" },
+          fields: [
+            {
+              type: "ui",
+              name: "seoInfo",
+              admin: {
+                components: {
+                  Field: "@/components/fields/InfoPanel#SeoInfoPanel",
+                },
+              },
+            },
+            {
+              type: "row",
+              fields: [
+                {
+                  name: "metaTitle",
+                  type: "text",
+                  label: { fr: "Titre Meta", en: "Meta Title" },
+                  admin: {
+                    width: "50%",
+                  },
+                },
+                {
+                  name: "metaDescription",
+                  type: "textarea",
+                  label: { fr: "Description Meta", en: "Meta Description" },
+                  admin: {
+                    width: "50%",
+                  },
+                },
+              ],
+            },
+          ],
         },
       ],
     },

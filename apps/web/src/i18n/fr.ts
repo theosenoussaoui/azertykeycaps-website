@@ -59,7 +59,8 @@ export const fr = {
     about: {
       title: "Informations",
       metaTitle: "Azertykeycaps - Informations",
-      metaDescription: "Informations techniques générales concernant le site Azertykeycaps.",
+      metaDescription:
+        "Informations techniques générales concernant le site Azertykeycaps.",
     },
     suggest: {
       title: "Suggérez un keyset !",
@@ -73,7 +74,8 @@ export const fr = {
       noArticles: "Aucun article pour ce profil",
       noArticlesDescription:
         "Nous n'avons pas encore de keysets pour ce profil en particulier, veuillez réessayer plus tard.",
-      noFilterResults: "Essayez de modifier vos filtres pour trouver des articles.",
+      noFilterResults:
+        "Essayez de modifier vos filtres pour trouver des articles.",
     },
   },
   status: {
@@ -93,6 +95,15 @@ export const fr = {
     pbt_double_shot: "PBT Double-shot",
     pbt_dye_sub: "PBT Dye-sub",
     pbt_laser_printed: "PBT Laser-printed",
+  },
+  search: {
+    placeholder: "Rechercher des keysets...",
+    noResults: "Aucun keyset trouvé",
+    searching: "Recherche...",
+    hint: "Tapez pour rechercher",
+    shortcut: "Ctrl K",
+    articles: "Keysets",
+    profiles: "Profils",
   },
 } as const;
 

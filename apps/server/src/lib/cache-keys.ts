@@ -26,7 +26,10 @@ export function buildCacheKeys(
   return keys;
 }
 
-export function buildUrlsToPurge(webUrl: string, payload: CacheInvalidationPayload): string[] {
+export function buildUrlsToPurge(
+  webUrl: string,
+  payload: CacheInvalidationPayload,
+): string[] {
   const urls: string[] = [];
   const { type, slug, articleSlug, profileSlug, relatedArticleSlugs } = payload;
 

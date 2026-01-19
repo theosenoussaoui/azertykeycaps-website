@@ -33,7 +33,10 @@ export async function purgeCloudflareCDN(
     );
 
     const responseData = await response.json();
-    console.log("[cache] Cloudflare purge response:", JSON.stringify(responseData));
+    console.log(
+      "[cache] Cloudflare purge response:",
+      JSON.stringify(responseData),
+    );
 
     if (!response.ok) {
       return {

@@ -11,7 +11,9 @@ export function createCorsMiddleware(origin: string): MiddlewareHandler {
   });
 }
 
-export function createSecureHeadersMiddleware(skipPaths: string[]): MiddlewareHandler {
+export function createSecureHeadersMiddleware(
+  skipPaths: string[],
+): MiddlewareHandler {
   return async (c, next) => {
     const shouldSkip = skipPaths.some((path) => c.req.path.startsWith(path));
     if (shouldSkip) {
