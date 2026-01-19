@@ -95,4 +95,13 @@ export const en = {
     pbt_dye_sub: "PBT Dye-sub",
     pbt_laser_printed: "PBT Laser-printed",
   },
+  search: {
+    placeholder: "Search keysets...",
+    noResults: "No keysets found",
+    searching: "Searching...",
+    hint: "Type to search",
+    shortcut: "Ctrl K",
+    articles: "Keysets",
+    profiles: "Profiles",
+  },
 } as const;

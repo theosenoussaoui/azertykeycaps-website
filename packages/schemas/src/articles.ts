@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { payloadIdSchema } from "./common";
 import { mediaSchema } from "./media";
 import { keycapProfileRefSchema } from "./profiles";
 
@@ -61,7 +62,7 @@ export const articleMaterialSchema = z.enum([
 
 // Schema for article list items (cards) - only fields selected in list query
 export const articleListItemSchema = z.object({
-  id: z.coerce.string(),
+  id: payloadIdSchema,
   title: z.string(),
   slug: z.string(),
   img: mediaSchema,
@@ -73,7 +74,7 @@ export const articleListItemSchema = z.object({
 // Schema for full article (detail page) - all fields
 // Full article schema - all fields from CMS
 export const articleSchema = z.object({
-  id: z.coerce.string(),
+  id: payloadIdSchema,
   title: z.string(),
   slug: z.string(),
   img: mediaSchema,

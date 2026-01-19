@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 const MOBILE_COLUMNS = 2;
-const DESKTOP_COLUMNS = 8;
+const DESKTOP_COLUMNS = 4;
 
 /**
  * GridLines - Responsive decorative grid overlay.
@@ -11,9 +11,9 @@ const DESKTOP_COLUMNS = 8;
  *
  * Features:
  * - Fixed positioning (covers full viewport)
- * - Responsive: 2 columns on mobile, 8 columns on desktop (md+)
+ * - Responsive: 2 columns on mobile, 4 columns on desktop (md+)
  * - Aligned with max-w-7xl container (1280px)
- * - Subtle opacity for non-intrusive visual guide
+ * - opacity-60 for visibility
  * - Decorative only (aria-hidden, pointer-events-none)
  * - z-0 (behind all content)
  * - Same padding as content containers
@@ -22,7 +22,7 @@ export function GridLines() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 opacity-30"
+      className="pointer-events-none fixed inset-0 z-0 opacity-60"
       data-slot="grid-lines"
     >
       {/* Inner container matches content container padding and max-width */}
@@ -39,8 +39,8 @@ export function GridLines() {
             />
           ))}
         </div>
-        {/* Desktop: 8 columns */}
-        <div className="hidden size-full grid-cols-8 md:grid">
+        {/* Desktop: 4 columns */}
+        <div className="hidden size-full grid-cols-4 md:grid">
           {Array.from({ length: DESKTOP_COLUMNS }, (_, i) => (
             <div
               key={i}

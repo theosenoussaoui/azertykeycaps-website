@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
  * GridLines overlay component.
  *
  * Responsive by default:
- * - Mobile: 2 columns (matches GridLines)
- * - Desktop (md+): 8 columns (matches GridLines)
+ * - Mobile: 2 columns
+ * - Desktop (md+): 8 columns
  *
  * Usage:
  * ```tsx
@@ -29,7 +29,7 @@ interface CardGridProps {
 
 /**
  * Grid container for cards.
- * Responsive: 2 columns on mobile, 8 on desktop (matches GridLines).
+ * Responsive: 2 columns on mobile, 8 on desktop.
  * No gap - vertical lines come from GridLines overlay.
  */
 export function CardGrid({

@@ -96,6 +96,15 @@ export const fr = {
     pbt_dye_sub: "PBT Dye-sub",
     pbt_laser_printed: "PBT Laser-printed",
   },
+  search: {
+    placeholder: "Rechercher des keysets...",
+    noResults: "Aucun keyset trouvé",
+    searching: "Recherche...",
+    hint: "Tapez pour rechercher",
+    shortcut: "Ctrl K",
+    articles: "Keysets",
+    profiles: "Profils",
+  },
 } as const;
 
 export type Translations = typeof fr;

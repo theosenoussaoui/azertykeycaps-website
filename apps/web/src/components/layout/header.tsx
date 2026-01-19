@@ -5,6 +5,7 @@ import type {
 import { Link, useLocation } from "@tanstack/react-router";
 import { MenuIcon } from "lucide-react";
 
+import { SearchCommand } from "@/components/search-command";
 import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
@@ -311,7 +312,7 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
 
 export default function Header({ profiles = [] }: HeaderProps) {
   return (
-    <header className="relative sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="mx-auto flex h-14 max-w-7xl items-center px-4 sm:px-6 lg:px-8">
         {/* Logo + Mobile Menu */}
         <div className="flex items-center gap-2">
@@ -322,8 +323,12 @@ export default function Header({ profiles = [] }: HeaderProps) {
         </div>
 
         {/* Desktop Navigation - pushed to the right */}
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center">
           <DesktopNav profiles={profiles} />
+          {/* Search - last element with extra margin on desktop */}
+          <div className="md:ml-4">
+            <SearchCommand profiles={profiles} />
+          </div>
         </div>
       </div>
     </header>

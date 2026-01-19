@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { payloadIdSchema } from "./common";
 import { mediaSchema } from "./media";
 
 // ============================================
@@ -25,7 +26,7 @@ export const profileShapeSchema = z.enum([
 
 // Reference schema (when populated in relationships)
 export const keycapProfileRefSchema = z.object({
-  id: z.coerce.string(),
+  id: payloadIdSchema,
   title: z.string(),
   slug: z.string(),
   abbreviation: z.string(),
@@ -35,7 +36,7 @@ export const keycapProfileRefSchema = z.object({
 
 // Full profile schema
 export const keycapProfileSchema = z.object({
-  id: z.coerce.string(),
+  id: payloadIdSchema,
   title: z.string(),
   slug: z.string(),
   description: z.string().nullable(),

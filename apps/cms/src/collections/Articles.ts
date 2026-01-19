@@ -1,4 +1,5 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, FieldHook } from "payload";
+import slugify from "slugify";
 
 import { isAuthenticated } from "../access/authenticated";
 import { ARTICLE_MATERIALS, ARTICLE_STATUS } from "../constants";
@@ -6,6 +7,23 @@ import {
   collectionAfterChangeHook,
   collectionAfterDeleteHook,
 } from "../hooks/cache-invalidation";
+
+/**
+ * Auto-generates a slug from the title field.
+ * Only generates on create, not on update (to preserve existing slugs).
+ */
+const generateSlugFromTitle: FieldHook = ({ data, operation, value }) => {
+  // If creating and no slug provided, generate from title
+  if (operation === "create" && !value && data?.title) {
+    return slugify(data.title, {
+      lower: true,
+      strict: true,
+      locale: "fr",
+    });
+  }
+  // Keep existing value on update
+  return value;
+};
 
 export const Articles: CollectionConfig = {
   slug: "articles",
@@ -40,10 +58,17 @@ export const Articles: CollectionConfig = {
       unique: true,
       index: true,
       label: { fr: "Slug", en: "Slug" },
+      hooks: {
+        beforeValidate: [generateSlugFromTitle],
+      },
       admin: {
+        readOnly: true,
         description: {
-          fr: "Identifiant URL unique de l'article",
-          en: "Unique URL identifier for the article",
+          fr: "Identifiant URL unique (généré automatiquement depuis le titre)",
+          en: "Unique URL identifier (auto-generated from title)",
+        },
+        components: {
+          Field: "@/components/fields/SlugField#SlugField",
         },
       },
     },

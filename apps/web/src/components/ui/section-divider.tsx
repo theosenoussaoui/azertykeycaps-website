@@ -20,7 +20,7 @@ export function SectionDivider({ className }: SectionDividerProps) {
     <div
       aria-hidden="true"
       className={cn(
-        "relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t border-border opacity-30",
+        "relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t border-border opacity-60",
         className,
       )}
       data-slot="section-divider"

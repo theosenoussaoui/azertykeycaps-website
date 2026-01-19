@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import type { CloudflareContext } from "@opennextjs/cloudflare";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { sqliteD1Adapter } from "@payloadcms/db-d1-sqlite";
+import { searchPlugin } from "@payloadcms/plugin-search";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { r2Storage } from "@payloadcms/storage-r2";
 import { en } from "@payloadcms/translations/languages/en";
@@ -80,6 +81,29 @@ export default buildConfig({
     r2Storage({
       bucket: (cloudflare.env as any).R2,
       collections: { media: true },
+    }),
+    searchPlugin({
+      collections: ["articles", "keycap-profiles"],
+      defaultPriorities: {
+        articles: 10,
+        "keycap-profiles": 20, // Profiles appear first in results
+      },
+      // Store slug directly in search records for navigation
+      beforeSync: ({ originalDoc, searchDoc }) => ({
+        ...searchDoc,
+        slug: originalDoc.slug,
+      }),
+      // Add slug field to search collection
+      searchOverrides: {
+        fields: ({ defaultFields }) => [
+          ...defaultFields,
+          {
+            name: "slug",
+            type: "text",
+            index: true,
+          },
+        ],
+      },
     }),
   ],
 });
