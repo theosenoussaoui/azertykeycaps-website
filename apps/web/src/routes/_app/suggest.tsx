@@ -70,10 +70,14 @@ function SuggestPage() {
 
       <PageSection>
         <PageSectionContent>
-          <Alert variant="info">
-            <ClockIcon className="size-4" />
-            <AlertDescription>{i18n.pages.suggest.comingSoon}</AlertDescription>
-          </Alert>
+          {!content?.formEnabled && (
+            <Alert variant="info">
+              <ClockIcon className="size-4" />
+              <AlertDescription>
+                {i18n.pages.suggest.comingSoon}
+              </AlertDescription>
+            </Alert>
+          )}
         </PageSectionContent>
       </PageSection>
     </PageContainer>

@@ -30,19 +30,15 @@ export const homepageSchema = z.object({
 // INFORMATIONS PAGE GLOBAL
 // ============================================
 
-export const seoSchema = z.object({
-  metaTitle: z.string().nullish(), // Can be null, undefined, or string
-  metaDescription: z.string().nullish(),
-});
-
 // Lexical rich text content - using any to avoid serialization issues with TanStack Start
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const lexicalContentSchema = z.any().nullable();
 
 export const informationsPageSchema = z.object({
   title: z.string(),
-  content: lexicalContentSchema, // Lexical rich text content
-  seo: seoSchema.nullable(),
+  content: lexicalContentSchema,
+  metaTitle: z.string().nullish(),
+  metaDescription: z.string().nullish(),
 });
 
 // ============================================
@@ -53,7 +49,8 @@ export const suggestionPageSchema = z.object({
   title: z.string(),
   description: z.string(),
   formEnabled: z.boolean(),
-  seo: seoSchema.nullable(),
+  metaTitle: z.string().nullish(),
+  metaDescription: z.string().nullish(),
 });
 
 // ============================================
@@ -63,6 +60,5 @@ export const suggestionPageSchema = z.object({
 export type SocialNetworkItem = z.infer<typeof socialNetworkItemSchema>;
 export type SocialNetworks = z.infer<typeof socialNetworksSchema>;
 export type Homepage = z.infer<typeof homepageSchema>;
-export type Seo = z.infer<typeof seoSchema>;
 export type InformationsPage = z.infer<typeof informationsPageSchema>;
 export type SuggestionPage = z.infer<typeof suggestionPageSchema>;
