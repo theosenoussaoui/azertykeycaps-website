@@ -2,16 +2,16 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* Self-hosted Space Mono font - eliminates render-blocking Google Fonts request */
-@import "@fontsource/space-mono/400.css";
-@import "@fontsource/space-mono/700.css";
+/* Self-hosted Geist fonts - eliminates render-blocking Google Fonts request */
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/geist-mono";
 
 @custom-variant dark (&:is(.dark *));
 
 /* =============================================================================
    DESIGN SYSTEM: Azertykeycaps
    
-   Typography: Space Mono (monospace)
+   Typography: Geist Sans / Geist Mono
    Colors: Cool-tinted grays (hue ~250 for subtle blue tint)
    Borders: Sharp corners (--radius: 0)
    ============================================================================= */
@@ -118,13 +118,17 @@
 }
 
 @theme inline {
-  /* Typography - Space Mono for brutalist mono aesthetic */
+  /* Typography - Geist for modern clean aesthetic */
   --font-sans:
-    "Space Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
-    "Liberation Mono", monospace;
+    "Geist Variable", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono:
-    "Space Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
-    "Liberation Mono", monospace;
+    "Geist Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+    Consolas, "Liberation Mono", monospace;
+  /* Heading font - Geist Mono for distinctive headings */
+  --font-heading:
+    "Geist Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+    Consolas, "Liberation Mono", monospace;
 
   /* Color mappings */
   --color-sidebar-ring: var(--sidebar-ring);
@@ -211,7 +215,7 @@
   h4,
   h5,
   h6 {
-    @apply font-bold tracking-tight;
+    @apply font-heading font-bold tracking-tight;
   }
 
   h1 {

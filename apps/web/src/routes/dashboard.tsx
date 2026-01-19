@@ -29,7 +29,7 @@ function RouteComponent() {
   const { privateData } = Route.useLoaderData();
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-8">
+    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Dashboard</h1>

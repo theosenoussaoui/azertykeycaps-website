@@ -10,6 +10,7 @@ import {
 
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
+import { GridLines } from "@/components/ui/grid-lines";
 import { getLayoutData } from "@/features/globals/api/get-layout-data";
 
 export interface AppLayoutContext {
@@ -43,9 +44,10 @@ function AppLayout() {
   const { socialNetworks, profiles } = Route.useLoaderData();
 
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="relative flex min-h-svh flex-col">
+      <GridLines />
       <Header profiles={profiles} />
-      <main className="flex-1">
+      <main className="relative z-10 flex-1">
         <Outlet />
       </main>
       <Footer socialNetworks={socialNetworks} />

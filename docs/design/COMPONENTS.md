@@ -254,3 +254,235 @@ Use the `render` prop for composition with TanStack Router `<Link>`:
   <XIcon />
 </Button>
 ```
+
+---
+
+## Loading Button Pattern
+
+When a button triggers an async action:
+
+```tsx
+<Button disabled={isPending}>
+  {isPending && <Spinner className="size-4 animate-spin" />}
+  {label} {/* Keep original label visible */}
+</Button>
+```
+
+**Rules:**
+
+- Show spinner alongside original label (never replace label with spinner)
+- Keep button enabled until request actually starts
+- Disable button only while request is in flight
+- Re-enable on success or failure
+
+---
+
+## Input Validation Pattern
+
+### Inline Error Display
+
+```tsx
+<Field>
+  <Label>Email</Label>
+  <Input
+    type="email"
+    aria-invalid={!!errors.email}
+    aria-describedby={errors.email ? "email-error" : undefined}
+  />
+  {errors.email && (
+    <p id="email-error" className="text-sm text-destructive">
+      {errors.email.message}
+    </p>
+  )}
+</Field>
+```
+
+### Focus First Error on Submit
+
+```tsx
+const onSubmit = async (data) => {
+  const result = await validate(data);
+  if (result.errors) {
+    // Focus the first field with an error
+    const firstErrorField = Object.keys(result.errors)[0];
+    document.querySelector(`[name="${firstErrorField}"]`)?.focus();
+  }
+};
+```
+
+---
+
+## Skeleton Pattern
+
+Skeletons must mirror the final content structure to prevent layout shift:
+
+```tsx
+// Good - matches final layout
+function ArticleCardSkeleton() {
+  return (
+    <Card className="h-full">
+      <Skeleton className="aspect-video w-full" /> {/* Image */}
+      <CardHeader>
+        <Skeleton className="h-5 w-3/4" /> {/* Title */}
+      </CardHeader>
+      <CardContent>
+        <Skeleton className="h-3 w-1/2" /> {/* Profile */}
+      </CardContent>
+      <CardFooter>
+        <Skeleton className="h-5 w-20" /> {/* Badge */}
+      </CardFooter>
+    </Card>
+  );
+}
+
+// Bad - different structure than final content
+function BadSkeleton() {
+  return <Skeleton className="h-80 w-full" />; // Doesn't match card structure
+}
+```
+
+---
+
+## Tooltip & Popover Delay
+
+```tsx
+// First tooltip in a group should have a delay
+<Tooltip delayDuration={300}>
+  <TooltipTrigger>...</TooltipTrigger>
+  <TooltipContent>Help text</TooltipContent>
+</Tooltip>
+
+// Subsequent tooltips in the same group should be instant
+// This is handled automatically by most tooltip libraries with "group" behavior
+```
+
+**Rules:**
+
+- Delay first tooltip appearance (~300ms)
+- Make subsequent peer tooltips instant
+- Prefer inline help text over tooltips when possible
+
+---
+
+## Image Card Pattern
+
+For cards with images that should be flush with the card edge:
+
+```tsx
+<Card className="h-full overflow-hidden">
+  {/* Image flush with top - no padding */}
+  <figure className="relative">
+    <img
+      src={image.url}
+      alt={image.alt}
+      className="aspect-video w-full object-cover"
+    />
+  </figure>
+
+  {/* Content with padding */}
+  <CardHeader>
+    <CardTitle>{title}</CardTitle>
+  </CardHeader>
+  <CardContent>{content}</CardContent>
+</Card>
+```
+
+**Key points:**
+
+- Card has `overflow-hidden` to clip image corners
+- `<figure>` has no padding, allowing image to touch card edges
+- Content sections (`CardHeader`, `CardContent`) have their own padding (`px-6`)
+
+---
+
+## CardGrid Pattern (Vercel-Style)
+
+Card borders become the grid lines themselves. No overlay needed.
+
+### Components
+
+| Component  | Element              | Purpose                               |
+| ---------- | -------------------- | ------------------------------------- |
+| `CardGrid` | `<div>`, `<ul>`, etc | Grid container with border-r border-b |
+| `GridCard` | `<div>`, `<li>`, etc | Grid cell with border-l border-t      |
+
+### How It Works
+
+```
+CardGrid: border-r border-b (closes the grid on right and bottom)
+GridCard: border-l border-t (forms the grid with left and top borders)
+
+┌─────────┬─────────┬─────────┐
+│ border-l│ border-l│ border-l│  <- border-t on each GridCard
+├─────────┼─────────┼─────────┤
+│ GridCard│ GridCard│ GridCard│
+│    1    │    2    │    3    │
+└─────────┴─────────┴─────────┘
+                    ↑
+          CardGrid has border-r border-b
+```
+
+### Usage
+
+```tsx
+import { CardGrid, GridCard } from "@/components/ui/card-grid";
+import { ArticleCard } from "@/features/articles/components/article-card";
+
+<CardGrid as="ul" columns={6} className="@container">
+  {articles.map((article) => (
+    <GridCard
+      key={article.id}
+      as="li"
+      className="col-span-6 @sm:col-span-3 @lg:col-span-2"
+    >
+      <ArticleCard article={article} variant="grid" />
+    </GridCard>
+  ))}
+</CardGrid>;
+```
+
+### Grid Columns
+
+| Columns | Classes        |
+| ------- | -------------- |
+| 1       | `grid-cols-1`  |
+| 2       | `grid-cols-2`  |
+| 3       | `grid-cols-3`  |
+| 4       | `grid-cols-4`  |
+| 6       | `grid-cols-6`  |
+| 12      | `grid-cols-12` |
+
+### Responsive with Container Queries
+
+The grid uses `@container` for responsive column spans:
+
+| Breakpoint | Width | Typical Usage |
+| ---------- | ----- | ------------- |
+| `@xs:`     | 384px | 2 columns     |
+| `@sm:`     | 512px | 3 columns     |
+| `@lg:`     | 768px | 4-6 columns   |
+
+```tsx
+<GridCard className="col-span-6 @sm:col-span-3 @lg:col-span-2">
+  {/* Full width on mobile, half on @sm, third on @lg */}
+</GridCard>
+```
+
+### ArticleCard Grid Variant
+
+When using `ArticleCard` inside a `GridCard`, use `variant="grid"` to remove the card's own borders:
+
+```tsx
+// ArticleCard variant="grid" removes:
+// - border (handled by GridCard)
+// - shadow (no shadow in grid layout)
+
+<ArticleCard article={article} variant="grid" />
+```
+
+### Benefits
+
+1. **No alignment issues** - Card edges ARE the grid lines
+2. **Simpler CSS** - No z-index, no fixed positioning overlay
+3. **Responsive** - Works naturally with container queries
+4. **Performance** - No extra DOM elements for grid overlay

@@ -41,7 +41,7 @@ function AboutPage() {
   const i18n = t();
 
   return (
-    <PageContainer size="md">
+    <PageContainer>
       <article>
         <PageHeader>
           <PageTitle>{content?.title ?? i18n.pages.about.title}</PageTitle>

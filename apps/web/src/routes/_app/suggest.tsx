@@ -43,7 +43,7 @@ function SuggestPage() {
   const i18n = t();
 
   return (
-    <PageContainer size="md">
+    <PageContainer>
       <PageHeader>
         <PageTitle>{content?.title ?? i18n.pages.suggest.title}</PageTitle>
         <PageDescription>

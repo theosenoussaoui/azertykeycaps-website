@@ -9,6 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { CardGrid, GridCard } from "@/components/ui/card-grid";
 import {
   Empty,
   EmptyDescription,
@@ -26,6 +27,7 @@ import {
   PageSectionTitle,
   PageTitle,
 } from "@/components/ui/page-container";
+import { SectionDivider } from "@/components/ui/section-divider";
 import { getLatestArticles } from "@/features/articles/api/get-latest-articles";
 import { ArticleCard } from "@/features/articles/components/article-card";
 import { t } from "@/i18n";
@@ -73,13 +75,13 @@ function HomeComponent() {
   const i18n = t();
 
   return (
-    <PageContainer size="lg">
-      {/* Hero Section */}
-      <PageHeader className="text-center">
-        <PageTitle>{i18n.home.title}</PageTitle>
-        <PageDescription className="mx-auto">
-          {i18n.home.subtitle}
-        </PageDescription>
+    <PageContainer>
+      {/* Hero Section - left aligned, bigger title */}
+      <PageHeader>
+        <PageTitle className="text-4xl @sm:text-5xl @md:text-6xl @lg:text-7xl">
+          {i18n.home.title}
+        </PageTitle>
+        <PageDescription>{i18n.home.subtitle}</PageDescription>
       </PageHeader>
 
       {/* Latest Articles Section */}
@@ -108,16 +110,21 @@ function HomeComponent() {
               </EmptyHeader>
             </Empty>
           ) : (
-            <ul
-              className="article-grid grid gap-6 @sm:grid-cols-2 @lg:grid-cols-3"
-              role="list"
-            >
-              {articles.docs.map((article) => (
-                <li key={article.id}>
-                  <ArticleCard article={article} />
-                </li>
-              ))}
-            </ul>
+            <>
+              <SectionDivider />
+              <CardGrid as="ul">
+                {articles.docs.map((article) => (
+                  <GridCard
+                    key={article.id}
+                    as="li"
+                    className="col-span-2 md:col-span-2"
+                  >
+                    <ArticleCard article={article} variant="grid" />
+                  </GridCard>
+                ))}
+              </CardGrid>
+              <SectionDivider />
+            </>
           )}
         </PageSectionContent>
       </PageSection>
@@ -128,19 +135,21 @@ function HomeComponent() {
           <PageSectionTitle>{i18n.home.browseByProfile}</PageSectionTitle>
         </PageSectionHeader>
         <PageSectionContent>
-          <ul
-            className="grid gap-4 @xs:grid-cols-2 @sm:grid-cols-3 @lg:grid-cols-4"
-            role="list"
-          >
+          <SectionDivider />
+          <CardGrid as="ul">
             {profiles.map((profile) => (
-              <li key={profile.slug}>
+              <GridCard
+                key={profile.slug}
+                as="li"
+                className="col-span-1 md:col-span-1"
+              >
                 <Link
                   to="/profile/$slug"
                   params={{ slug: profile.slug }}
                   preload="viewport"
-                  className="block"
+                  className="block h-full"
                 >
-                  <Card className="h-full transition-colors hover:bg-accent">
+                  <Card className="h-full border-0 shadow-none transition-colors hover:bg-accent">
                     <CardHeader>
                       <CardTitle className="flex items-center justify-between">
                         <span>{profile.title}</span>
@@ -154,9 +163,10 @@ function HomeComponent() {
                     </CardHeader>
                   </Card>
                 </Link>
-              </li>
+              </GridCard>
             ))}
-          </ul>
+          </CardGrid>
+          <SectionDivider />
         </PageSectionContent>
       </PageSection>
     </PageContainer>

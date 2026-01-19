@@ -8,6 +8,7 @@ import { ArrowLeftIcon, SearchXIcon } from "lucide-react";
 
 import { PageErrorWithBack } from "@/components/errors/page-error";
 import { Button } from "@/components/ui/button";
+import { CardGrid, GridCard } from "@/components/ui/card-grid";
 import {
   Empty,
   EmptyContent,
@@ -116,7 +117,7 @@ function ProfilePage() {
   // Empty state when no articles exist for this profile (not filtered)
   if (articles.docs.length === 0 && !hasActiveFilters) {
     return (
-      <PageContainer size="md">
+      <PageContainer>
         <Empty className="py-16">
           <EmptyHeader>
             <EmptyMedia variant="icon">
@@ -139,7 +140,7 @@ function ProfilePage() {
   }
 
   return (
-    <PageContainer size="lg">
+    <PageContainer>
       {/* Back Navigation */}
       <nav className="py-4">
         <Button variant="ghost" size="sm" render={<Link to="/" />}>
@@ -194,16 +195,21 @@ function ProfilePage() {
               </EmptyContent>
             </Empty>
           ) : (
-            <ul
-              className="grid gap-6 @sm:grid-cols-2 @lg:grid-cols-3"
-              role="list"
-            >
+            <CardGrid as="ul">
               {articles.docs.map((article) => (
-                <li key={article.id}>
-                  <ArticleCard article={article} preload="viewport" />
-                </li>
+                <GridCard
+                  key={article.id}
+                  as="li"
+                  className="col-span-2 md:col-span-2"
+                >
+                  <ArticleCard
+                    article={article}
+                    preload="viewport"
+                    variant="grid"
+                  />
+                </GridCard>
               ))}
-            </ul>
+            </CardGrid>
           )}
         </PageSectionContent>
       </PageSection>

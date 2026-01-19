@@ -63,7 +63,7 @@ function ArticleDetailPage() {
   const i18n = t();
 
   return (
-    <PageContainer size="md">
+    <PageContainer>
       {/* Back Navigation */}
       <nav className="py-4">
         <Button variant="ghost" size="sm" render={<Link to="/" />}>
