@@ -62,6 +62,8 @@
 
 ## Badge
 
+Badges use **Geist Mono** font (`font-mono`) for a brutalist, technical aesthetic.
+
 ### Size Variants
 
 | Size      | Height            | Min Width | Padding | Text                         |
@@ -422,18 +424,30 @@ GridCard: border-l border-t (forms the grid with left and top borders)
           CardGrid has border-r border-b
 ```
 
+### Responsive Grid (2/8 Columns)
+
+CardGrid uses a responsive column system that matches the GridLines overlay:
+
+| Breakpoint    | Grid Columns | Usage            |
+| ------------- | ------------ | ---------------- |
+| Mobile        | 2 columns    | `grid-cols-2`    |
+| Desktop (md+) | 8 columns    | `md:grid-cols-8` |
+
+**Note:** CardGrid uses **media queries** (`md:`), not container queries (`@md:`), to stay in sync with the fixed-position GridLines component.
+
 ### Usage
 
 ```tsx
 import { CardGrid, GridCard } from "@/components/ui/card-grid";
 import { ArticleCard } from "@/features/articles/components/article-card";
 
-<CardGrid as="ul" columns={6} className="@container">
+// CardGrid automatically uses grid-cols-2 md:grid-cols-8
+<CardGrid as="ul">
   {articles.map((article) => (
     <GridCard
       key={article.id}
       as="li"
-      className="col-span-6 @sm:col-span-3 @lg:col-span-2"
+      className="col-span-2 md:col-span-2" // Full width mobile, 1/4 desktop
     >
       <ArticleCard article={article} variant="grid" />
     </GridCard>
@@ -441,32 +455,14 @@ import { ArticleCard } from "@/features/articles/components/article-card";
 </CardGrid>;
 ```
 
-### Grid Columns
+### Column Span Patterns
 
-| Columns | Classes        |
-| ------- | -------------- |
-| 1       | `grid-cols-1`  |
-| 2       | `grid-cols-2`  |
-| 3       | `grid-cols-3`  |
-| 4       | `grid-cols-4`  |
-| 6       | `grid-cols-6`  |
-| 12      | `grid-cols-12` |
-
-### Responsive with Container Queries
-
-The grid uses `@container` for responsive column spans:
-
-| Breakpoint | Width | Typical Usage |
-| ---------- | ----- | ------------- |
-| `@xs:`     | 384px | 2 columns     |
-| `@sm:`     | 512px | 3 columns     |
-| `@lg:`     | 768px | 4-6 columns   |
-
-```tsx
-<GridCard className="col-span-6 @sm:col-span-3 @lg:col-span-2">
-  {/* Full width on mobile, half on @sm, third on @lg */}
-</GridCard>
-```
+| Content Type | Mobile (2-col) | Desktop (8-col) | Classes                    |
+| ------------ | -------------- | --------------- | -------------------------- |
+| Article card | Full width     | 1/4 width       | `col-span-2 md:col-span-2` |
+| Profile card | Half width     | 1/8 width       | `col-span-1 md:col-span-1` |
+| Featured     | Full width     | Half width      | `col-span-2 md:col-span-4` |
+| Hero         | Full width     | Full width      | `col-span-2 md:col-span-8` |
 
 ### ArticleCard Grid Variant
 
@@ -484,5 +480,46 @@ When using `ArticleCard` inside a `GridCard`, use `variant="grid"` to remove the
 
 1. **No alignment issues** - Card edges ARE the grid lines
 2. **Simpler CSS** - No z-index, no fixed positioning overlay
-3. **Responsive** - Works naturally with container queries
+3. **Responsive** - Syncs with GridLines via media queries
 4. **Performance** - No extra DOM elements for grid overlay
+
+---
+
+## SectionDivider
+
+Full-width horizontal lines that extend beyond the container to match the full-viewport GridLines.
+
+### Usage
+
+```tsx
+import { SectionDivider } from "@/components/ui/section-divider";
+
+<SectionDivider />              // Default: subtle line (opacity-30)
+<SectionDivider prominent />    // More visible line (opacity-100)
+```
+
+### How It Works
+
+The divider extends beyond its container using the `left-1/2 -ml-[50vw] w-screen` technique:
+
+```tsx
+<div className="relative w-full">
+  <div className="absolute left-1/2 -ml-[50vw] w-screen border-t border-border opacity-30" />
+</div>
+```
+
+### Typical Pattern
+
+Wrap card grids with section dividers to create visual separation:
+
+```tsx
+<SectionDivider />
+<CardGrid as="ul">
+  {items.map((item) => (
+    <GridCard key={item.id} as="li">
+      <ItemCard item={item} variant="grid" />
+    </GridCard>
+  ))}
+</CardGrid>
+<SectionDivider />
+```

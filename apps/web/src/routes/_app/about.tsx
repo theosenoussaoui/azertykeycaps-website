@@ -11,6 +11,12 @@ import {
 import { getAboutContent } from "@/features/globals/api/get-about-content";
 import { RichTextContent } from "@/features/globals/components/rich-text-content";
 import { t } from "@/i18n";
+import {
+  generateAboutPageSchema,
+  generateCanonical,
+  generateJsonLd,
+  generateMeta,
+} from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/about")({
   component: AboutPage,
@@ -21,10 +27,20 @@ export const Route = createFileRoute("/_app/about")({
   head: () => {
     const i18n = t();
     return {
-      meta: [
-        { title: i18n.pages.about.metaTitle },
-        { name: "description", content: i18n.pages.about.metaDescription },
-      ],
+      meta: generateMeta({
+        title: i18n.pages.about.title,
+        description: i18n.pages.about.metaDescription,
+        path: "/about",
+      }),
+      links: [generateCanonical("/about")],
+      scripts: [
+        generateJsonLd(
+          generateAboutPageSchema({
+            name: i18n.pages.about.title,
+            description: i18n.pages.about.metaDescription,
+          }),
+        ),
+      ].filter(Boolean),
     };
   },
   headers: () => ({

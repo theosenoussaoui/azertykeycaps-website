@@ -273,19 +273,37 @@ Animate elements along a path using `offset-path`:
 
 ---
 
-## Implementation: CardGrid Component
+## Implementation: Responsive Grid System
 
-We implemented a simpler approach where **card borders ARE the grid lines**:
+We implemented a responsive grid system with two key components:
 
-### CardGrid + GridCard Pattern
+### 1. GridLines (Visual Overlay)
+
+Full-viewport vertical lines that respond to screen width:
+
+```tsx
+// apps/web/src/components/ui/grid-lines.tsx
+
+<GridLines />
+
+// Responsive columns:
+// - Mobile: 2 columns (3 vertical lines)
+// - Desktop (md+): 8 columns (9 vertical lines)
+```
+
+**Important:** GridLines uses **media queries** (`md:`), not container queries, because it's a fixed-position element that must respond to viewport width.
+
+### 2. CardGrid + GridCard Pattern
+
+Card borders become the grid lines themselves:
 
 ```tsx
 // apps/web/src/components/ui/card-grid.tsx
 
 // Container: right and bottom borders close the grid
-<CardGrid as="ul" columns={6}>
+<CardGrid as="ul">
   {/* Each card: left and top borders form the grid */}
-  <GridCard as="li" className="col-span-2">
+  <GridCard as="li" className="col-span-2 md:col-span-2">
     <ArticleCard article={article} variant="grid" />
   </GridCard>
 </CardGrid>
@@ -294,42 +312,70 @@ We implemented a simpler approach where **card borders ARE the grid lines**:
 ### How It Works
 
 ```
-┌─────────┬─────────┬─────────┐
-│ Card 1  │ Card 2  │ Card 3  │  <- border-t on each card
-│ border-l│ border-l│ border-l│
-├─────────┼─────────┼─────────┤
-│ Card 4  │ Card 5  │ Card 6  │
-│         │         │         │
-└─────────┴─────────┴─────────┘
-                    ↑
-         CardGrid has border-r border-b
+Mobile (2 columns):
+┌─────────────┬─────────────┐
+│   Card 1    │   Card 2    │
+├─────────────┼─────────────┤
+│   Card 3    │   Card 4    │
+└─────────────┴─────────────┘
+
+Desktop (8 columns):
+┌─────┬─────┬─────┬─────┬─────┬─────┬─────┬─────┐
+│  1  │  2  │  3  │  4  │  5  │  6  │  7  │  8  │
+└─────┴─────┴─────┴─────┴─────┴─────┴─────┴─────┘
 ```
+
+### 3. SectionDivider
+
+Full-width horizontal lines that extend beyond the container:
+
+```tsx
+// apps/web/src/components/ui/section-divider.tsx
+
+<SectionDivider />
+<CardGrid>...</CardGrid>
+<SectionDivider />
+
+// Uses left-1/2 -ml-[50vw] w-screen technique
+// opacity-30 to match GridLines subtlety
+```
+
+### Media Queries vs Container Queries
+
+| Component      | Query Type         | Why                                 |
+| -------------- | ------------------ | ----------------------------------- |
+| GridLines      | Media (`md:`)      | Fixed-position, must match viewport |
+| CardGrid       | Media (`md:`)      | Must stay in sync with GridLines    |
+| SectionDivider | None               | Full-width, no responsive behavior  |
+| Card content   | Container (`@md:`) | Component-level responsiveness      |
 
 ### Benefits Over Overlay Grid
 
 1. **No alignment issues** - Card edges ARE the grid lines
-2. **Simpler CSS** - No z-index, no fixed positioning
-3. **Responsive** - Works naturally with container queries
+2. **Simpler CSS** - No z-index, no fixed positioning for cards
+3. **Responsive** - 2/8 column system matches GridLines
 4. **Performance** - No extra DOM elements for grid overlay
+5. **Consistency** - All grid elements use the same breakpoint (`md:`)
 
 ### Usage
 
 ```tsx
 import { CardGrid, GridCard } from "@/components/ui/card-grid";
+import { SectionDivider } from "@/components/ui/section-divider";
 
-// ArticleCard with variant="grid" removes its own borders
-<CardGrid as="ul" columns={6} className="@container">
+<SectionDivider />
+<CardGrid as="ul">
   {articles.map((article) => (
     <GridCard
       key={article.id}
       as="li"
-      className="col-span-6 @sm:col-span-3 @lg:col-span-2"
+      className="col-span-2 md:col-span-2"  // Full width mobile, 1/4 desktop
     >
       <ArticleCard article={article} variant="grid" />
     </GridCard>
   ))}
-</CardGrid>;
-```
+</CardGrid>
+<SectionDivider />
 
 ---
 
@@ -338,3 +384,4 @@ import { CardGrid, GridCard } from "@/components/ui/card-grid";
 - [DESIGN_SYSTEM.md](./DESIGN_SYSTEM.md) - Full design system reference
 - [ANIMATION.md](./ANIMATION.md) - Animation guidelines
 - [Web Interface Guidelines](https://interfaces.rauno.me) - Rauno's design principles
+```

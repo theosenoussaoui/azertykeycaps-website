@@ -1,3 +1,8 @@
+import { cn } from "@/lib/utils";
+
+const MOBILE_COLUMNS = 2;
+const DESKTOP_COLUMNS = 8;
+
 /**
  * GridLines - Responsive decorative grid overlay.
  *
@@ -6,7 +11,7 @@
  *
  * Features:
  * - Fixed positioning (covers full viewport)
- * - Responsive: 2 columns on mobile, 6 columns on desktop (md+)
+ * - Responsive: 2 columns on mobile, 8 columns on desktop (md+)
  * - Aligned with max-w-7xl container (1280px)
  * - Subtle opacity for non-intrusive visual guide
  * - Decorative only (aria-hidden, pointer-events-none)
@@ -24,21 +29,25 @@ export function GridLines() {
       <div className="mx-auto size-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Mobile: 2 columns */}
         <div className="grid size-full grid-cols-2 md:hidden">
-          {[0, 1].map((i) => (
+          {Array.from({ length: MOBILE_COLUMNS }, (_, i) => (
             <div
               key={i}
-              className="h-full border-l border-border"
-              style={i === 1 ? { borderRightWidth: "1px" } : undefined}
+              className={cn(
+                "h-full border-l border-border",
+                i === MOBILE_COLUMNS - 1 && "border-r",
+              )}
             />
           ))}
         </div>
-        {/* Desktop: 6 columns */}
-        <div className="hidden size-full grid-cols-6 md:grid">
-          {[0, 1, 2, 3, 4, 5].map((i) => (
+        {/* Desktop: 8 columns */}
+        <div className="hidden size-full grid-cols-8 md:grid">
+          {Array.from({ length: DESKTOP_COLUMNS }, (_, i) => (
             <div
               key={i}
-              className="h-full border-l border-border"
-              style={i === 5 ? { borderRightWidth: "1px" } : undefined}
+              className={cn(
+                "h-full border-l border-border",
+                i === DESKTOP_COLUMNS - 1 && "border-r",
+              )}
             />
           ))}
         </div>

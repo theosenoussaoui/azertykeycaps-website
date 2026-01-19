@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
  *
  * Responsive by default:
  * - Mobile: 2 columns (matches GridLines)
- * - Desktop (md+): 6 columns (matches GridLines)
+ * - Desktop (md+): 8 columns (matches GridLines)
  *
  * Usage:
  * ```tsx
@@ -29,7 +29,7 @@ interface CardGridProps {
 
 /**
  * Grid container for cards.
- * Responsive: 2 columns on mobile, 6 on desktop (matches GridLines).
+ * Responsive: 2 columns on mobile, 8 on desktop (matches GridLines).
  * No gap - vertical lines come from GridLines overlay.
  */
 export function CardGrid({
@@ -39,7 +39,7 @@ export function CardGrid({
 }: CardGridProps) {
   return (
     <Component
-      className={cn("grid grid-cols-2 md:grid-cols-6", className)}
+      className={cn("grid grid-cols-2 md:grid-cols-8", className)}
       data-slot="card-grid"
     >
       {children}

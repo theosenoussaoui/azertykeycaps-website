@@ -32,6 +32,12 @@ import { getLatestArticles } from "@/features/articles/api/get-latest-articles";
 import { ArticleCard } from "@/features/articles/components/article-card";
 import { t } from "@/i18n";
 import { getPreloadImageUrl } from "@/lib/image-utils";
+import {
+  generateCanonical,
+  generateItemListSchema,
+  generateJsonLd,
+  generateMeta,
+} from "@/lib/seo";
 
 const appRouteApi = getRouteApi("/_app");
 
@@ -46,24 +52,37 @@ export const Route = createFileRoute("/_app/")({
   gcTime: 5 * 60_000,
   head: ({ loaderData }) => {
     const i18n = t();
-    const firstArticle = loaderData?.articles?.docs?.[0];
+    const articles = loaderData?.articles?.docs ?? [];
+    const firstArticle = articles[0];
     // Use optimized image URL for preloading (matches what OptimizedImage renders)
     const preloadImageUrl = getPreloadImageUrl(firstArticle?.img.url, "card");
 
     return {
-      meta: [
-        { title: i18n.home.metaTitle },
-        { name: "description", content: i18n.home.metaDescription },
+      meta: generateMeta({
+        title: i18n.home.metaTitle,
+        description: i18n.home.metaDescription,
+        path: "/",
+        image: firstArticle?.img.url,
+      }),
+      links: [
+        generateCanonical("/"),
+        ...(preloadImageUrl
+          ? [
+              {
+                rel: "preload",
+                as: "image",
+                href: preloadImageUrl,
+              },
+            ]
+          : []),
       ],
-      links: preloadImageUrl
-        ? [
-            {
-              rel: "preload",
-              as: "image",
-              href: preloadImageUrl,
-            },
-          ]
-        : [],
+      scripts: [
+        generateJsonLd(
+          generateItemListSchema(
+            articles.map((a) => ({ slug: a.slug, title: a.title })),
+          ),
+        ),
+      ].filter(Boolean),
     };
   },
   errorComponent: PageError,
@@ -141,7 +160,7 @@ function HomeComponent() {
               <GridCard
                 key={profile.slug}
                 as="li"
-                className="col-span-1 md:col-span-1"
+                className="col-span-1 md:col-span-2"
               >
                 <Link
                   to="/profile/$slug"

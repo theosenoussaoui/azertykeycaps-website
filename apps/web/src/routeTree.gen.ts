@@ -16,11 +16,29 @@ import { Route as AppIndexRouteImport } from "./routes/_app/index";
 import { Route as AppProfileSlugRouteImport } from "./routes/_app/profile.$slug";
 import { Route as AppSuggestRouteImport } from "./routes/_app/suggest";
 import { Route as DashboardRouteImport } from "./routes/dashboard";
+import { Route as LlmsDottxtRouteImport } from "./routes/llms[.]txt";
 import { Route as LoginRouteImport } from "./routes/login";
+import { Route as RobotsDottxtRouteImport } from "./routes/robots[.]txt";
+import { Route as SitemapDotxmlRouteImport } from "./routes/sitemap[.]xml";
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: "/sitemap.xml",
+  path: "/sitemap.xml",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: "/robots.txt",
+  path: "/robots.txt",
+  getParentRoute: () => rootRouteImport,
+} as any);
 const LoginRoute = LoginRouteImport.update({
   id: "/login",
   path: "/login",
+  getParentRoute: () => rootRouteImport,
+} as any);
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: "/llms.txt",
+  path: "/llms.txt",
   getParentRoute: () => rootRouteImport,
 } as any);
 const DashboardRoute = DashboardRouteImport.update({
@@ -60,7 +78,10 @@ const AppArticlesSlugRoute = AppArticlesSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   "/dashboard": typeof DashboardRoute;
+  "/llms.txt": typeof LlmsDottxtRoute;
   "/login": typeof LoginRoute;
+  "/robots.txt": typeof RobotsDottxtRoute;
+  "/sitemap.xml": typeof SitemapDotxmlRoute;
   "/about": typeof AppAboutRoute;
   "/suggest": typeof AppSuggestRoute;
   "/": typeof AppIndexRoute;
@@ -69,7 +90,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   "/dashboard": typeof DashboardRoute;
+  "/llms.txt": typeof LlmsDottxtRoute;
   "/login": typeof LoginRoute;
+  "/robots.txt": typeof RobotsDottxtRoute;
+  "/sitemap.xml": typeof SitemapDotxmlRoute;
   "/about": typeof AppAboutRoute;
   "/suggest": typeof AppSuggestRoute;
   "/": typeof AppIndexRoute;
@@ -80,7 +104,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   "/_app": typeof AppRouteWithChildren;
   "/dashboard": typeof DashboardRoute;
+  "/llms.txt": typeof LlmsDottxtRoute;
   "/login": typeof LoginRoute;
+  "/robots.txt": typeof RobotsDottxtRoute;
+  "/sitemap.xml": typeof SitemapDotxmlRoute;
   "/_app/about": typeof AppAboutRoute;
   "/_app/suggest": typeof AppSuggestRoute;
   "/_app/": typeof AppIndexRoute;
@@ -91,7 +118,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
   fullPaths:
     | "/dashboard"
+    | "/llms.txt"
     | "/login"
+    | "/robots.txt"
+    | "/sitemap.xml"
     | "/about"
     | "/suggest"
     | "/"
@@ -100,7 +130,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo;
   to:
     | "/dashboard"
+    | "/llms.txt"
     | "/login"
+    | "/robots.txt"
+    | "/sitemap.xml"
     | "/about"
     | "/suggest"
     | "/"
@@ -110,7 +143,10 @@ export interface FileRouteTypes {
     | "__root__"
     | "/_app"
     | "/dashboard"
+    | "/llms.txt"
     | "/login"
+    | "/robots.txt"
+    | "/sitemap.xml"
     | "/_app/about"
     | "/_app/suggest"
     | "/_app/"
@@ -121,16 +157,40 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren;
   DashboardRoute: typeof DashboardRoute;
+  LlmsDottxtRoute: typeof LlmsDottxtRoute;
   LoginRoute: typeof LoginRoute;
+  RobotsDottxtRoute: typeof RobotsDottxtRoute;
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute;
 }
 
 declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
+    "/sitemap.xml": {
+      id: "/sitemap.xml";
+      path: "/sitemap.xml";
+      fullPath: "/sitemap.xml";
+      preLoaderRoute: typeof SitemapDotxmlRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/robots.txt": {
+      id: "/robots.txt";
+      path: "/robots.txt";
+      fullPath: "/robots.txt";
+      preLoaderRoute: typeof RobotsDottxtRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     "/login": {
       id: "/login";
       path: "/login";
       fullPath: "/login";
       preLoaderRoute: typeof LoginRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
+    "/llms.txt": {
+      id: "/llms.txt";
+      path: "/llms.txt";
+      fullPath: "/llms.txt";
+      preLoaderRoute: typeof LlmsDottxtRouteImport;
       parentRoute: typeof rootRouteImport;
     };
     "/dashboard": {
@@ -206,7 +266,10 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren);
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   DashboardRoute: DashboardRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   LoginRoute: LoginRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

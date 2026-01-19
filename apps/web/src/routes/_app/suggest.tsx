@@ -13,6 +13,12 @@ import {
 } from "@/components/ui/page-container";
 import { getSuggestContent } from "@/features/globals/api/get-suggest-content";
 import { t } from "@/i18n";
+import {
+  generateCanonical,
+  generateJsonLd,
+  generateMeta,
+  generateWebPageSchema,
+} from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/suggest")({
   component: SuggestPage,
@@ -29,10 +35,21 @@ export const Route = createFileRoute("/_app/suggest")({
   head: () => {
     const i18n = t();
     return {
-      meta: [
-        { title: i18n.pages.suggest.metaTitle },
-        { name: "description", content: i18n.pages.suggest.metaDescription },
-      ],
+      meta: generateMeta({
+        title: i18n.pages.suggest.title,
+        description: i18n.pages.suggest.metaDescription,
+        path: "/suggest",
+      }),
+      links: [generateCanonical("/suggest")],
+      scripts: [
+        generateJsonLd(
+          generateWebPageSchema({
+            name: i18n.pages.suggest.title,
+            description: i18n.pages.suggest.metaDescription,
+            path: "/suggest",
+          }),
+        ),
+      ].filter(Boolean),
     };
   },
   errorComponent: PageError,

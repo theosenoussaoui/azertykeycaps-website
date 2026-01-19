@@ -1,6 +1,16 @@
 "use client";
 
 import { mergeProps } from "@base-ui/react/merge-props";
+
+// Type for Cookie Store API (not included in TypeScript lib by default)
+type CookieStore = {
+  set: (options: {
+    expires: number;
+    name: string;
+    path: string;
+    value: string;
+  }) => Promise<void>;
+};
 import { useRender } from "@base-ui/react/use-render";
 import { cva, type VariantProps } from "class-variance-authority";
 import { PanelLeftIcon } from "lucide-react";
@@ -80,12 +90,17 @@ function SidebarProvider({
       }
 
       // This sets the cookie to keep the sidebar state.
-      await cookieStore.set({
-        expires: Date.now() + SIDEBAR_COOKIE_MAX_AGE * 1000,
-        name: SIDEBAR_COOKIE_NAME,
-        path: "/",
-        value: String(openState),
-      });
+      // Guard cookieStore for SSR - only available in browser
+      if (typeof window !== "undefined" && "cookieStore" in window) {
+        await (
+          window as unknown as { cookieStore: CookieStore }
+        ).cookieStore.set({
+          expires: Date.now() + SIDEBAR_COOKIE_MAX_AGE * 1000,
+          name: SIDEBAR_COOKIE_NAME,
+          path: "/",
+          value: String(openState),
+        });
+      }
     },
     [setOpenProp, open],
   );
@@ -619,9 +634,12 @@ function SidebarMenuSkeleton({
 }: React.ComponentProps<"div"> & {
   showIcon?: boolean;
 }) {
-  // Random width between 50 to 90%.
-  const width = React.useMemo(() => {
-    return `${Math.floor(Math.random() * 40) + 50}%`;
+  // Use client-side random width to avoid hydration mismatch
+  // Server renders with default 70%, client updates after hydration
+  const [width, setWidth] = React.useState("70%");
+
+  React.useEffect(() => {
+    setWidth(`${Math.floor(Math.random() * 40) + 50}%`);
   }, []);
 
   return (

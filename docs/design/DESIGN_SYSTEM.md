@@ -4,18 +4,19 @@
 
 ## Quick Reference
 
-| Aspect              | Value                        |
-| ------------------- | ---------------------------- |
-| **Font (Sans)**     | Geist Sans                   |
-| **Font (Mono)**     | Geist Mono                   |
-| **Border Radius**   | 0 (sharp corners everywhere) |
-| **Color Hue**       | 250 (cool blue-tinted grays) |
-| **Color Space**     | oklch                        |
-| **UI Library**      | Base UI (`@base-ui/react`)   |
-| **Styling Pattern** | coss.com/ui                  |
-| **CSS Framework**   | Tailwind CSS v4              |
-| **Container Width** | max-w-6xl (1152px)           |
-| **Grid System**     | 6-column visual grid         |
+| Aspect              | Value                                     |
+| ------------------- | ----------------------------------------- |
+| **Font (Sans)**     | Geist Sans (body text)                    |
+| **Font (Mono)**     | Geist Mono (headings, badges, nav links)  |
+| **Font (Heading)**  | Geist Mono (`font-heading`)               |
+| **Border Radius**   | 0 (sharp corners everywhere)              |
+| **Color Hue**       | 250 (cool blue-tinted grays)              |
+| **Color Space**     | oklch                                     |
+| **UI Library**      | Base UI (`@base-ui/react`)                |
+| **Styling Pattern** | coss.com/ui                               |
+| **CSS Framework**   | Tailwind CSS v4                           |
+| **Container Width** | max-w-7xl (1280px)                        |
+| **Grid System**     | Responsive: 2 cols mobile, 8 cols desktop |
 
 ---
 
@@ -53,6 +54,9 @@
 --font-mono:
   "Geist Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
   Consolas, "Liberation Mono", monospace;
+--font-heading:
+  "Geist Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+  Consolas, "Liberation Mono", monospace;
 ```
 
 ### Loading Font (via Fontsource in `index.css`)
@@ -65,10 +69,26 @@
 
 ### Typography Rules
 
-- **Headings**: `font-bold tracking-tight`
+- **Headings**: `font-heading font-bold tracking-tight` (uses Geist Mono)
+- **Body text**: `font-sans` (uses Geist Sans)
+- **Badges**: `font-mono` (uses Geist Mono)
+- **Nav links**: `font-mono` (uses Geist Mono)
 - **h1**: `text-wrap: balance` (prevents orphans)
 - **h2, h3**: `text-wrap: pretty`
 - **Body**: `font-variant-numeric: tabular-nums` (aligned numbers)
+
+### Font Usage Guidelines
+
+| Element        | Font Class     | Font Family |
+| -------------- | -------------- | ----------- |
+| Page titles    | `font-heading` | Geist Mono  |
+| Section titles | `font-heading` | Geist Mono  |
+| Card titles    | `font-heading` | Geist Mono  |
+| Body text      | `font-sans`    | Geist Sans  |
+| Badges         | `font-mono`    | Geist Mono  |
+| Navigation     | `font-mono`    | Geist Mono  |
+| Code           | `font-mono`    | Geist Mono  |
+| Footer links   | `font-mono`    | Geist Mono  |
 
 ### Heading Sizes (with Container Queries)
 
@@ -215,17 +235,17 @@ Use `@container` queries for component-level responsiveness.
 ```tsx
 import { PageContainer } from "@/components/ui/page-container";
 
-<PageContainer />                // max-w-6xl (1152px) - DEFAULT
+<PageContainer />                // max-w-7xl (1280px) - DEFAULT
 <PageContainer size="full" />    // No max-width
-<PageContainer size="7xl" />     // max-w-7xl (1280px)
-<PageContainer size="6xl" />     // max-w-6xl (1152px) - same as default
+<PageContainer size="7xl" />     // max-w-7xl (1280px) - same as default
+<PageContainer size="6xl" />     // max-w-6xl (1152px)
 <PageContainer size="lg" />      // max-w-5xl (1024px)
 <PageContainer size="md" />      // max-w-3xl (768px)
 <PageContainer size="sm" />      // max-w-xl (576px)
 <PageContainer size="narrow" />  // max-w-md (448px)
 ```
 
-**Important:** All pages should use the default `max-w-6xl` container for visual consistency. The header and footer also use this width to ensure alignment with the 12-column grid lines.
+**Important:** All pages should use the default `max-w-7xl` container for visual consistency. The header and footer also use this width to ensure alignment with the 8-column grid lines.
 
 ### Section Spacing
 
@@ -662,6 +682,7 @@ apps/web/src/
 - [ ] Uses semantic HTML elements
 - [ ] Has proper `data-slot` attribute
 - [ ] Uses `render` prop for composition with Link
+- [ ] No inline `style` prop (use `cn()` with Tailwind classes)
 
 ---
 
@@ -746,6 +767,28 @@ apps/web/src/
   {items.map(item => <li key={item.id}>{item.name}</li>)}
 </ul>
 ```
+
+### 7. Using inline `style` prop
+
+**The `style` prop is strictly forbidden.** Always use Tailwind classes with `cn()` for dynamic properties.
+
+```tsx
+// Bad - inline style
+<div style={{ marginTop: spacing }}>
+<div style={{ borderRightWidth: "1px" }}>
+<div style={{ "--x": x, "--y": y }}>
+
+// Good - use cn() with conditional classes
+<div className={cn("mt-4", isLarge && "mt-8")}>
+<div className={cn("border-l", isLast && "border-r")}>
+
+// Good - use Tailwind arbitrary values if needed
+<div className="mt-[var(--spacing)]">
+```
+
+**Why:** Tailwind classes are optimized, tree-shaken, and maintain design system consistency. Inline styles bypass the design system and can't be purged.
+
+**Exception:** Only use `style` when a CSS property has no Tailwind equivalent AND cannot be expressed with arbitrary values (extremely rare).
 
 ---
 
@@ -1097,41 +1140,67 @@ const virtualizer = useVirtualizer({
 
 ### Visual Grid System
 
-The site uses a 6-column visual grid overlay for design consistency:
+The site uses a responsive visual grid overlay for design consistency:
 
 ```tsx
 // GridLines component renders full-height vertical lines
 <GridLines />
 
-// Lines align with max-w-6xl container (1152px)
-// Uses var(--color-border) for theme consistency
-// 6 columns = 7 vertical lines (including edges)
+// Responsive columns:
+// - Mobile: 2 columns (3 vertical lines)
+// - Desktop (md+): 8 columns (9 vertical lines)
+// Lines align with max-w-7xl container (1280px)
+// Uses var(--color-border) at opacity-30 for subtle effect
 ```
 
 ### Grid Alignment
 
-- All content containers use `max-w-6xl` (1152px)
+- All content containers use `max-w-7xl` (1280px)
 - Header and footer match this width
 - Grid lines span full viewport height
 - Lines are decorative (`aria-hidden="true"`, `pointer-events-none`)
 - Mobile-ready: same padding as content containers (`px-4 sm:px-6 lg:px-8`)
 
-### Content Grid Patterns
+**Important:** GridLines uses **media queries** (`md:`), not container queries (`@md:`), because it's a fixed-position element that needs to respond to viewport width.
 
-| Breakpoint | Article Cards | Profile Cards |
-| ---------- | ------------- | ------------- |
-| Mobile     | 1 column      | 1 column      |
-| `@xs`      | 1 column      | 2 columns     |
-| `@sm`      | 2 columns     | 3 columns     |
-| `@lg`      | 3 columns     | 6 columns     |
+### Content Grid Patterns (CardGrid)
+
+The `CardGrid` component uses a responsive 2/8 column system:
+
+| Breakpoint    | Grid Columns | Typical Card Span                                    |
+| ------------- | ------------ | ---------------------------------------------------- |
+| Mobile        | 2 columns    | `col-span-2` (full width)                            |
+| Desktop (md+) | 8 columns    | `col-span-2` (1/4 width) or `col-span-4` (1/2 width) |
 
 ```tsx
-// Article grid (3 cards = 2 columns each on large screens)
-<ul className="grid grid-cols-1 gap-6 @sm:grid-cols-2 @lg:grid-cols-3">
+// CardGrid with responsive columns (no columns prop needed)
+<CardGrid as="ul">
+  {/* Article cards: span 2 of 8 columns on desktop (1/4 width) */}
+  <GridCard as="li" className="col-span-2 md:col-span-2">
+    <ArticleCard article={article} variant="grid" />
+  </GridCard>
 
-// Profile grid (6 items = 1 column each on large screens)
-<ul className="grid grid-cols-1 gap-4 @xs:grid-cols-2 @sm:grid-cols-3 @lg:grid-cols-6">
+  {/* Featured cards: span 4 of 8 columns on desktop (1/2 width) */}
+  <GridCard as="li" className="col-span-2 md:col-span-4">
+    <FeaturedCard item={item} />
+  </GridCard>
+</CardGrid>
 ```
+
+### SectionDivider
+
+Full-width horizontal lines that extend beyond the container:
+
+```tsx
+import { SectionDivider } from "@/components/ui/section-divider";
+
+// Wrap content sections with dividers
+<SectionDivider />
+<CardGrid>...</CardGrid>
+<SectionDivider />
+```
+
+The divider spans 100vw using the `left-1/2 -ml-[50vw]` technique and uses `opacity-30` to match grid line subtlety.
 
 ---
 
@@ -1148,8 +1217,10 @@ The site uses a 6-column visual grid overlay for design consistency:
 
 ## Version History
 
-| Version | Date       | Changes                                                                                                                          |
-| ------- | ---------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| 1.2     | 2026-01-18 | Added forms, URL state, content handling, dark mode, hydration, performance, grid lines sections. Unified container to max-w-6xl |
-| 1.1     | 2026-01-18 | Added semantic HTML props (CardTitle as, EmptyTitle as), oklch semantic colors, accessibility improvements, animation guidelines |
-| 1.0     | 2026-01-16 | Initial design system documentation                                                                                              |
+| Version | Date       | Changes                                                                                                                                                                            |
+| ------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.4     | 2026-01-19 | Changed grid system from 6 to 8 columns on desktop                                                                                                                                 |
+| 1.3     | 2026-01-19 | Updated container to max-w-7xl (1280px), responsive 2/6 column grid system, SectionDivider component, Geist Mono for headings/badges/nav, DitherShader hover effect on ArticleCard |
+| 1.2     | 2026-01-18 | Added forms, URL state, content handling, dark mode, hydration, performance, grid lines sections. Unified container to max-w-6xl                                                   |
+| 1.1     | 2026-01-18 | Added semantic HTML props (CardTitle as, EmptyTitle as), oklch semantic colors, accessibility improvements, animation guidelines                                                   |
+| 1.0     | 2026-01-16 | Initial design system documentation                                                                                                                                                |

@@ -30,6 +30,12 @@ import { ArticleCard } from "@/features/articles/components/article-card";
 import { ArticleFilters } from "@/features/articles/components/article-filters";
 import { ArticlesPagination } from "@/features/articles/components/articles-pagination";
 import { t } from "@/i18n";
+import {
+  generateCanonical,
+  generateCollectionPageSchema,
+  generateJsonLd,
+  generateMeta,
+} from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/profile/$slug")({
   component: ProfilePage,
@@ -53,18 +59,33 @@ export const Route = createFileRoute("/_app/profile/$slug")({
   }),
   staleTime: 5 * 60_000,
   gcTime: 30 * 60_000,
-  head: ({ loaderData }) => {
+  head: ({ loaderData, params }) => {
+    const i18n = t();
+    const articles = loaderData?.articles.docs ?? [];
     const profileTitle =
-      loaderData?.articles.docs[0]?.profile?.title ?? loaderData?.profileSlug;
+      articles[0]?.profile?.title ?? loaderData?.profileSlug ?? params.slug;
     const articleCount = loaderData?.articles.totalDocs ?? 0;
+    const path = `/profile/${params.slug}`;
+    const description = `${i18n.home.metaDescription} ${articleCount} keyset${articleCount > 1 ? "s" : ""} ${profileTitle}.`;
+
     return {
-      meta: [
-        { title: `${profileTitle} - Azertykeycaps` },
-        {
-          name: "description",
-          content: `Decouvrez ${articleCount} keyset${articleCount > 1 ? "s" : ""} avec le profil ${profileTitle} sur Azertykeycaps.`,
-        },
-      ],
+      meta: generateMeta({
+        title: profileTitle,
+        description,
+        path,
+        image: articles[0]?.img.url,
+      }),
+      links: [generateCanonical(path)],
+      scripts: [
+        generateJsonLd(
+          generateCollectionPageSchema({
+            name: profileTitle,
+            description,
+            path,
+            items: articles.map((a) => ({ slug: a.slug, title: a.title })),
+          }),
+        ),
+      ].filter(Boolean),
     };
   },
   errorComponent: PageErrorWithBack,

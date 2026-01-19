@@ -96,6 +96,7 @@ export const web = await TanStackStart("web", {
   placement: { mode: "smart" },
   bindings: {
     VITE_SERVER_URL: serverUrl,
+    VITE_SITE_URL: webUrl,
     CORS_ORIGIN: webUrl,
     BETTER_AUTH_SECRET: getSecret("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: serverUrl,
