@@ -146,7 +146,9 @@ export function SearchCommand({ profiles }: SearchCommandProps) {
     <CommandDialog open={open} onOpenChange={setOpen}>
       {/* Mobile: icon only */}
       <CommandDialogTrigger
-        render={<Button variant="ghost" size="icon" className="size-9 md:hidden" />}
+        render={
+          <Button variant="ghost" size="icon" className="size-9 md:hidden" />
+        }
         aria-label={i18n.search.placeholder}
       >
         <SearchIcon className="size-4" />
@@ -240,7 +242,10 @@ export function SearchCommand({ profiles }: SearchCommandProps) {
                           key={item.id}
                           value={item.id}
                           render={
-                            <Link to={getResultPath(item)} onClick={closeDialog} />
+                            <Link
+                              to={getResultPath(item)}
+                              onClick={closeDialog}
+                            />
                           }
                         >
                           {item.title}

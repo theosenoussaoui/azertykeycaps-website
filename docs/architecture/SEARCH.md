@@ -62,15 +62,15 @@ searchPlugin({
 
 The plugin creates a `search` collection with:
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `id` | number | Auto-generated ID (D1/SQLite) |
-| `title` | string | Searchable title from source document |
-| `slug` | string | URL slug (added via `beforeSync`) |
-| `priority` | number | Sort priority |
-| `doc` | object | Reference to source document |
+| Field            | Type   | Description                                       |
+| ---------------- | ------ | ------------------------------------------------- |
+| `id`             | number | Auto-generated ID (D1/SQLite)                     |
+| `title`          | string | Searchable title from source document             |
+| `slug`           | string | URL slug (added via `beforeSync`)                 |
+| `priority`       | number | Sort priority                                     |
+| `doc`            | object | Reference to source document                      |
 | `doc.relationTo` | string | Collection name (`articles` or `keycap-profiles`) |
-| `doc.value` | number | Source document ID |
+| `doc.value`      | number | Source document ID                                |
 
 ## tRPC Search Router
 
@@ -83,19 +83,22 @@ export const searchRouter = router({
     .output(searchResponseSchema)
     .query(async ({ ctx, input }) => {
       const { q, limit } = input;
-      
-      const queryString = stringify({
-        where: { title: { contains: q } },
-        limit,
-        depth: 0,
-        sort: "-priority",
-      }, { addQueryPrefix: true });
+
+      const queryString = stringify(
+        {
+          where: { title: { contains: q } },
+          limit,
+          depth: 0,
+          sort: "-priority",
+        },
+        { addQueryPrefix: true },
+      );
 
       const response = await fetch(
         `${ctx.env.CMS_API_URL}/api/search${queryString}`,
-        { headers: { Authorization: `users API-Key ${ctx.env.CMS_API_KEY}` } }
+        { headers: { Authorization: `users API-Key ${ctx.env.CMS_API_KEY}` } },
       );
-      
+
       // ... validation and return
     }),
 });
@@ -103,10 +106,10 @@ export const searchRouter = router({
 
 ### Query Parameters
 
-| Parameter | Description |
-|-----------|-------------|
-| `q` | Search query (min 1, max 100 chars) |
-| `limit` | Max results (1-20, default 10) |
+| Parameter | Description                         |
+| --------- | ----------------------------------- |
+| `q`       | Search query (min 1, max 100 chars) |
+| `limit`   | Max results (1-20, default 10)      |
 
 ### Response Format
 
@@ -126,13 +129,13 @@ export const searchRouter = router({
 import { payloadIdSchema } from "./common";
 
 export const searchResultSchema = z.object({
-  id: payloadIdSchema,           // Coerced to string
+  id: payloadIdSchema, // Coerced to string
   title: z.string(),
   slug: z.string(),
   priority: z.number().optional(),
   doc: z.object({
     relationTo: z.enum(["articles", "keycap-profiles"]),
-    value: payloadIdSchema,      // Coerced to string
+    value: payloadIdSchema, // Coerced to string
   }),
 });
 ```
@@ -158,17 +161,17 @@ const debouncedQuery = useDebounce(query, 300);
 
 const searchQuery = useQuery({
   ...trpc.search.query.queryOptions({ q: debouncedQuery, limit: 10 }),
-  enabled: isSearching && open,  // Only fetch when dialog is open
-  staleTime: 30_000,             // Cache for 30 seconds
+  enabled: isSearching && open, // Only fetch when dialog is open
+  staleTime: 30_000, // Cache for 30 seconds
 });
 ```
 
 ### Navigation Paths
 
-| Collection | Route |
-|------------|-------|
-| `keycap-profiles` | `/profile/{slug}` |
-| `articles` | `/articles/{slug}` |
+| Collection        | Route              |
+| ----------------- | ------------------ |
+| `keycap-profiles` | `/profile/{slug}`  |
+| `articles`        | `/articles/{slug}` |
 
 ## Common Pitfalls & Traps
 
@@ -229,7 +232,7 @@ beforeSync: ({ originalDoc, searchDoc }) => ({
 ```typescript
 export const MyCollection: CollectionConfig = {
   admin: {
-    useAsTitle: "title",  // Required for search indexing
+    useAsTitle: "title", // Required for search indexing
   },
   // ...
 };
@@ -240,6 +243,7 @@ export const MyCollection: CollectionConfig = {
 **Problem:** Search results don't update when typing.
 
 **Solution:** Check:
+
 - `useDebounce` hook is working (300ms delay expected)
 - `enabled` condition includes `open` state
 - `debouncedQuery.length >= 2` (minimum search length)
@@ -256,9 +260,9 @@ export const MyCollection: CollectionConfig = {
 
 ## Environment Variables
 
-| Variable | Description | Used By |
-|----------|-------------|---------|
-| `CMS_API_URL` | Payload CMS base URL | Server (tRPC) |
+| Variable      | Description                    | Used By       |
+| ------------- | ------------------------------ | ------------- |
+| `CMS_API_URL` | Payload CMS base URL           | Server (tRPC) |
 | `CMS_API_KEY` | API key for CMS authentication | Server (tRPC) |
 
 ## File Structure
@@ -286,16 +290,18 @@ apps/
 ## Adding a New Collection to Search
 
 1. **Add to plugin config:**
+
    ```typescript
    searchPlugin({
      collections: ["articles", "keycap-profiles", "new-collection"],
      defaultPriorities: {
        "new-collection": 5,
      },
-   })
+   });
    ```
 
 2. **Ensure `useAsTitle` is set:**
+
    ```typescript
    export const NewCollection: CollectionConfig = {
      admin: { useAsTitle: "name" },
@@ -303,6 +309,7 @@ apps/
    ```
 
 3. **Update schema enum:**
+
    ```typescript
    // packages/schemas/src/search.ts
    doc: z.object({
@@ -311,6 +318,7 @@ apps/
    ```
 
 4. **Update navigation paths:**
+
    ```typescript
    // apps/web/src/components/search-command.tsx
    const getResultPath = (result: SearchResult) => {

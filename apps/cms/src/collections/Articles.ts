@@ -136,7 +136,10 @@ export const Articles: CollectionConfig = {
                       value: ARTICLE_MATERIALS.PBT_DYE_SUB,
                     },
                     {
-                      label: { fr: "PBT Laser Printed", en: "PBT Laser Printed" },
+                      label: {
+                        fr: "PBT Laser Printed",
+                        en: "PBT Laser Printed",
+                      },
                       value: ARTICLE_MATERIALS.PBT_LASER_PRINTED,
                     },
                   ],
