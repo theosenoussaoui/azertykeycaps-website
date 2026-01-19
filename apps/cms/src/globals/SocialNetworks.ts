@@ -1,7 +1,7 @@
 import type { GlobalConfig } from "payload";
 
-import { isAuthenticated } from "../access/authenticated";
-import { globalAfterChangeHook } from "../hooks/cache-invalidation";
+import { isAuthenticated } from "@/access/authenticated";
+import { globalAfterChangeHook } from "@/hooks/cache-invalidation";
 
 export const SocialNetworks: GlobalConfig = {
   slug: "social-networks",
@@ -17,32 +17,53 @@ export const SocialNetworks: GlobalConfig = {
   },
   fields: [
     {
+      type: "ui",
+      name: "socialInfo",
+      admin: {
+        components: {
+          Field: "@/components/fields/InfoPanel#SocialInfoPanel",
+        },
+      },
+    },
+    {
       name: "networks",
       type: "array",
       label: { fr: "Réseaux", en: "Networks" },
+      admin: {
+        initCollapsed: false,
+      },
       fields: [
         {
-          name: "title",
-          type: "text",
-          required: true,
-          label: { fr: "Titre", en: "Title" },
+          type: "row",
+          fields: [
+            {
+              name: "title",
+              type: "text",
+              required: true,
+              label: { fr: "Titre", en: "Title" },
+              admin: {
+                width: "50%",
+              },
+            },
+            {
+              name: "iconText",
+              type: "text",
+              label: { fr: "Icône", en: "Icon" },
+              admin: {
+                width: "50%",
+                description: {
+                  fr: "Nom de l'icône Lucide",
+                  en: "Lucide icon name",
+                },
+              },
+            },
+          ],
         },
         {
           name: "url",
           type: "text",
           required: true,
           label: { fr: "URL", en: "URL" },
-        },
-        {
-          name: "iconText",
-          type: "text",
-          label: { fr: "Texte de l'icône", en: "Icon Text" },
-          admin: {
-            description: {
-              fr: "Nom de l'icône Lucide",
-              en: "Lucide icon name",
-            },
-          },
         },
       ],
     },

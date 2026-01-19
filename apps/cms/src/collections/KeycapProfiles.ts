@@ -1,11 +1,11 @@
 import type { CollectionConfig } from "payload";
 
-import { isAuthenticated } from "../access/authenticated";
-import { PROFILE_SHAPES } from "../constants";
+import { isAuthenticated } from "@/access/authenticated";
+import { PROFILE_SHAPES } from "@/constants";
 import {
   collectionAfterChangeHook,
   collectionAfterDeleteHook,
-} from "../hooks/cache-invalidation";
+} from "@/hooks/cache-invalidation";
 
 export const KeycapProfiles: CollectionConfig = {
   slug: "keycap-profiles",
@@ -13,8 +13,6 @@ export const KeycapProfiles: CollectionConfig = {
     singular: { fr: "Profil de keycap", en: "Keycap Profile" },
     plural: { fr: "Profils de keycap", en: "Keycap Profiles" },
   },
-  // Only return essential fields when this collection is populated from relationships
-  // This reduces response size when profiles are embedded in articles
   defaultPopulate: {
     id: true,
     title: true,
@@ -38,65 +36,112 @@ export const KeycapProfiles: CollectionConfig = {
   },
   fields: [
     {
-      name: "title",
-      type: "text",
-      required: true,
-      label: { fr: "Titre", en: "Title" },
-    },
-    {
-      name: "slug",
-      type: "text",
-      required: true,
-      unique: true,
-      index: true,
-      label: { fr: "Slug", en: "Slug" },
-      admin: {
-        description: {
-          fr: "Identifiant URL unique du profil",
-          en: "Unique URL identifier for the profile",
+      type: "tabs",
+      tabs: [
+        {
+          label: { fr: "Informations", en: "Information" },
+          fields: [
+            {
+              type: "row",
+              fields: [
+                {
+                  name: "title",
+                  type: "text",
+                  required: true,
+                  label: { fr: "Titre", en: "Title" },
+                  admin: {
+                    width: "50%",
+                  },
+                },
+                {
+                  name: "abbreviation",
+                  type: "text",
+                  required: true,
+                  label: { fr: "Abréviation", en: "Abbreviation" },
+                  admin: {
+                    width: "50%",
+                    description: {
+                      fr: "Ex: SA, DSA, Cherry, etc.",
+                      en: "E.g.: SA, DSA, Cherry, etc.",
+                    },
+                  },
+                },
+              ],
+            },
+            {
+              name: "slug",
+              type: "text",
+              required: true,
+              unique: true,
+              index: true,
+              label: { fr: "Slug", en: "Slug" },
+              admin: {
+                description: {
+                  fr: "Identifiant URL unique du profil",
+                  en: "Unique URL identifier for the profile",
+                },
+              },
+            },
+            {
+              name: "description",
+              type: "textarea",
+              label: { fr: "Description", en: "Description" },
+            },
+            {
+              name: "thumbnail",
+              type: "upload",
+              relationTo: "media",
+              label: { fr: "Miniature", en: "Thumbnail" },
+            },
+          ],
         },
-      },
-    },
-    {
-      name: "description",
-      type: "textarea",
-      label: { fr: "Description", en: "Description" },
-    },
-    {
-      name: "abbreviation",
-      type: "text",
-      required: true,
-      label: { fr: "Abréviation", en: "Abbreviation" },
-      admin: {
-        description: {
-          fr: "Ex: SA, DSA, Cherry, etc.",
-          en: "E.g.: SA, DSA, Cherry, etc.",
+        {
+          label: { fr: "Navigation", en: "Navigation" },
+          fields: [
+            {
+              type: "ui",
+              name: "navInfo",
+              admin: {
+                components: {
+                  Field: "@/components/fields/InfoPanel#NavInfoPanel",
+                },
+              },
+            },
+            {
+              name: "navbarDescription",
+              type: "text",
+              required: true,
+              label: { fr: "Description navbar", en: "Navbar Description" },
+              admin: {
+                description: {
+                  fr: "Courte description pour le menu de navigation",
+                  en: "Short description for the navigation menu",
+                },
+              },
+            },
+            {
+              name: "navbarIconName",
+              type: "text",
+              label: { fr: "Nom de l'icône navbar", en: "Navbar Icon Name" },
+              admin: {
+                description: {
+                  fr: "Nom de l'icône Lucide pour le menu",
+                  en: "Lucide icon name for the menu",
+                },
+              },
+            },
+          ],
         },
-      },
-    },
-    {
-      name: "navbarDescription",
-      type: "text",
-      required: true,
-      label: { fr: "Description navbar", en: "Navbar Description" },
-      admin: {
-        description: {
-          fr: "Courte description pour le menu de navigation",
-          en: "Short description for the navigation menu",
-        },
-      },
-    },
-    {
-      name: "thumbnail",
-      type: "upload",
-      relationTo: "media",
-      label: { fr: "Miniature", en: "Thumbnail" },
+      ],
     },
     {
       name: "shape",
       type: "select",
       required: true,
       label: { fr: "Forme", en: "Shape" },
+      admin: {
+        position: "sidebar",
+      },
       options: [
         {
           label: { fr: "Sculpté", en: "Sculpted" },
@@ -107,17 +152,6 @@ export const KeycapProfiles: CollectionConfig = {
           value: PROFILE_SHAPES.UNIFORM,
         },
       ],
-    },
-    {
-      name: "navbarIconName",
-      type: "text",
-      label: { fr: "Nom de l'icône navbar", en: "Navbar Icon Name" },
-      admin: {
-        description: {
-          fr: "Nom de l'icône Lucide pour le menu",
-          en: "Lucide icon name for the menu",
-        },
-      },
     },
   ],
 };

@@ -192,6 +192,7 @@ export interface Article {
    */
   slug: string;
   img: number | Media;
+  description?: string | null;
   profile: number | KeycapProfile;
   material?:
     | (
@@ -204,8 +205,18 @@ export interface Article {
         | 'pbt_laser_printed'
       )
     | null;
-  description?: string | null;
-  status: 'in_stock' | 'extras_gb' | 'extras_in_stock' | 'gb_running' | 'gb_ended' | 'interest_check' | 'out_of_stock';
+  /**
+   * Link to the product
+   */
+  url: string;
+  /**
+   * Secondary link (e.g., base kit)
+   */
+  additionalUrl?: string | null;
+  /**
+   * Affiliate link for tracking
+   */
+  affiliateUrl?: string | null;
   /**
    * Group Buy start date
    */
@@ -215,15 +226,10 @@ export interface Article {
    */
   endDate?: string | null;
   /**
-   * Link to the product
-   */
-  url: string;
-  additionalUrl?: string | null;
-  affiliateUrl?: string | null;
-  /**
-   * Warning message displayed on the card
+   * Warning message displayed on the card (e.g., delivery delay)
    */
   warningText?: string | null;
+  status: 'in_stock' | 'extras_gb' | 'extras_in_stock' | 'gb_running' | 'gb_ended' | 'interest_check' | 'out_of_stock';
   /**
    * Displays a 'New' badge on the article
    */
@@ -239,24 +245,24 @@ export interface KeycapProfile {
   id: number;
   title: string;
   /**
-   * Unique URL identifier for the profile
-   */
-  slug: string;
-  description?: string | null;
-  /**
    * E.g.: SA, DSA, Cherry, etc.
    */
   abbreviation: string;
   /**
+   * Unique URL identifier for the profile
+   */
+  slug: string;
+  description?: string | null;
+  thumbnail?: (number | null) | Media;
+  /**
    * Short description for the navigation menu
    */
   navbarDescription: string;
-  thumbnail?: (number | null) | Media;
-  shape: 'sculpted' | 'uniform';
   /**
    * Lucide icon name for the menu
    */
   navbarIconName?: string | null;
+  shape: 'sculpted' | 'uniform';
   updatedAt: string;
   createdAt: string;
 }
@@ -419,16 +425,16 @@ export interface ArticlesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   img?: T;
+  description?: T;
   profile?: T;
   material?: T;
-  description?: T;
-  status?: T;
-  startDate?: T;
-  endDate?: T;
   url?: T;
   additionalUrl?: T;
   affiliateUrl?: T;
+  startDate?: T;
+  endDate?: T;
   warningText?: T;
+  status?: T;
   isNew?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -439,13 +445,13 @@ export interface ArticlesSelect<T extends boolean = true> {
  */
 export interface KeycapProfilesSelect<T extends boolean = true> {
   title?: T;
+  abbreviation?: T;
   slug?: T;
   description?: T;
-  abbreviation?: T;
-  navbarDescription?: T;
   thumbnail?: T;
-  shape?: T;
+  navbarDescription?: T;
   navbarIconName?: T;
+  shape?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -525,11 +531,11 @@ export interface SocialNetwork {
   networks?:
     | {
         title: string;
-        url: string;
         /**
          * Lucide icon name
          */
         iconText?: string | null;
+        url: string;
         id?: string | null;
       }[]
     | null;
@@ -558,10 +564,8 @@ export interface InformationsPage {
     };
     [k: string]: unknown;
   };
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-  };
+  metaTitle?: string | null;
+  metaDescription?: string | null;
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -573,14 +577,12 @@ export interface SuggestionPage {
   id: number;
   title: string;
   description: string;
+  metaTitle?: string | null;
+  metaDescription?: string | null;
   /**
    * Enable or disable the suggestion form
    */
   formEnabled?: boolean | null;
-  seo?: {
-    metaTitle?: string | null;
-    metaDescription?: string | null;
-  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -605,8 +607,8 @@ export interface SocialNetworksSelect<T extends boolean = true> {
     | T
     | {
         title?: T;
-        url?: T;
         iconText?: T;
+        url?: T;
         id?: T;
       };
   updatedAt?: T;
@@ -620,12 +622,8 @@ export interface SocialNetworksSelect<T extends boolean = true> {
 export interface InformationsPageSelect<T extends boolean = true> {
   title?: T;
   content?: T;
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-      };
+  metaTitle?: T;
+  metaDescription?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -637,13 +635,9 @@ export interface InformationsPageSelect<T extends boolean = true> {
 export interface SuggestionPageSelect<T extends boolean = true> {
   title?: T;
   description?: T;
+  metaTitle?: T;
+  metaDescription?: T;
   formEnabled?: T;
-  seo?:
-    | T
-    | {
-        metaTitle?: T;
-        metaDescription?: T;
-      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
