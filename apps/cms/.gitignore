@@ -56,3 +56,4 @@ importMap.js
 *.db-shm
 *.db-wal
 payload.db*
+.wrangler/
