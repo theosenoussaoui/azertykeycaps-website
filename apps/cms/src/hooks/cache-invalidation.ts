@@ -90,10 +90,6 @@ async function sendInvalidationToServer(
       console.error(
         `[cache-invalidation] Server invalidation failed: ${response.status} - ${errorText}`,
       );
-    } else {
-      console.log(
-        `[cache-invalidation] Server invalidation sent for ${payload.slug}`,
-      );
     }
   } catch (error) {
     console.error("[cache-invalidation] Failed to send invalidation:", error);
@@ -125,9 +121,6 @@ export const collectionAfterChangeHook: CollectionAfterChangeHook = ({
     await sendInvalidationToServer(payload);
   };
 
-  console.log(
-    `[cache-invalidation] Collection ${collection.slug} changed: ${doc.id}`,
-  );
   void buildAndSendPayload();
 
   return doc;
@@ -157,9 +150,6 @@ export const collectionAfterDeleteHook: CollectionAfterDeleteHook = ({
     await sendInvalidationToServer(payload);
   };
 
-  console.log(
-    `[cache-invalidation] Collection ${collection.slug} deleted: ${doc.id}`,
-  );
   void buildAndSendPayload();
 
   return doc;
@@ -174,7 +164,6 @@ export const globalAfterChangeHook: GlobalAfterChangeHook = ({
     slug: global.slug,
   };
 
-  console.log(`[cache-invalidation] Global ${global.slug} updated`);
   void sendInvalidationToServer(payload);
 
   return doc;

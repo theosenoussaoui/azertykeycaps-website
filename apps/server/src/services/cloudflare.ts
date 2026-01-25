@@ -17,7 +17,8 @@ export async function purgeCloudflareCDN(
     };
   }
 
-  console.log("[cache] URLs to purge:", JSON.stringify(urlsToPurge));
+  // URLs logged in production could leak internal structure - log count only
+  console.log(`[cache] Purging ${urlsToPurge.length} URLs`);
 
   try {
     const response = await fetch(
@@ -33,10 +34,7 @@ export async function purgeCloudflareCDN(
     );
 
     const responseData = await response.json();
-    console.log(
-      "[cache] Cloudflare purge response:",
-      JSON.stringify(responseData),
-    );
+    // Avoid logging full API response - only log success/failure
 
     if (!response.ok) {
       return {

@@ -17,21 +17,17 @@ function isDevMode(): boolean {
 }
 
 function createDevCacheLogger(
-  cacheName: string,
-  cacheControl: string,
+  _cacheName: string,
+  _cacheControl: string,
 ): MiddlewareHandler {
   return async (c, next) => {
     const startTime = Date.now();
     await next();
     const duration = Date.now() - startTime;
 
+    // Dev-only logging - URLs are local, safe to log
     console.log(
-      `[cache:dev] ${c.req.method} ${c.req.url}\n` +
-        `  Cache: ${cacheName}\n` +
-        `  Would set: ${cacheControl}\n` +
-        `  Status: ${c.res.status}\n` +
-        `  Duration: ${duration}ms\n` +
-        `  (Cache API not available in dev - request went to origin)`,
+      `[cache:dev] ${c.req.method} ${new URL(c.req.url).pathname} - ${c.res.status} (${duration}ms)`,
     );
   };
 }
@@ -52,10 +48,9 @@ export async function invalidateCache(
   patterns?: string[],
 ): Promise<{ success: boolean; message: string }> {
   if (isDevMode()) {
+    // Dev-only: log pattern count, not actual URLs
     console.log(
-      `[cache:dev] Invalidation request for ${cacheName}\n` +
-        `  Patterns: ${patterns?.join(", ") || "(full cache)"}\n` +
-        `  (Cache API not available in dev - nothing to invalidate)`,
+      `[cache:dev] Invalidation for ${cacheName}: ${patterns?.length ?? 0} patterns`,
     );
     return {
       success: true,

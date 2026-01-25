@@ -21,20 +21,17 @@ const cache = new Hono()
       const payload = c.req.valid("json");
       const { type, slug, id } = payload;
 
-      console.log(
-        `[cache] Invalidation request: type=${type}, slug=${slug}, id=${id || "N/A"}`,
-      );
+      // Log invalidation without exposing full URLs
+      console.log(`[cache] Invalidation: ${type}/${slug}`);
 
       const cacheKeys = buildCacheKeys(env.SERVER_URL, type, slug);
 
       const cmsResult = await invalidateCache(CACHE_NAMES.CMS_API, cacheKeys);
-      console.log(`[cache] CMS cache: ${cmsResult.message}`);
 
       let mediaResult = { success: true, message: "Skipped (not media)" };
       if (slug === "media" && id) {
         const mediaKeys = [`${env.SERVER_URL}/api/media/${id}`];
         mediaResult = await invalidateCache(CACHE_NAMES.MEDIA, mediaKeys);
-        console.log(`[cache] Media cache: ${mediaResult.message}`);
       }
 
       let cdnResult: {
@@ -53,7 +50,6 @@ const cache = new Hono()
           env.CORS_ORIGIN,
           payload,
         );
-        console.log(`[cache] CDN cache: ${cdnResult.message}`);
       }
 
       return c.json({
