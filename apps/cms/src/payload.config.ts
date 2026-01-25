@@ -111,8 +111,7 @@ export default buildConfig({
       globals: ["homepage", "informations-page", "suggestion-page"],
       uploadsCollection: "media",
       tabbedUI: true,
-      generateTitle: ({ doc }) =>
-        (doc as { title?: string })?.title ?? "",
+      generateTitle: ({ doc }) => (doc as { title?: string })?.title ?? "",
       generateDescription: ({ doc }) =>
         (doc as { description?: string })?.description ??
         (doc as { subtitle?: string })?.subtitle ??

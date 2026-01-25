@@ -9,7 +9,9 @@
       "default": "./src/*.ts"
     }
   },
-  "scripts": {},
+  "scripts": {
+    "check-types": "tsc --noEmit"
+  },
   "dependencies": {
     "@azertykeycaps-app/auth": "workspace:*",
     "@azertykeycaps-app/db": "workspace:*",

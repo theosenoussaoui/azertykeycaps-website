@@ -44,8 +44,10 @@ export default buildConfig({
       generateDescription: ({ doc }) => doc?.description,
       generateURL: ({ doc, collectionSlug }) => {
         const baseUrl = cloudflare.env.WEB_URL;
-        if (collectionSlug === "articles") return `${baseUrl}/articles/${doc?.slug}`;
-        if (collectionSlug === "keycap-profiles") return `${baseUrl}/profile/${doc?.slug}`;
+        if (collectionSlug === "articles")
+          return `${baseUrl}/articles/${doc?.slug}`;
+        if (collectionSlug === "keycap-profiles")
+          return `${baseUrl}/profile/${doc?.slug}`;
         return baseUrl;
       },
     }),
@@ -61,9 +63,9 @@ The plugin adds a `meta` field group to collections/globals:
 // Field structure added by @payloadcms/plugin-seo
 {
   meta: {
-    title: string | null;        // Override page title
-    description: string | null;  // Override meta description
-    image: Media | null;         // OG image (relationship to media collection)
+    title: string | null; // Override page title
+    description: string | null; // Override meta description
+    image: Media | null; // OG image (relationship to media collection)
   }
 }
 ```
@@ -74,16 +76,20 @@ The corresponding Zod schema in `packages/schemas/src/common.ts`:
 
 ```typescript
 export const seoFieldsSchema = z.object({
-  meta: z.object({
-    title: z.string().nullish(),
-    description: z.string().nullish(),
-    image: z.object({
-      url: z.string(),
-      alt: z.string().optional(),
-      width: z.number().nullish(),
-      height: z.number().nullish(),
-    }).nullish(),
-  }).nullish(),
+  meta: z
+    .object({
+      title: z.string().nullish(),
+      description: z.string().nullish(),
+      image: z
+        .object({
+          url: z.string(),
+          alt: z.string().optional(),
+          width: z.number().nullish(),
+          height: z.number().nullish(),
+        })
+        .nullish(),
+    })
+    .nullish(),
 });
 ```
 
@@ -93,11 +99,13 @@ When fetching data from CMS, spread `seoFieldsSchema` into your data schema:
 
 ```typescript
 // In packages/schemas/src/globals.ts
-export const homepageSchema = z.object({
-  title: z.string().nullish(),
-  subtitle: z.string().nullish(),
-  // ... other fields
-}).merge(seoFieldsSchema);
+export const homepageSchema = z
+  .object({
+    title: z.string().nullish(),
+    subtitle: z.string().nullish(),
+    // ... other fields
+  })
+  .merge(seoFieldsSchema);
 ```
 
 Then pass the SEO data to `generateMeta()`:
@@ -309,10 +317,14 @@ import type { SeoFields } from "@azertykeycaps-app/schemas";
 
 export const siteConfig = {
   name: "Azertykeycaps",
-  get url() { return import.meta.env.VITE_SITE_URL || "https://azertykeycaps.fr"; },
+  get url() {
+    return import.meta.env.VITE_SITE_URL || "https://azertykeycaps.fr";
+  },
   locale: "fr_FR",
   language: "fr",
-  get defaultOgImage() { return `${this.url}/og.webp`; },
+  get defaultOgImage() {
+    return `${this.url}/og.webp`;
+  },
 };
 
 // CMS SEO data type (matches @payloadcms/plugin-seo structure)
@@ -320,10 +332,10 @@ export type CmsSeoData = SeoFields;
 
 /**
  * Generate standard meta tags with CMS override support.
- * 
+ *
  * When CMS SEO data is provided via `seo` parameter:
  * - meta.title overrides the default title
- * - meta.description overrides the default description  
+ * - meta.description overrides the default description
  * - meta.image overrides the default OG image
  */
 export function generateMeta({
@@ -332,7 +344,7 @@ export function generateMeta({
   path,
   image,
   type = "website",
-  seo,  // Pass CMS data with meta.* fields
+  seo, // Pass CMS data with meta.* fields
 }: {
   title: string;
   description: string;
@@ -661,7 +673,12 @@ export const env = createEnv({
 The home page fetches CMS data including SEO fields via server function:
 
 ```tsx
-import { generateMeta, generateCanonical, generateJsonLd, siteConfig } from "@/lib/seo";
+import {
+  generateMeta,
+  generateCanonical,
+  generateJsonLd,
+  siteConfig,
+} from "@/lib/seo";
 import { getHomepageContent } from "@/features/globals/api/get-homepage-content";
 
 export const Route = createFileRoute("/_app/")({
@@ -706,7 +723,12 @@ export const Route = createFileRoute("/_app/")({
 Articles have their own SEO fields managed in the CMS:
 
 ```tsx
-import { generateMeta, generateCanonical, generateJsonLd, siteConfig } from "@/lib/seo";
+import {
+  generateMeta,
+  generateCanonical,
+  generateJsonLd,
+  siteConfig,
+} from "@/lib/seo";
 
 export const Route = createFileRoute("/_app/articles/$slug")({
   head: ({ loaderData, params }) => {
@@ -805,6 +827,7 @@ export const Route = createFileRoute("/_app/profile/$slug")({
 ## Checklist for New Routes
 
 ### Code Implementation
+
 - [ ] Title meta tag (unique, max 60 chars)
 - [ ] Description meta tag (unique, 150-160 chars)
 - [ ] Open Graph tags (og:title, og:description, og:image, og:url, og:type)
@@ -815,6 +838,7 @@ export const Route = createFileRoute("/_app/profile/$slug")({
 - [ ] Pass CMS `seo` data to `generateMeta()` if page has CMS-managed SEO
 
 ### CMS Configuration (for CMS-backed pages)
+
 - [ ] Add collection/global to `seoPlugin` config in `payload.config.ts`
 - [ ] Implement `generateTitle`, `generateDescription`, `generateURL` for collection
 - [ ] Add schema with `seoFieldsSchema` in `packages/schemas`
@@ -822,6 +846,7 @@ export const Route = createFileRoute("/_app/profile/$slug")({
 - [ ] Update loader to fetch and return SEO fields
 
 ### Testing
+
 - [ ] Add to sitemap (if public)
 - [ ] Test with Google Rich Results Test
 - [ ] Test social sharing previews (Facebook, Twitter)
@@ -906,4 +931,3 @@ head: () => ({
   <h1>{title}</h1>
 </article>
 ```
-
