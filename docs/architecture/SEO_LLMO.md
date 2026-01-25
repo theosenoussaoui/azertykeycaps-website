@@ -17,6 +17,105 @@
 
 ---
 
+## CMS-Managed SEO
+
+SEO metadata is managed through Payload CMS using the official `@payloadcms/plugin-seo` plugin, which provides:
+
+- **SERP Preview**: Live preview showing how pages appear in Google search results
+- **Character Counters**: Real-time character counts for title (max 60) and description (max 160)
+- **Auto-Generate**: Buttons to auto-generate metadata from content fields
+- **Image Selection**: Upload picker for OG images with media library integration
+
+### Plugin Configuration
+
+The SEO plugin is configured in `apps/cms/src/payload.config.ts`:
+
+```typescript
+import { seoPlugin } from "@payloadcms/plugin-seo";
+
+export default buildConfig({
+  plugins: [
+    seoPlugin({
+      collections: ["articles", "keycap-profiles"],
+      globals: ["homepage", "informations-page", "suggestion-page"],
+      uploadsCollection: "media",
+      tabbedUI: true, // Renders SEO fields in a separate tab
+      generateTitle: ({ doc }) => doc?.title,
+      generateDescription: ({ doc }) => doc?.description,
+      generateURL: ({ doc, collectionSlug }) => {
+        const baseUrl = cloudflare.env.WEB_URL;
+        if (collectionSlug === "articles") return `${baseUrl}/articles/${doc?.slug}`;
+        if (collectionSlug === "keycap-profiles") return `${baseUrl}/profile/${doc?.slug}`;
+        return baseUrl;
+      },
+    }),
+  ],
+});
+```
+
+### SEO Field Structure
+
+The plugin adds a `meta` field group to collections/globals:
+
+```typescript
+// Field structure added by @payloadcms/plugin-seo
+{
+  meta: {
+    title: string | null;        // Override page title
+    description: string | null;  // Override meta description
+    image: Media | null;         // OG image (relationship to media collection)
+  }
+}
+```
+
+### Schema Definition
+
+The corresponding Zod schema in `packages/schemas/src/common.ts`:
+
+```typescript
+export const seoFieldsSchema = z.object({
+  meta: z.object({
+    title: z.string().nullish(),
+    description: z.string().nullish(),
+    image: z.object({
+      url: z.string(),
+      alt: z.string().optional(),
+      width: z.number().nullish(),
+      height: z.number().nullish(),
+    }).nullish(),
+  }).nullish(),
+});
+```
+
+### Accessing CMS SEO Data
+
+When fetching data from CMS, spread `seoFieldsSchema` into your data schema:
+
+```typescript
+// In packages/schemas/src/globals.ts
+export const homepageSchema = z.object({
+  title: z.string().nullish(),
+  subtitle: z.string().nullish(),
+  // ... other fields
+}).merge(seoFieldsSchema);
+```
+
+Then pass the SEO data to `generateMeta()`:
+
+```typescript
+// In route head() function
+head: ({ loaderData }) => ({
+  meta: generateMeta({
+    title: "Default Title",
+    description: "Default description",
+    path: "/",
+    seo: loaderData?.homepage, // Pass CMS data with meta.* fields
+  }),
+}),
+```
+
+---
+
 ## SEO Checklist for Routes
 
 Every route MUST have these meta tags in its `head` function:
@@ -206,60 +305,80 @@ function getSchemaAvailability(status: string): string {
 Use `apps/web/src/lib/seo.ts` for consistent SEO implementation:
 
 ```tsx
-import { env } from "@azertykeycaps-app/env/web";
+import type { SeoFields } from "@azertykeycaps-app/schemas";
 
-const siteUrl = env.VITE_SITE_URL;
-const siteName = "Azertykeycaps";
-const defaultOgImage = `${siteUrl}/og-image.png`;
+export const siteConfig = {
+  name: "Azertykeycaps",
+  get url() { return import.meta.env.VITE_SITE_URL || "https://azertykeycaps.fr"; },
+  locale: "fr_FR",
+  language: "fr",
+  get defaultOgImage() { return `${this.url}/og.webp`; },
+};
 
-// Generate standard meta tags
+// CMS SEO data type (matches @payloadcms/plugin-seo structure)
+export type CmsSeoData = SeoFields;
+
+/**
+ * Generate standard meta tags with CMS override support.
+ * 
+ * When CMS SEO data is provided via `seo` parameter:
+ * - meta.title overrides the default title
+ * - meta.description overrides the default description  
+ * - meta.image overrides the default OG image
+ */
 export function generateMeta({
   title,
   description,
   path,
   image,
   type = "website",
+  seo,  // Pass CMS data with meta.* fields
 }: {
   title: string;
   description: string;
   path: string;
   image?: string;
   type?: "website" | "article";
+  seo?: CmsSeoData | null;
 }) {
-  const fullTitle = `${title} - ${siteName}`;
-  const url = `${siteUrl}${path}`;
-  const ogImage = image || defaultOgImage;
+  // CMS SEO data takes precedence (uses meta.* structure from plugin)
+  const finalTitle = seo?.meta?.title || title;
+  const finalDescription = seo?.meta?.description || description;
+  const ogImage = seo?.meta?.image?.url || image || siteConfig.defaultOgImage;
+
+  const fullTitle = `${finalTitle} - ${siteConfig.name}`;
+  const url = `${siteConfig.url}${path}`;
 
   return [
     { title: fullTitle },
-    { name: "description", content: description },
+    { name: "description", content: finalDescription },
     // Open Graph
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
+    { property: "og:title", content: finalTitle },
+    { property: "og:description", content: finalDescription },
     { property: "og:image", content: ogImage },
     { property: "og:url", content: url },
     { property: "og:type", content: type },
-    { property: "og:site_name", content: siteName },
-    { property: "og:locale", content: "fr_FR" },
+    { property: "og:site_name", content: siteConfig.name },
+    { property: "og:locale", content: siteConfig.locale },
     // Twitter Card
     { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
+    { name: "twitter:title", content: finalTitle },
+    { name: "twitter:description", content: finalDescription },
     { name: "twitter:image", content: ogImage },
   ];
 }
 
 // Generate canonical link
 export function generateCanonical(path: string) {
-  return { rel: "canonical", href: `${siteUrl}${path}` };
+  const cleanPath = path.split("?")[0];
+  return { rel: "canonical" as const, href: `${siteConfig.url}${cleanPath}` };
 }
 
 // Generate JSON-LD script tag
 export function generateJsonLd(data: object) {
-  return {
-    type: "application/ld+json",
-    children: JSON.stringify(data),
-  };
+  const json = JSON.stringify(data);
+  if (!json || json === "{}" || json === "null") return undefined;
+  return { type: "application/ld+json", children: json };
 }
 ```
 
@@ -539,21 +658,30 @@ export const env = createEnv({
 
 ### Home Page (`_app/index.tsx`)
 
+The home page fetches CMS data including SEO fields via server function:
+
 ```tsx
-import { generateMeta, generateCanonical, generateJsonLd } from "@/lib/seo";
-import { env } from "@azertykeycaps-app/env/web";
+import { generateMeta, generateCanonical, generateJsonLd, siteConfig } from "@/lib/seo";
+import { getHomepageContent } from "@/features/globals/api/get-homepage-content";
 
 export const Route = createFileRoute("/_app/")({
+  loader: async () => {
+    const [articles, homepage] = await Promise.all([
+      getArticles(),
+      getHomepageContent(), // Fetches homepage global with meta.* fields
+    ]);
+    return { articles, homepage };
+  },
   head: ({ loaderData }) => {
-    const i18n = t();
     const articles = loaderData?.articles?.docs ?? [];
-    const siteUrl = env.VITE_SITE_URL;
+    const homepage = loaderData?.homepage;
 
     return {
       meta: generateMeta({
-        title: i18n.home.metaTitle,
-        description: i18n.home.metaDescription,
+        title: homepage?.title ?? "Accueil",
+        description: homepage?.subtitle ?? "Annuaire de keysets AZERTY",
         path: "/",
+        seo: homepage, // Pass CMS data - meta.* fields override defaults
       }),
       links: [generateCanonical("/")],
       scripts: [
@@ -563,11 +691,11 @@ export const Route = createFileRoute("/_app/")({
           itemListElement: articles.map((article, index) => ({
             "@type": "ListItem",
             position: index + 1,
-            url: `${siteUrl}/articles/${article.slug}`,
+            url: `${siteConfig.url}/articles/${article.slug}`,
             name: article.title,
           })),
         }),
-      ],
+      ].filter(Boolean),
     };
   },
 });
@@ -575,11 +703,14 @@ export const Route = createFileRoute("/_app/")({
 
 ### Article Detail (`_app/articles.$slug.tsx`)
 
+Articles have their own SEO fields managed in the CMS:
+
 ```tsx
+import { generateMeta, generateCanonical, generateJsonLd, siteConfig } from "@/lib/seo";
+
 export const Route = createFileRoute("/_app/articles/$slug")({
   head: ({ loaderData, params }) => {
     const article = loaderData?.article;
-    const siteUrl = env.VITE_SITE_URL;
 
     return {
       meta: generateMeta({
@@ -588,6 +719,7 @@ export const Route = createFileRoute("/_app/articles/$slug")({
         path: `/articles/${params.slug}`,
         image: article?.img.url,
         type: "article",
+        seo: article, // Article has meta.* fields from CMS SEO plugin
       }),
       links: [generateCanonical(`/articles/${params.slug}`)],
       scripts: article
@@ -595,10 +727,10 @@ export const Route = createFileRoute("/_app/articles/$slug")({
             generateJsonLd({
               "@context": "https://schema.org",
               "@type": "Article",
-              headline: article.title,
-              description: article.description,
-              image: article.img.url,
-              url: `${siteUrl}/articles/${article.slug}`,
+              headline: article.meta?.title || article.title,
+              description: article.meta?.description || article.description,
+              image: article.meta?.image?.url || article.img.url,
+              url: `${siteConfig.url}/articles/${article.slug}`,
               datePublished: article.createdAt,
               dateModified: article.updatedAt,
               author: {
@@ -610,7 +742,7 @@ export const Route = createFileRoute("/_app/articles/$slug")({
                 name: "Azertykeycaps",
                 logo: {
                   "@type": "ImageObject",
-                  url: `${siteUrl}/logo.png`,
+                  url: `${siteConfig.url}/logo.png`,
                 },
               },
             }),
@@ -621,10 +753,58 @@ export const Route = createFileRoute("/_app/articles/$slug")({
 });
 ```
 
+### Profile Page (`_app/profile.$slug.tsx`)
+
+Profile pages fetch SEO data from keycap-profiles collection:
+
+```tsx
+export const Route = createFileRoute("/_app/profile/$slug")({
+  loader: async ({ params }) => {
+    const profile = await getProfileBySlug(params.slug); // Includes meta.* fields
+    const articles = await getArticlesByProfile(params.slug);
+    return { profile, articles };
+  },
+  head: ({ loaderData, params }) => {
+    const profile = loaderData?.profile;
+    const articles = loaderData?.articles?.docs ?? [];
+
+    return {
+      meta: generateMeta({
+        title: profile?.title ?? "Profile",
+        description: profile?.description ?? "Keycap profile",
+        path: `/profile/${params.slug}`,
+        image: profile?.img?.url,
+        seo: profile, // Profile has meta.* fields from CMS SEO plugin
+      }),
+      links: [generateCanonical(`/profile/${params.slug}`)],
+      scripts: [
+        generateJsonLd({
+          "@context": "https://schema.org",
+          "@type": "CollectionPage",
+          name: profile?.meta?.title || profile?.title,
+          description: profile?.meta?.description || profile?.description,
+          url: `${siteConfig.url}/profile/${params.slug}`,
+          mainEntity: {
+            "@type": "ItemList",
+            itemListElement: articles.map((article, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              url: `${siteConfig.url}/articles/${article.slug}`,
+              name: article.title,
+            })),
+          },
+        }),
+      ].filter(Boolean),
+    };
+  },
+});
+```
+
 ---
 
 ## Checklist for New Routes
 
+### Code Implementation
 - [ ] Title meta tag (unique, max 60 chars)
 - [ ] Description meta tag (unique, 150-160 chars)
 - [ ] Open Graph tags (og:title, og:description, og:image, og:url, og:type)
@@ -632,9 +812,20 @@ export const Route = createFileRoute("/_app/articles/$slug")({
 - [ ] Canonical URL link
 - [ ] JSON-LD structured data (appropriate type for page)
 - [ ] Preload critical images (if above fold)
+- [ ] Pass CMS `seo` data to `generateMeta()` if page has CMS-managed SEO
+
+### CMS Configuration (for CMS-backed pages)
+- [ ] Add collection/global to `seoPlugin` config in `payload.config.ts`
+- [ ] Implement `generateTitle`, `generateDescription`, `generateURL` for collection
+- [ ] Add schema with `seoFieldsSchema` in `packages/schemas`
+- [ ] Create API endpoint in `packages/api` to fetch SEO data
+- [ ] Update loader to fetch and return SEO fields
+
+### Testing
 - [ ] Add to sitemap (if public)
 - [ ] Test with Google Rich Results Test
-- [ ] Test social sharing previews
+- [ ] Test social sharing previews (Facebook, Twitter)
+- [ ] Verify CMS SERP preview matches actual output
 
 ---
 
@@ -716,10 +907,3 @@ head: () => ({
 </article>
 ```
 
----
-
-## Version History
-
-| Version | Date       | Changes                        |
-| ------- | ---------- | ------------------------------ |
-| 1.0     | 2026-01-19 | Initial SEO/LLMO documentation |

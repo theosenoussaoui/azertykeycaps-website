@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { seoFieldsSchema } from "./common";
 import { keycapProfileRefSchema } from "./profiles";
 
 // ============================================
@@ -20,11 +21,13 @@ export const socialNetworksSchema = z.object({
 // HOMEPAGE GLOBAL
 // ============================================
 
-export const homepageSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  profileCards: z.array(keycapProfileRefSchema),
-});
+export const homepageSchema = z
+  .object({
+    title: z.string().nullish(),
+    subtitle: z.string().nullish(),
+    profileCards: z.array(keycapProfileRefSchema).nullish(),
+  })
+  .merge(seoFieldsSchema);
 
 // ============================================
 // INFORMATIONS PAGE GLOBAL
@@ -34,24 +37,24 @@ export const homepageSchema = z.object({
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const lexicalContentSchema = z.any().nullable();
 
-export const informationsPageSchema = z.object({
-  title: z.string(),
-  content: lexicalContentSchema,
-  metaTitle: z.string().nullish(),
-  metaDescription: z.string().nullish(),
-});
+export const informationsPageSchema = z
+  .object({
+    title: z.string(),
+    content: lexicalContentSchema,
+  })
+  .merge(seoFieldsSchema);
 
 // ============================================
 // SUGGESTION PAGE GLOBAL
 // ============================================
 
-export const suggestionPageSchema = z.object({
-  title: z.string(),
-  description: z.string(),
-  formEnabled: z.boolean(),
-  metaTitle: z.string().nullish(),
-  metaDescription: z.string().nullish(),
-});
+export const suggestionPageSchema = z
+  .object({
+    title: z.string(),
+    description: z.string(),
+    formEnabled: z.boolean(),
+  })
+  .merge(seoFieldsSchema);
 
 // ============================================
 // TYPES

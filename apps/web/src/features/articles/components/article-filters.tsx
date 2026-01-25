@@ -50,7 +50,10 @@ export function ArticleFilters({
           value={selectedProfile ?? ""}
           onValueChange={(v) => onProfileChange(v || undefined)}
         >
-          <SelectTrigger className="w-40">
+          <SelectTrigger
+            className="w-40"
+            aria-label={i18n.articles.filters.profile}
+          >
             <SelectValue>
               {selectedProfile
                 ? profiles.find((p) => p.slug === selectedProfile)?.title
@@ -73,7 +76,10 @@ export function ArticleFilters({
         value={selectedStatus ?? ""}
         onValueChange={(v) => onStatusChange((v as ArticleStatus) || undefined)}
       >
-        <SelectTrigger className="w-40">
+        <SelectTrigger
+          className="w-40"
+          aria-label={i18n.articles.filters.status}
+        >
           <SelectValue>
             {selectedStatus
               ? i18n.status[selectedStatus]
@@ -97,7 +103,10 @@ export function ArticleFilters({
           onMaterialChange((v as ArticleMaterial) || undefined)
         }
       >
-        <SelectTrigger className="w-40">
+        <SelectTrigger
+          className="w-40"
+          aria-label={i18n.articles.filters.material}
+        >
           <SelectValue>
             {selectedMaterial
               ? i18n.materials[selectedMaterial]

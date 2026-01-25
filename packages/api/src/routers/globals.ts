@@ -1,8 +1,10 @@
 import {
   socialNetworksSchema,
+  homepageSchema,
   informationsPageSchema,
   suggestionPageSchema,
   type SocialNetworks,
+  type Homepage,
   type InformationsPage,
   type SuggestionPage,
 } from "@azertykeycaps-app/schemas";
@@ -44,6 +46,41 @@ function fetchCMS(
 }
 
 export const globalsRouter = router({
+  /**
+   * Get homepage global (title, subtitle, SEO)
+   */
+  homepage: publicProcedure
+    .output(homepageSchema.nullable())
+    .query(async ({ ctx }) => {
+      try {
+        const response = await fetchCMS(
+          `${ctx.env.CMS_API_URL}/api/globals/homepage`,
+          ctx.env.CMS_API_KEY,
+          ctx.isDev ? undefined : CMS_CACHE_TTL,
+        );
+
+        if (!response.ok) {
+          console.error(`CMS API error: ${response.status}`);
+          return null;
+        }
+
+        const data = (await response.json()) as Homepage;
+
+        const validation = homepageSchema.safeParse(data);
+        if (!validation.success) {
+          console.error(
+            "[globals.homepage] Output validation failed:",
+            JSON.stringify(validation.error.issues, null, 2),
+          );
+        }
+
+        return data;
+      } catch (error) {
+        console.error("Failed to fetch homepage:", error);
+        return null;
+      }
+    }),
+
   /**
    * Get social networks global
    */

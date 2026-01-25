@@ -6,6 +6,7 @@ import type { CloudflareContext } from "@opennextjs/cloudflare";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { sqliteD1Adapter } from "@payloadcms/db-d1-sqlite";
 import { searchPlugin } from "@payloadcms/plugin-search";
+import { seoPlugin } from "@payloadcms/plugin-seo";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { r2Storage } from "@payloadcms/storage-r2";
 import { en } from "@payloadcms/translations/languages/en";
@@ -103,6 +104,41 @@ export default buildConfig({
             index: true,
           },
         ],
+      },
+    }),
+    seoPlugin({
+      collections: ["articles", "keycap-profiles"],
+      globals: ["homepage", "informations-page", "suggestion-page"],
+      uploadsCollection: "media",
+      tabbedUI: true,
+      generateTitle: ({ doc }) =>
+        (doc as { title?: string })?.title ?? "",
+      generateDescription: ({ doc }) =>
+        (doc as { description?: string })?.description ??
+        (doc as { subtitle?: string })?.subtitle ??
+        "",
+      generateURL: ({ doc, collectionSlug, globalSlug }) => {
+        const baseUrl =
+          (cloudflare.env as { WEB_URL?: string })?.WEB_URL ??
+          "https://azertykeycaps.fr";
+        const slug = (doc as { slug?: string })?.slug;
+
+        if (collectionSlug === "articles" && slug) {
+          return `${baseUrl}/articles/${slug}`;
+        }
+        if (collectionSlug === "keycap-profiles" && slug) {
+          return `${baseUrl}/profile/${slug}`;
+        }
+        if (globalSlug === "homepage") {
+          return baseUrl;
+        }
+        if (globalSlug === "informations-page") {
+          return `${baseUrl}/about`;
+        }
+        if (globalSlug === "suggestion-page") {
+          return `${baseUrl}/suggest`;
+        }
+        return baseUrl;
       },
     }),
   ],

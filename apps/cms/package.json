@@ -31,6 +31,7 @@
     "@payloadcms/db-d1-sqlite": "3.71.1",
     "@payloadcms/next": "3.71.1",
     "@payloadcms/plugin-search": "3.71.1",
+    "@payloadcms/plugin-seo": "3.71.1",
     "@payloadcms/richtext-lexical": "3.71.1",
     "@payloadcms/storage-r2": "3.71.1",
     "@payloadcms/translations": "3.71.1",

@@ -5,9 +5,11 @@ import {
   articleListResponseSchema,
   articleSchema,
   profileListResponseSchema,
+  keycapProfileSchema,
   type Article,
   type ArticleListResponse,
   type KeycapProfileRef,
+  type KeycapProfile,
 } from "@azertykeycaps-app/schemas";
 import { TRPCError } from "@trpc/server";
 import { stringify } from "qs-esm";
@@ -365,6 +367,60 @@ export const articlesRouter = router({
       } catch (error) {
         console.error("Failed to fetch profiles:", error);
         return [];
+      }
+    }),
+
+  /**
+   * Get a single keycap profile by slug (with full data including SEO)
+   */
+  profileBySlug: publicProcedure
+    .input(articleBySlugInputSchema) // Reuse slug input schema
+    .output(keycapProfileSchema.nullable())
+    .query(async ({ ctx, input }) => {
+      const { slug } = input;
+
+      try {
+        // Use qs-esm to properly format query string for Payload REST API
+        const queryString = stringify(
+          {
+            where: {
+              slug: { equals: slug },
+            },
+            limit: 1,
+            pagination: false,
+          },
+          { addQueryPrefix: true },
+        );
+
+        const response = await fetchCMS(
+          `${ctx.env.CMS_API_URL}/api/keycap-profiles${queryString}`,
+          ctx.env.CMS_API_KEY,
+          ctx.isDev ? undefined : CMS_CACHE_TTL,
+        );
+
+        if (!response.ok) {
+          console.error(`CMS API error: ${response.status}`);
+          return null;
+        }
+
+        const data = (await response.json()) as { docs: KeycapProfile[] };
+        const profile = data.docs[0] ?? null;
+
+        if (!profile) return null;
+
+        // Validate before returning
+        const validation = keycapProfileSchema.safeParse(profile);
+        if (!validation.success) {
+          console.error(
+            "[articles.profileBySlug] Output validation failed:",
+            JSON.stringify(validation.error.issues, null, 2),
+          );
+        }
+
+        return profile;
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+        return null;
       }
     }),
 });

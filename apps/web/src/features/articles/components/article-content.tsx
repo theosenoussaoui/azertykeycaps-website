@@ -53,14 +53,18 @@ export function ArticleContent({ article }: ArticleContentProps) {
           </Badge>
           {article.isNew && <Badge variant="default">{i18n.common.new}</Badge>}
           {article.profile && (
-            <Link to="/profile/$slug" params={{ slug: article.profile.slug }}>
-              <Badge
-                variant="outline"
-                className="cursor-pointer hover:bg-accent"
-              >
-                {article.profile.title}
-              </Badge>
-            </Link>
+            <Badge
+              variant="outline"
+              className="cursor-pointer hover:bg-accent"
+              render={
+                <Link
+                  to="/profile/$slug"
+                  params={{ slug: article.profile.slug }}
+                />
+              }
+            >
+              {article.profile.title}
+            </Badge>
           )}
           {article.material && (
             <Badge variant="outline">{i18n.materials[article.material]}</Badge>

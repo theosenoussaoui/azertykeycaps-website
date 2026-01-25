@@ -24,20 +24,28 @@ export const Route = createFileRoute("/_app/about")({
     const content = await getAboutContent();
     return { content };
   },
-  head: () => {
+  head: ({ loaderData }) => {
     const i18n = t();
+    const content = loaderData?.content;
+
+    // Use CMS content with i18n fallbacks
+    const title = content?.title ?? i18n.pages.about.title;
+    const description =
+      content?.meta?.description ?? i18n.pages.about.metaDescription;
+
     return {
       meta: generateMeta({
-        title: i18n.pages.about.title,
-        description: i18n.pages.about.metaDescription,
+        title,
+        description,
         path: "/about",
+        seo: content,
       }),
       links: [generateCanonical("/about")],
       scripts: [
         generateJsonLd(
           generateAboutPageSchema({
-            name: i18n.pages.about.title,
-            description: i18n.pages.about.metaDescription,
+            name: title,
+            description,
           }),
         ),
       ].filter(Boolean),

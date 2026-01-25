@@ -248,7 +248,7 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
                 {groupedProfiles.sculpted &&
                   groupedProfiles.sculpted.length > 0 && (
                     <div className="flex flex-col gap-1">
-                      <h3 className="py-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                      <h3 className="py-2 text-xs font-semibold text-muted-foreground uppercase">
                         {i18n.nav.profileShapes.sculpted}
                       </h3>
                       {groupedProfiles.sculpted.map((profile) => (
@@ -277,7 +277,7 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
                 {groupedProfiles.uniform &&
                   groupedProfiles.uniform.length > 0 && (
                     <div className="flex flex-col gap-1">
-                      <h3 className="py-2 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+                      <h3 className="py-2 text-xs font-semibold text-muted-foreground uppercase">
                         {i18n.nav.profileShapes.uniform}
                       </h3>
                       {groupedProfiles.uniform.map((profile) => (

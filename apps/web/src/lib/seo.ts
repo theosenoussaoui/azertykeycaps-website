@@ -1,6 +1,6 @@
 /**
  * SEO utility functions for generating meta tags, Open Graph, and JSON-LD structured data.
- * @see docs/SEO_LLMO.md for full documentation
+ * @see docs/architecture/SEO_LLMO.md for full documentation
  *
  * IMPORTANT: This module must work on both server and client.
  * - Server: head() function runs during SSR
@@ -8,6 +8,8 @@
  *
  * We use import.meta.env.VITE_SITE_URL which Vite replaces at build time.
  */
+
+import type { SeoFields } from "@azertykeycaps-app/schemas";
 
 /**
  * Get the site URL.
@@ -35,8 +37,27 @@ export const siteConfig = {
 };
 
 /**
+ * CMS SEO data type for page metadata.
+ * Matches the SEO fields from @payloadcms/plugin-seo (meta.* structure).
+ */
+export type CmsSeoData = SeoFields;
+
+/**
  * Generate standard meta tags including Open Graph and Twitter Card.
  * Returns an array compatible with TanStack Router's head function.
+ *
+ * When CMS SEO data is provided, it takes precedence over default values:
+ * - meta.title overrides title
+ * - meta.description overrides description
+ * - meta.image overrides image
+ *
+ * @param options - Meta generation options
+ * @param options.title - Default page title (used as fallback)
+ * @param options.description - Default page description (used as fallback)
+ * @param options.path - URL path for canonical and og:url
+ * @param options.image - Default OG image (used as fallback)
+ * @param options.type - OG type (website or article)
+ * @param options.seo - CMS SEO data to override defaults (uses meta.* structure)
  */
 export function generateMeta({
   title,
@@ -44,25 +65,32 @@ export function generateMeta({
   path,
   image,
   type = "website",
-  noIndex = false,
+  seo,
 }: {
   title: string;
   description: string;
   path: string;
   image?: string;
   type?: "website" | "article";
-  noIndex?: boolean;
+  seo?: CmsSeoData | null;
 }) {
-  const fullTitle = `${title} - ${siteConfig.name}`;
-  const url = `${siteConfig.url}${path}`;
-  const ogImage = image || siteConfig.defaultOgImage;
+  // Use CMS SEO data if provided, otherwise fall back to defaults
+  // Plugin uses meta.* structure: meta.title, meta.description, meta.image
+  const finalTitle = seo?.meta?.title || title;
+  const finalDescription = seo?.meta?.description || description;
 
-  const meta = [
+  // For OG image, prefer: CMS meta.image > provided image > default
+  const ogImage = seo?.meta?.image?.url || image || siteConfig.defaultOgImage;
+
+  const fullTitle = `${finalTitle} - ${siteConfig.name}`;
+  const url = `${siteConfig.url}${path}`;
+
+  return [
     { title: fullTitle },
-    { name: "description", content: description },
+    { name: "description", content: finalDescription },
     // Open Graph
-    { property: "og:title", content: title },
-    { property: "og:description", content: description },
+    { property: "og:title", content: finalTitle },
+    { property: "og:description", content: finalDescription },
     { property: "og:image", content: ogImage },
     { property: "og:url", content: url },
     { property: "og:type", content: type },
@@ -70,16 +98,10 @@ export function generateMeta({
     { property: "og:locale", content: siteConfig.locale },
     // Twitter Card
     { name: "twitter:card", content: "summary_large_image" },
-    { name: "twitter:title", content: title },
-    { name: "twitter:description", content: description },
+    { name: "twitter:title", content: finalTitle },
+    { name: "twitter:description", content: finalDescription },
     { name: "twitter:image", content: ogImage },
   ];
-
-  if (noIndex) {
-    meta.push({ name: "robots", content: "noindex, nofollow" });
-  }
-
-  return meta;
 }
 
 /**

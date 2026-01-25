@@ -37,41 +37,6 @@ export const InformationsPage: GlobalConfig = {
             },
           ],
         },
-        {
-          label: { fr: "SEO", en: "SEO" },
-          fields: [
-            {
-              type: "ui",
-              name: "seoInfo",
-              admin: {
-                components: {
-                  Field: "@/components/fields/InfoPanel#SeoInfoPanel",
-                },
-              },
-            },
-            {
-              type: "row",
-              fields: [
-                {
-                  name: "metaTitle",
-                  type: "text",
-                  label: { fr: "Titre Meta", en: "Meta Title" },
-                  admin: {
-                    width: "50%",
-                  },
-                },
-                {
-                  name: "metaDescription",
-                  type: "textarea",
-                  label: { fr: "Description Meta", en: "Meta Description" },
-                  admin: {
-                    width: "50%",
-                  },
-                },
-              ],
-            },
-          ],
-        },
       ],
     },
   ],

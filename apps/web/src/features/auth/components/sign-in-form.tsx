@@ -69,47 +69,69 @@ export default function SignInForm({
       >
         <div>
           <form.Field name="email">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Email</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="email"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
+            {(field) => {
+              const hasErrors = field.state.meta.errors.length > 0;
+              const errorId = `${field.name}-error`;
+              return (
+                <div className="space-y-2">
+                  <Label htmlFor={field.name}>Email</Label>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type="email"
+                    autoComplete="email"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    aria-invalid={hasErrors}
+                    aria-describedby={hasErrors ? errorId : undefined}
+                  />
+                  {hasErrors && (
+                    <p
+                      id={errorId}
+                      className="text-sm text-destructive"
+                      aria-live="polite"
+                    >
+                      {field.state.meta.errors[0]?.message}
+                    </p>
+                  )}
+                </div>
+              );
+            }}
           </form.Field>
         </div>
 
         <div>
           <form.Field name="password">
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name}>Password</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-                {field.state.meta.errors.map((error) => (
-                  <p key={error?.message} className="text-red-500">
-                    {error?.message}
-                  </p>
-                ))}
-              </div>
-            )}
+            {(field) => {
+              const hasErrors = field.state.meta.errors.length > 0;
+              const errorId = `${field.name}-error`;
+              return (
+                <div className="space-y-2">
+                  <Label htmlFor={field.name}>Password</Label>
+                  <Input
+                    id={field.name}
+                    name={field.name}
+                    type="password"
+                    autoComplete="current-password"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                    aria-invalid={hasErrors}
+                    aria-describedby={hasErrors ? errorId : undefined}
+                  />
+                  {hasErrors && (
+                    <p
+                      id={errorId}
+                      className="text-sm text-destructive"
+                      aria-live="polite"
+                    >
+                      {field.state.meta.errors[0]?.message}
+                    </p>
+                  )}
+                </div>
+              );
+            }}
           </form.Field>
         </div>
 
@@ -127,11 +149,7 @@ export default function SignInForm({
       </form>
 
       <div className="mt-4 text-center">
-        <Button
-          variant="link"
-          onClick={onSwitchToSignUp}
-          className="text-indigo-600 hover:text-indigo-800"
-        >
+        <Button variant="link" onClick={onSwitchToSignUp}>
           Need an account? Sign Up
         </Button>
       </div>

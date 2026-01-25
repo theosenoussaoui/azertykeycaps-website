@@ -25,6 +25,39 @@ export const payloadIdOptionalSchema = z.coerce.string().optional();
 export const payloadTimestampSchema = z.string();
 
 // ============================================
+// SEO SCHEMA
+// ============================================
+
+/**
+ * SEO fields schema for CMS-managed meta data.
+ *
+ * Matches the field structure from @payloadcms/plugin-seo:
+ * - meta.title: Custom title for search engines (50-60 chars recommended)
+ * - meta.description: Custom description for search results (150-160 chars)
+ * - meta.image: Custom Open Graph image for social sharing (media reference)
+ *
+ * All fields are optional and fall back to content fields when not provided.
+ */
+export const seoFieldsSchema = z.object({
+  meta: z
+    .object({
+      title: z.string().nullish(),
+      description: z.string().nullish(),
+      image: z
+        .object({
+          url: z.string(),
+          alt: z.string().optional(),
+          width: z.number().nullish(),
+          height: z.number().nullish(),
+        })
+        .nullish(),
+    })
+    .nullish(),
+});
+
+export type SeoFields = z.infer<typeof seoFieldsSchema>;
+
+// ============================================
 // TYPES
 // ============================================
 

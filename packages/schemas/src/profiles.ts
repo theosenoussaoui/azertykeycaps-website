@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { payloadIdSchema } from "./common";
+import { payloadIdSchema, seoFieldsSchema } from "./common";
 import { mediaSchema } from "./media";
 
 // ============================================
@@ -35,19 +35,21 @@ export const keycapProfileRefSchema = z.object({
 });
 
 // Full profile schema
-export const keycapProfileSchema = z.object({
-  id: payloadIdSchema,
-  title: z.string(),
-  slug: z.string(),
-  description: z.string().nullable(),
-  abbreviation: z.string(),
-  navbarDescription: z.string(),
-  thumbnail: mediaSchema.nullable(),
-  shape: profileShapeSchema,
-  navbarIconName: z.string().nullable(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
+export const keycapProfileSchema = z
+  .object({
+    id: payloadIdSchema,
+    title: z.string(),
+    slug: z.string(),
+    description: z.string().nullable(),
+    abbreviation: z.string(),
+    navbarDescription: z.string(),
+    thumbnail: mediaSchema.nullable(),
+    shape: profileShapeSchema,
+    navbarIconName: z.string().nullable(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  })
+  .merge(seoFieldsSchema);
 
 // ============================================
 // TYPES

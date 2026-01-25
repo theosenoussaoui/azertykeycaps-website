@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { payloadIdSchema } from "./common";
+import { payloadIdSchema, seoFieldsSchema } from "./common";
 import { mediaSchema } from "./media";
 import { keycapProfileRefSchema } from "./profiles";
 
@@ -73,25 +73,27 @@ export const articleListItemSchema = z.object({
 
 // Schema for full article (detail page) - all fields
 // Full article schema - all fields from CMS
-export const articleSchema = z.object({
-  id: payloadIdSchema,
-  title: z.string(),
-  slug: z.string(),
-  img: mediaSchema,
-  profile: keycapProfileRefSchema,
-  material: articleMaterialSchema.nullish(),
-  description: z.string().nullish(),
-  status: articleStatusSchema,
-  startDate: z.string().nullish(),
-  endDate: z.string().nullish(),
-  url: z.string(),
-  additionalUrl: z.string().nullish(),
-  affiliateUrl: z.string().nullish(),
-  warningText: z.string().nullish(),
-  isNew: z.boolean(),
-  createdAt: z.string(),
-  updatedAt: z.string(),
-});
+export const articleSchema = z
+  .object({
+    id: payloadIdSchema,
+    title: z.string(),
+    slug: z.string(),
+    img: mediaSchema,
+    profile: keycapProfileRefSchema,
+    material: articleMaterialSchema.nullish(),
+    description: z.string().nullish(),
+    status: articleStatusSchema,
+    startDate: z.string().nullish(),
+    endDate: z.string().nullish(),
+    url: z.string(),
+    additionalUrl: z.string().nullish(),
+    affiliateUrl: z.string().nullish(),
+    warningText: z.string().nullish(),
+    isNew: z.boolean(),
+    createdAt: z.string(),
+    updatedAt: z.string(),
+  })
+  .merge(seoFieldsSchema);
 
 // ============================================
 // UI SCHEMAS (derived from base schema)

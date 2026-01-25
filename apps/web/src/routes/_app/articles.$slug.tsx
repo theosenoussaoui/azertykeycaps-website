@@ -1,10 +1,26 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeftIcon } from "lucide-react";
 
 import { PageErrorWithBack } from "@/components/errors/page-error";
-import { Button } from "@/components/ui/button";
-import { PageContainer } from "@/components/ui/page-container";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { CardGrid, GridCard } from "@/components/ui/card-grid";
+import {
+  PageContainer,
+  PageSection,
+  PageSectionContent,
+  PageSectionHeader,
+  PageSectionTitle,
+} from "@/components/ui/page-container";
+import { SectionDivider } from "@/components/ui/section-divider";
 import { getArticleBySlug } from "@/features/articles/api/get-article-by-slug";
+import { getRelatedArticles } from "@/features/articles/api/get-related-articles";
+import { ArticleCard } from "@/features/articles/components/article-card";
 import { ArticleContent } from "@/features/articles/components/article-content";
 import { t } from "@/i18n";
 import { getPreloadImageUrl } from "@/lib/image-utils";
@@ -24,7 +40,18 @@ export const Route = createFileRoute("/_app/articles/$slug")({
       throw notFound();
     }
 
-    return { article };
+    // Fetch related articles (same profile, excluding current)
+    const relatedArticles = article.profile
+      ? await getRelatedArticles({
+          data: {
+            profileSlug: article.profile.slug,
+            excludeSlug: article.slug,
+            limit: 4,
+          },
+        })
+      : { docs: [] };
+
+    return { article, relatedArticles: relatedArticles.docs };
   },
   head: ({ loaderData, params }) => {
     const article = loaderData?.article;
@@ -33,13 +60,18 @@ export const Route = createFileRoute("/_app/articles/$slug")({
     const path = `/articles/${params.slug}`;
     const i18n = t();
 
+    // Use CMS SEO data with fallbacks to article content
+    const title = article?.title ?? "Article";
+    const description = article?.description ?? i18n.home.subtitle;
+
     return {
       meta: generateMeta({
-        title: article?.title ?? "Article",
-        description: article?.description ?? i18n.home.metaDescription,
+        title,
+        description,
         path,
         image: article?.img.url,
         type: "article",
+        seo: article,
       }),
       links: [
         generateCanonical(path),
@@ -57,9 +89,10 @@ export const Route = createFileRoute("/_app/articles/$slug")({
         ? [
             generateJsonLd(
               generateArticleSchema({
-                title: article.title,
-                description: article.description ?? "",
-                image: article.img.url,
+                title: article.meta?.title ?? article.title,
+                description:
+                  article.meta?.description ?? article.description ?? "",
+                image: article.meta?.image?.url ?? article.img.url,
                 slug: article.slug,
                 createdAt: article.createdAt,
                 updatedAt: article.updatedAt,
@@ -80,20 +113,76 @@ export const Route = createFileRoute("/_app/articles/$slug")({
 });
 
 function ArticleDetailPage() {
-  const { article } = Route.useLoaderData();
+  const { article, relatedArticles } = Route.useLoaderData();
   const i18n = t();
 
   return (
     <PageContainer>
-      {/* Back Navigation */}
+      {/* Breadcrumb Navigation */}
       <nav className="py-4">
-        <Button variant="ghost" size="sm" render={<Link to="/" />}>
-          <ArrowLeftIcon />
-          {i18n.common.back}
-        </Button>
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink render={<Link to="/" />}>
+                {i18n.nav.home}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            {article.profile && (
+              <>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbLink
+                    render={
+                      <Link
+                        to="/profile/$slug"
+                        params={{ slug: article.profile.slug }}
+                      />
+                    }
+                  >
+                    {article.profile.title}
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+              </>
+            )}
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="max-w-48 truncate">
+                {article.title}
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </nav>
 
       <ArticleContent article={article} />
+
+      {/* Related Keysets Section */}
+      {relatedArticles.length > 0 && (
+        <PageSection>
+          <PageSectionHeader>
+            <PageSectionTitle>{i18n.articles.related}</PageSectionTitle>
+          </PageSectionHeader>
+          <PageSectionContent>
+            <SectionDivider />
+            <CardGrid as="ul">
+              {relatedArticles.map((relatedArticle) => (
+                <GridCard
+                  key={relatedArticle.id}
+                  as="li"
+                  className="col-span-2 md:col-span-2"
+                >
+                  <ArticleCard
+                    article={relatedArticle}
+                    preload="viewport"
+                    variant="grid"
+                  />
+                </GridCard>
+              ))}
+            </CardGrid>
+            <SectionDivider />
+          </PageSectionContent>
+        </PageSection>
+      )}
     </PageContainer>
   );
 }

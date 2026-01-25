@@ -29,10 +29,16 @@ export const Homepage: GlobalConfig = {
               label: { fr: "Titre", en: "Title" },
             },
             {
-              name: "description",
-              type: "textarea",
+              name: "subtitle",
+              type: "text",
               required: true,
-              label: { fr: "Description", en: "Description" },
+              label: { fr: "Sous-titre", en: "Subtitle" },
+              admin: {
+                description: {
+                  fr: "Texte affiché sous le titre principal",
+                  en: "Text displayed below the main title",
+                },
+              },
             },
           ],
         },

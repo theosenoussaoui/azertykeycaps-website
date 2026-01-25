@@ -1,8 +1,9 @@
 import { createFileRoute, getRouteApi, Link } from "@tanstack/react-router";
-import { AlertCircleIcon, InboxIcon } from "lucide-react";
+import { AlertCircleIcon, InboxIcon, ArrowRightIcon } from "lucide-react";
 
 import { PageError } from "@/components/errors/page-error";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardDescription,
@@ -12,6 +13,7 @@ import {
 import { CardGrid, GridCard } from "@/components/ui/card-grid";
 import {
   Empty,
+  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
@@ -30,6 +32,7 @@ import {
 import { SectionDivider } from "@/components/ui/section-divider";
 import { getLatestArticles } from "@/features/articles/api/get-latest-articles";
 import { ArticleCard } from "@/features/articles/components/article-card";
+import { getHomepageContent } from "@/features/globals/api/get-homepage-content";
 import { t } from "@/i18n";
 import { getPreloadImageUrl } from "@/lib/image-utils";
 import {
@@ -43,7 +46,13 @@ const appRouteApi = getRouteApi("/_app");
 
 export const Route = createFileRoute("/_app/")({
   component: HomeComponent,
-  loader: async () => getLatestArticles(),
+  loader: async () => {
+    const [articlesData, homepage] = await Promise.all([
+      getLatestArticles(),
+      getHomepageContent(),
+    ]);
+    return { ...articlesData, homepage };
+  },
   headers: () => ({
     "Cache-Control":
       "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
@@ -53,16 +62,22 @@ export const Route = createFileRoute("/_app/")({
   head: ({ loaderData }) => {
     const i18n = t();
     const articles = loaderData?.articles?.docs ?? [];
+    const homepage = loaderData?.homepage;
     const firstArticle = articles[0];
     // Use optimized image URL for preloading (matches what OptimizedImage renders)
     const preloadImageUrl = getPreloadImageUrl(firstArticle?.img.url, "card");
 
+    // Use CMS content with i18n fallbacks
+    const title = homepage?.title ?? i18n.home.title;
+    const subtitle = homepage?.subtitle ?? i18n.home.subtitle;
+
     return {
       meta: generateMeta({
-        title: i18n.home.metaTitle,
-        description: i18n.home.metaDescription,
+        title,
+        description: subtitle,
         path: "/",
         image: firstArticle?.img.url,
+        seo: homepage,
       }),
       links: [
         generateCanonical("/"),
@@ -89,18 +104,22 @@ export const Route = createFileRoute("/_app/")({
 });
 
 function HomeComponent() {
-  const { articles } = Route.useLoaderData();
+  const { articles, homepage } = Route.useLoaderData();
   const { profiles } = appRouteApi.useLoaderData();
   const i18n = t();
+
+  // Use CMS content with i18n fallbacks
+  const title = homepage?.title ?? i18n.home.title;
+  const subtitle = homepage?.subtitle ?? i18n.home.subtitle;
 
   return (
     <PageContainer>
       {/* Hero Section - left aligned, bigger title */}
       <PageHeader>
         <PageTitle className="text-4xl @sm:text-5xl @md:text-6xl @lg:text-7xl">
-          {i18n.home.title}
+          {title}
         </PageTitle>
-        <PageDescription>{i18n.home.subtitle}</PageDescription>
+        <PageDescription>{subtitle}</PageDescription>
       </PageHeader>
 
       {/* Latest Articles Section */}
@@ -127,6 +146,15 @@ function HomeComponent() {
                   {i18n.pages.profile.noArticlesDescription}
                 </EmptyDescription>
               </EmptyHeader>
+              <EmptyContent>
+                <Button
+                  variant="secondary"
+                  render={<a href="#browse-profiles" />}
+                >
+                  {i18n.home.browseByProfile}
+                  <ArrowRightIcon />
+                </Button>
+              </EmptyContent>
             </Empty>
           ) : (
             <>
@@ -149,7 +177,7 @@ function HomeComponent() {
       </PageSection>
 
       {/* Browse by Profile Section */}
-      <PageSection>
+      <PageSection id="browse-profiles">
         <PageSectionHeader>
           <PageSectionTitle>{i18n.home.browseByProfile}</PageSectionTitle>
         </PageSectionHeader>

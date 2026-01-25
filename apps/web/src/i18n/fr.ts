@@ -54,6 +54,7 @@ export const fr = {
     additionalLink: "Lien additionnel",
     startDate: "Début",
     endDate: "Fin",
+    related: "Keysets similaires",
   },
   pages: {
     about: {
@@ -66,7 +67,10 @@ export const fr = {
       title: "Suggérez un keyset !",
       description:
         "Vous avez un keyset en tête qui n'est pas présent sur le site ? Vous pouvez le suggérer ici, et nous l'ajouterons s'il correspond aux critères de sélection.",
-      comingSoon: "Le formulaire de suggestion sera bientôt disponible.",
+      comingSoon: "Bientôt disponible",
+      comingSoonDescription:
+        "Le formulaire de suggestion sera bientôt disponible. En attendant, parcourez les keysets existants.",
+      browseExisting: "Parcourir les keysets",
       metaTitle: "Azertykeycaps - Suggestion",
       metaDescription: "Suggérez un keyset à ajouter sur Azertykeycaps.",
     },
@@ -76,6 +80,10 @@ export const fr = {
         "Nous n'avons pas encore de keysets pour ce profil en particulier, veuillez réessayer plus tard.",
       noFilterResults:
         "Essayez de modifier vos filtres pour trouver des articles.",
+      shapes: {
+        sculpted: "Sculpté",
+        uniform: "Uniforme",
+      },
     },
   },
   status: {

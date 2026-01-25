@@ -306,15 +306,42 @@ import { PageSection } from "@/components/ui/page-container";
 | Definitions         | `<dl><dt><dd>`       | Metadata (dates, specs)     |
 | Time                | `<time dateTime="">` | Dates                       |
 
-### Example: Article Page
+### Example: Article Page with Breadcrumbs
 
 ```tsx
-<PageContainer size="md">
+<PageContainer>
+  {/* Breadcrumb Navigation */}
   <nav className="py-4">
-    <Button variant="ghost" render={<Link to="/" />}>
-      <ArrowLeftIcon />
-      Back
-    </Button>
+    <Breadcrumb>
+      <BreadcrumbList>
+        <BreadcrumbItem>
+          <BreadcrumbLink render={<Link to="/" />}>Home</BreadcrumbLink>
+        </BreadcrumbItem>
+        {article.profile && (
+          <>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                render={
+                  <Link
+                    to="/profile/$slug"
+                    params={{ slug: article.profile.slug }}
+                  />
+                }
+              >
+                {article.profile.title}
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          </>
+        )}
+        <BreadcrumbSeparator />
+        <BreadcrumbItem>
+          <BreadcrumbPage className="max-w-48 truncate">
+            {article.title}
+          </BreadcrumbPage>
+        </BreadcrumbItem>
+      </BreadcrumbList>
+    </Breadcrumb>
   </nav>
 
   <article>
@@ -337,7 +364,51 @@ import { PageSection } from "@/components/ui/page-container";
       </div>
     </dl>
   </article>
+
+  {/* Related Content */}
+  {relatedArticles.length > 0 && (
+    <PageSection>
+      <PageSectionHeader>
+        <PageSectionTitle>Similar keysets</PageSectionTitle>
+      </PageSectionHeader>
+      <PageSectionContent>
+        <SectionDivider />
+        <CardGrid as="ul">
+          {relatedArticles.map((article) => (
+            <GridCard
+              key={article.id}
+              as="li"
+              className="col-span-2 md:col-span-2"
+            >
+              <ArticleCard article={article} variant="grid" />
+            </GridCard>
+          ))}
+        </CardGrid>
+        <SectionDivider />
+      </PageSectionContent>
+    </PageSection>
+  )}
 </PageContainer>
+```
+
+### Example: Category/Profile Page Header with Badge
+
+```tsx
+<PageHeader className="py-4">
+  <div className="flex flex-wrap items-center gap-3">
+    <PageTitle>{profile.title}</PageTitle>
+    {profile.shape && (
+      <Badge variant="outline" className="text-xs">
+        {i18n.pages.profile.shapes[profile.shape]}
+      </Badge>
+    )}
+  </div>
+  {totalDocs > 0 && (
+    <PageDescription>
+      {totalDocs} article{totalDocs > 1 ? "s" : ""}
+    </PageDescription>
+  )}
+</PageHeader>
 ```
 
 ### Example: List Page
@@ -697,8 +768,12 @@ apps/web/src/
 - [ ] Metadata uses `<dl><dt><dd>` pattern
 - [ ] Images have `alt` text and lazy loading
 - [ ] Error states use `Alert` component
-- [ ] Empty states use `Empty` component
-- [ ] Back navigation uses `Button` with `render` prop
+- [ ] Empty states use `Empty` component **with clear action button**
+- [ ] Detail pages have breadcrumb navigation (not just back button)
+- [ ] Detail pages consider related content section
+- [ ] Category pages show relevant badges (e.g., profile shape)
+- [ ] Filter components have `aria-label` attributes
+- [ ] CardGrid sections wrapped with `SectionDivider` for consistency
 
 ---
 
@@ -850,6 +925,35 @@ materials: {
   pbt_double_shot: "PBT Double-shot",
   pbt_dye_sub: "PBT Dye-sub",
   pbt_laser_printed: "PBT Laser-printed",
+}
+```
+
+### Articles (`articles.*`)
+
+```ts
+articles: {
+  // ... existing keys
+  related: "Similar keysets",  // For related content sections
+}
+```
+
+### Pages (`pages.*`)
+
+```ts
+pages: {
+  suggest: {
+    // ... existing keys
+    comingSoon: "Coming soon",
+    comingSoonDescription: "The suggestion form will be available soon...",
+    browseExisting: "Browse keysets",
+  },
+  profile: {
+    // ... existing keys
+    shapes: {
+      sculpted: "Sculpted",
+      uniform: "Uniform",
+    },
+  },
 }
 ```
 
@@ -1219,6 +1323,7 @@ The divider spans 100vw using the `left-1/2 -ml-[50vw]` technique and uses `opac
 
 | Version | Date       | Changes                                                                                                                                                                            |
 | ------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.5     | 2026-01-25 | Added breadcrumb navigation pattern, related content sections, filter accessibility (aria-labels), empty state action requirement, profile shape badges, Badge render prop pattern |
 | 1.4     | 2026-01-19 | Changed grid system from 6 to 8 columns on desktop                                                                                                                                 |
 | 1.3     | 2026-01-19 | Updated container to max-w-7xl (1280px), responsive 2/6 column grid system, SectionDivider component, Geist Mono for headings/badges/nav, DitherShader hover effect on ArticleCard |
 | 1.2     | 2026-01-18 | Added forms, URL state, content handling, dark mode, hydration, performance, grid lines sections. Unified container to max-w-6xl                                                   |

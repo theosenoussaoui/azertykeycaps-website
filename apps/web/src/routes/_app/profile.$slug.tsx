@@ -7,6 +7,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowLeftIcon, SearchXIcon } from "lucide-react";
 
 import { PageErrorWithBack } from "@/components/errors/page-error";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CardGrid, GridCard } from "@/components/ui/card-grid";
 import {
@@ -25,6 +26,7 @@ import {
   PageSectionContent,
   PageTitle,
 } from "@/components/ui/page-container";
+import { SectionDivider } from "@/components/ui/section-divider";
 import { getArticlesByProfile } from "@/features/articles/api/get-articles-by-profile";
 import { ArticleCard } from "@/features/articles/components/article-card";
 import { ArticleFilters } from "@/features/articles/components/article-filters";
@@ -62,25 +64,33 @@ export const Route = createFileRoute("/_app/profile/$slug")({
   head: ({ loaderData, params }) => {
     const i18n = t();
     const articles = loaderData?.articles.docs ?? [];
+    const profile = loaderData?.profile;
     const profileTitle =
-      articles[0]?.profile?.title ?? loaderData?.profileSlug ?? params.slug;
+      profile?.title ??
+      articles[0]?.profile?.title ??
+      loaderData?.profileSlug ??
+      params.slug;
     const articleCount = loaderData?.articles.totalDocs ?? 0;
     const path = `/profile/${params.slug}`;
-    const description = `${i18n.home.metaDescription} ${articleCount} keyset${articleCount > 1 ? "s" : ""} ${profileTitle}.`;
+
+    // Use CMS description if available, otherwise generate dynamically
+    const dynamicDescription = `${i18n.home.subtitle} ${articleCount} keyset${articleCount > 1 ? "s" : ""} ${profileTitle}.`;
+    const description = profile?.description ?? dynamicDescription;
 
     return {
       meta: generateMeta({
         title: profileTitle,
         description,
         path,
-        image: articles[0]?.img.url,
+        image: profile?.thumbnail?.url ?? articles[0]?.img.url,
+        seo: profile,
       }),
       links: [generateCanonical(path)],
       scripts: [
         generateJsonLd(
           generateCollectionPageSchema({
-            name: profileTitle,
-            description,
+            name: profile?.meta?.title ?? profileTitle,
+            description: profile?.meta?.description ?? description,
             path,
             items: articles.map((a) => ({ slug: a.slug, title: a.title })),
           }),
@@ -95,10 +105,11 @@ function ProfilePage() {
   const navigate = useNavigate();
   const params = Route.useParams();
   const search = Route.useSearch();
-  const { articles, profileSlug } = Route.useLoaderData();
+  const { articles, profileSlug, profile } = Route.useLoaderData();
   const i18n = t();
 
-  const profileInfo = articles.docs[0]?.profile;
+  // Use full profile data if available, otherwise fall back to article's profile ref
+  const profileInfo = profile ?? articles.docs[0]?.profile;
   const hasActiveFilters = !!(search.status || search.material);
 
   const handleFilterChange = (
@@ -172,7 +183,14 @@ function ProfilePage() {
 
       {/* Page Header */}
       <PageHeader className="py-4">
-        <PageTitle>{profileInfo?.title ?? profileSlug}</PageTitle>
+        <div className="flex flex-wrap items-center gap-3">
+          <PageTitle>{profileInfo?.title ?? profileSlug}</PageTitle>
+          {profileInfo?.shape && (
+            <Badge variant="outline" className="text-xs">
+              {i18n.pages.profile.shapes[profileInfo.shape]}
+            </Badge>
+          )}
+        </div>
         {articles.totalDocs > 0 && (
           <PageDescription>
             {articles.totalDocs} article{articles.totalDocs > 1 ? "s" : ""}
@@ -216,21 +234,25 @@ function ProfilePage() {
               </EmptyContent>
             </Empty>
           ) : (
-            <CardGrid as="ul">
-              {articles.docs.map((article) => (
-                <GridCard
-                  key={article.id}
-                  as="li"
-                  className="col-span-2 md:col-span-2"
-                >
-                  <ArticleCard
-                    article={article}
-                    preload="viewport"
-                    variant="grid"
-                  />
-                </GridCard>
-              ))}
-            </CardGrid>
+            <>
+              <SectionDivider />
+              <CardGrid as="ul">
+                {articles.docs.map((article) => (
+                  <GridCard
+                    key={article.id}
+                    as="li"
+                    className="col-span-2 md:col-span-2"
+                  >
+                    <ArticleCard
+                      article={article}
+                      preload="viewport"
+                      variant="grid"
+                    />
+                  </GridCard>
+                ))}
+              </CardGrid>
+              <SectionDivider />
+            </>
           )}
         </PageSectionContent>
       </PageSection>

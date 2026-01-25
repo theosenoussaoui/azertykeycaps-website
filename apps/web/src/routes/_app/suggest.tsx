@@ -1,8 +1,16 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { ClockIcon } from "lucide-react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { LightbulbIcon, ArrowRightIcon } from "lucide-react";
 
 import { PageError } from "@/components/errors/page-error";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import {
+  Empty,
+  EmptyContent,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import {
   PageContainer,
   PageDescription,
@@ -32,20 +40,30 @@ export const Route = createFileRoute("/_app/suggest")({
   }),
   staleTime: 60 * 60_000,
   gcTime: 24 * 60 * 60_000,
-  head: () => {
+  head: ({ loaderData }) => {
     const i18n = t();
+    const content = loaderData?.content;
+
+    // Use CMS content with i18n fallbacks
+    const title = content?.title ?? i18n.pages.suggest.title;
+    const description =
+      content?.meta?.description ??
+      content?.description ??
+      i18n.pages.suggest.metaDescription;
+
     return {
       meta: generateMeta({
-        title: i18n.pages.suggest.title,
-        description: i18n.pages.suggest.metaDescription,
+        title,
+        description,
         path: "/suggest",
+        seo: content,
       }),
       links: [generateCanonical("/suggest")],
       scripts: [
         generateJsonLd(
           generateWebPageSchema({
-            name: i18n.pages.suggest.title,
-            description: i18n.pages.suggest.metaDescription,
+            name: title,
+            description,
             path: "/suggest",
           }),
         ),
@@ -71,12 +89,23 @@ function SuggestPage() {
       <PageSection>
         <PageSectionContent>
           {!content?.formEnabled && (
-            <Alert variant="info">
-              <ClockIcon className="size-4" />
-              <AlertDescription>
-                {i18n.pages.suggest.comingSoon}
-              </AlertDescription>
-            </Alert>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia variant="icon">
+                  <LightbulbIcon />
+                </EmptyMedia>
+                <EmptyTitle as="h2">{i18n.pages.suggest.comingSoon}</EmptyTitle>
+                <EmptyDescription>
+                  {i18n.pages.suggest.comingSoonDescription}
+                </EmptyDescription>
+              </EmptyHeader>
+              <EmptyContent>
+                <Button variant="secondary" render={<Link to="/" />}>
+                  {i18n.pages.suggest.browseExisting}
+                  <ArrowRightIcon />
+                </Button>
+              </EmptyContent>
+            </Empty>
           )}
         </PageSectionContent>
       </PageSection>

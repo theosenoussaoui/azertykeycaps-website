@@ -178,6 +178,173 @@ Badges use **Geist Mono** font (`font-mono`) for a brutalist, technical aestheti
 </Empty>
 ```
 
+### Empty State Rule
+
+**Every empty state MUST have one clear next action.**
+
+```tsx
+// Good - has action button
+<Empty>
+  <EmptyHeader>
+    <EmptyMedia variant="icon"><InboxIcon /></EmptyMedia>
+    <EmptyTitle>No articles yet</EmptyTitle>
+    <EmptyDescription>Check back later for new keysets.</EmptyDescription>
+  </EmptyHeader>
+  <EmptyContent>
+    <Button variant="secondary" render={<a href="#browse-profiles" />}>
+      Browse profiles
+      <ArrowRightIcon />
+    </Button>
+  </EmptyContent>
+</Empty>
+
+// Bad - no action
+<Empty>
+  <EmptyHeader>
+    <EmptyTitle>No articles</EmptyTitle>
+    <EmptyDescription>Nothing here.</EmptyDescription>
+  </EmptyHeader>
+  {/* Missing EmptyContent with action! */}
+</Empty>
+```
+
+### Coming Soon Pattern
+
+For features not yet available:
+
+```tsx
+<Empty>
+  <EmptyHeader>
+    <EmptyMedia variant="icon">
+      <LightbulbIcon />
+    </EmptyMedia>
+    <EmptyTitle>Coming soon</EmptyTitle>
+    <EmptyDescription>
+      This feature will be available soon. In the meantime, browse existing
+      content.
+    </EmptyDescription>
+  </EmptyHeader>
+  <EmptyContent>
+    <Button variant="secondary" render={<Link to="/" />}>
+      Browse keysets
+      <ArrowRightIcon />
+    </Button>
+  </EmptyContent>
+</Empty>
+```
+
+---
+
+## Related Content Section
+
+For showing related items at the end of detail pages.
+
+### Pattern
+
+```tsx
+{
+  relatedArticles.length > 0 && (
+    <PageSection>
+      <PageSectionHeader>
+        <PageSectionTitle>{i18n.articles.related}</PageSectionTitle>
+      </PageSectionHeader>
+      <PageSectionContent>
+        <SectionDivider />
+        <CardGrid as="ul">
+          {relatedArticles.map((article) => (
+            <GridCard
+              key={article.id}
+              as="li"
+              className="col-span-2 md:col-span-2"
+            >
+              <ArticleCard
+                article={article}
+                preload="viewport"
+                variant="grid"
+              />
+            </GridCard>
+          ))}
+        </CardGrid>
+        <SectionDivider />
+      </PageSectionContent>
+    </PageSection>
+  );
+}
+```
+
+### Data Fetching
+
+Related items should be fetched in the same loader as the main content:
+
+```tsx
+// In route loader
+const article = await getArticleBySlug({ data: { slug: params.slug } });
+const relatedArticles = article.profile
+  ? await getRelatedArticles({
+      data: {
+        profileSlug: article.profile.slug,
+        excludeSlug: article.slug,
+        limit: 4,
+      },
+    })
+  : { docs: [] };
+
+return { article, relatedArticles: relatedArticles.docs };
+```
+
+### Guidelines
+
+- Fetch 4 related items (fits nicely in 8-column grid)
+- Exclude current item from results
+- Only show section if results > 0
+- Use same card variant as listing pages (`variant="grid"`)
+
+---
+
+## Filter Components
+
+### Accessibility Requirements
+
+All filter Select components must have `aria-label`:
+
+```tsx
+<Select value={status} onValueChange={setStatus}>
+  <SelectTrigger className="w-40" aria-label={i18n.articles.filters.status}>
+    <SelectValue>
+      {status ? i18n.status[status] : i18n.articles.filters.status}
+    </SelectValue>
+  </SelectTrigger>
+  <SelectContent>
+    <SelectItem value="">{i18n.articles.filters.all}</SelectItem>
+    {/* Options */}
+  </SelectContent>
+</Select>
+```
+
+### Filter Group Pattern
+
+```tsx
+<div className="flex flex-wrap items-center gap-3">
+  {/* Profile filter (optional) */}
+  {showProfileFilter && (
+    <Select aria-label={i18n.articles.filters.profile}>...</Select>
+  )}
+
+  {/* Status filter */}
+  <Select aria-label={i18n.articles.filters.status}>...</Select>
+
+  {/* Material filter */}
+  <Select aria-label={i18n.articles.filters.material}>...</Select>
+
+  {/* Clear button (only when filters active) */}
+  {hasActiveFilters && (
+    <Button variant="ghost" size="sm" onClick={onClearFilters}>
+      {i18n.common.clearFilters}
+    </Button>
+  )}
+</div>
+```
+
 ---
 
 ## Component State Matrix
@@ -225,11 +392,92 @@ Use the `render` prop for composition with TanStack Router `<Link>`:
   Home
 </NavigationMenuLink>
 
+// Correct - Badge as link
+<Badge
+  variant="outline"
+  className="cursor-pointer hover:bg-accent"
+  render={<Link to="/profile/$slug" params={{ slug: "cherry" }} />}
+>
+  Cherry
+</Badge>
+
+// Correct - BreadcrumbLink
+<BreadcrumbLink render={<Link to="/" />}>
+  Home
+</BreadcrumbLink>
+
 // Incorrect - wrapping creates nested interactive elements
 <Link to="/about">
   <Button>About</Button>
 </Link>
+
+// Incorrect - Link wrapping Badge
+<Link to="/profile/cherry">
+  <Badge>Cherry</Badge>
+</Link>
 ```
+
+---
+
+## Breadcrumb
+
+Navigation breadcrumbs for showing location in page hierarchy.
+
+### Components
+
+| Component             | Element  | Purpose                        |
+| --------------------- | -------- | ------------------------------ |
+| `Breadcrumb`          | `<nav>`  | Container with aria-label      |
+| `BreadcrumbList`      | `<ol>`   | Ordered list of items          |
+| `BreadcrumbItem`      | `<li>`   | List item wrapper              |
+| `BreadcrumbLink`      | `<a>`    | Clickable link (render prop)   |
+| `BreadcrumbPage`      | `<span>` | Current page (not clickable)   |
+| `BreadcrumbSeparator` | `<li>`   | Separator (chevron by default) |
+
+### Usage
+
+```tsx
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+
+<Breadcrumb>
+  <BreadcrumbList>
+    <BreadcrumbItem>
+      <BreadcrumbLink render={<Link to="/" />}>Home</BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbLink
+        render={<Link to="/profile/$slug" params={{ slug: "cherry" }} />}
+      >
+        Cherry
+      </BreadcrumbLink>
+    </BreadcrumbItem>
+    <BreadcrumbSeparator />
+    <BreadcrumbItem>
+      <BreadcrumbPage className="max-w-48 truncate">GMK Dracula</BreadcrumbPage>
+    </BreadcrumbItem>
+  </BreadcrumbList>
+</Breadcrumb>;
+```
+
+### When to Use
+
+- Article detail pages (Home > Profile > Article)
+- Nested category pages
+- Multi-step wizards
+
+### Accessibility
+
+- Uses `<nav aria-label="breadcrumb">` for screen readers
+- Current page uses `aria-current="page"`
+- Separators are `aria-hidden`
 
 ---
 
