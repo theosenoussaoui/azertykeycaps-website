@@ -30,7 +30,7 @@ interface CardGridProps {
 /**
  * Grid container for cards.
  * Responsive: 2 columns on mobile, 8 on desktop.
- * No gap - vertical lines come from GridLines overlay.
+ * No borders on container - GridCard handles borders on hover.
  */
 export function CardGrid({
   children,
@@ -56,11 +56,12 @@ interface GridCardProps {
 
 /**
  * Card for use within CardGrid.
- * Vertical grid lines come from the GridLines overlay.
- * Horizontal lines (top/bottom of grid) come from SectionDivider.
+ * No visible borders by default, visible outline on hover.
+ * Creates PayloadCMS-style hover effect where only hovered card shows border.
  *
  * Styling:
- * - No borders (handled by GridLines + SectionDivider)
+ * - No borders by default
+ * - Hover: outline-border visible + bg-accent highlight
  * - No shadow, no rounded corners (brutalist)
  */
 export function GridCard({
@@ -70,7 +71,10 @@ export function GridCard({
 }: GridCardProps) {
   return (
     <Component
-      className={cn("bg-card text-card-foreground", className)}
+      className={cn(
+        "bg-card text-card-foreground transition-colors duration-150 hover:bg-accent hover:outline hover:outline-1 hover:outline-border",
+        className,
+      )}
       data-slot="grid-card"
     >
       {children}

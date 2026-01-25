@@ -7,26 +7,25 @@ const DESKTOP_COLUMNS = 4;
  * GridLines - Responsive decorative grid overlay.
  *
  * Renders vertical lines spanning the full viewport height
- * to enforce visual consistency across the site.
+ * constrained within the max-w-7xl container bounds.
  *
  * Features:
- * - Fixed positioning (covers full viewport)
+ * - Fixed positioning with flex centering
  * - Responsive: 2 columns on mobile, 4 columns on desktop (md+)
- * - Aligned with max-w-7xl container (1280px)
+ * - Constrained to max-w-7xl container (1280px) - does NOT extend to viewport edges
  * - opacity-60 for visibility
  * - Decorative only (aria-hidden, pointer-events-none)
  * - z-0 (behind all content)
- * - Same padding as content containers
  */
 export function GridLines() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none fixed inset-0 z-0 opacity-60"
+      className="pointer-events-none fixed inset-0 z-0 flex justify-center opacity-60"
       data-slot="grid-lines"
     >
-      {/* Inner container matches content container padding and max-width */}
-      <div className="mx-auto size-full max-w-7xl px-4 sm:px-6 lg:px-8">
+      {/* Constrained inner container - matches page container */}
+      <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Mobile: 2 columns */}
         <div className="grid size-full grid-cols-2 md:hidden">
           {Array.from({ length: MOBILE_COLUMNS }, (_, i) => (

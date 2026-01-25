@@ -9,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { DitherShader } from "@/components/ui/dither-shader";
 import {
   OptimizedImage,
   RESPONSIVE_WIDTHS,
@@ -32,11 +31,11 @@ export function ArticleCard({
 }: ArticleCardProps) {
   const i18n = t();
 
-  // Grid variant: no borders (CardGrid handles them), no shadow
+  // Grid variant: no borders (CardGrid handles them), no shadow, transparent bg for GridCard hover
   // Default variant: full border and shadow
   const cardClassName =
     variant === "grid"
-      ? "h-full overflow-hidden pt-0 border-0 shadow-none"
+      ? "h-full overflow-hidden pt-0 border-0 bg-transparent shadow-none"
       : "h-full overflow-hidden pt-0 transition-shadow hover:shadow-lg";
 
   return (
@@ -47,32 +46,19 @@ export function ArticleCard({
         preload={preload}
         className="group block h-full"
       >
-        {/* Card with no top padding (pt-0) for flush image, overflow-hidden for effects */}
+        {/* Card with no top padding (pt-0) for flush image */}
         <Card className={cardClassName}>
-          {/* Article Image - flush with top edge, with hover dithering effect */}
+          {/* Article Image - flush with top edge, grayscale on hover */}
           <figure className="relative aspect-video overflow-hidden">
-            {/* Normal image - visible by default, hidden on hover */}
             <OptimizedImage
               src={article.img.url}
               alt={article.img.alt}
               widths={RESPONSIVE_WIDTHS.card}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-              className="absolute inset-0 size-full object-cover transition-opacity duration-300 group-hover:opacity-0 motion-reduce:transition-none"
+              className="size-full object-cover grayscale-0 transition-[filter] duration-200 group-hover:grayscale motion-reduce:transition-none"
               width={768}
               height={432}
             />
-            {/* Dithered image - hidden by default, visible on hover */}
-            <div className="absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100 motion-reduce:transition-none">
-              <DitherShader
-                src={article.img.url}
-                gridSize={1}
-                ditherMode="bayer"
-                colorMode="grayscale"
-                pixelRatio={1}
-                threshold={0.4}
-                className="size-full"
-              />
-            </div>
             {/* New Badge - Positioned over image */}
             {article.isNew && (
               <Badge variant="default" className="absolute top-2 right-2 z-20">

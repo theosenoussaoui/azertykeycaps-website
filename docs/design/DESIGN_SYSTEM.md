@@ -1323,9 +1323,10 @@ The divider spans 100vw using the `left-1/2 -ml-[50vw]` technique and uses `opac
 
 | Version | Date       | Changes                                                                                                                                                                            |
 | ------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.6     | 2026-01-25 | PayloadCMS-style grid: integrated borders on CardGrid/GridCard, bg-accent hover, grayscale image hover. Removed DitherShader for performance.                                      |
 | 1.5     | 2026-01-25 | Added breadcrumb navigation pattern, related content sections, filter accessibility (aria-labels), empty state action requirement, profile shape badges, Badge render prop pattern |
 | 1.4     | 2026-01-19 | Changed grid system from 6 to 8 columns on desktop                                                                                                                                 |
-| 1.3     | 2026-01-19 | Updated container to max-w-7xl (1280px), responsive 2/6 column grid system, SectionDivider component, Geist Mono for headings/badges/nav, DitherShader hover effect on ArticleCard |
+| 1.3     | 2026-01-19 | Updated container to max-w-7xl (1280px), responsive 2/6 column grid system, SectionDivider component, Geist Mono for headings/badges/nav                                           |
 | 1.2     | 2026-01-18 | Added forms, URL state, content handling, dark mode, hydration, performance, grid lines sections. Unified container to max-w-6xl                                                   |
 | 1.1     | 2026-01-18 | Added semantic HTML props (CardTitle as, EmptyTitle as), oklch semantic colors, accessibility improvements, animation guidelines                                                   |
 | 1.0     | 2026-01-16 | Initial design system documentation                                                                                                                                                |

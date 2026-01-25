@@ -645,32 +645,41 @@ For cards with images that should be flush with the card edge:
 
 ---
 
-## CardGrid Pattern (Vercel-Style)
+## CardGrid Pattern (PayloadCMS-Style)
 
-Card borders become the grid lines themselves. No overlay needed.
+Integrated grid borders with hover effects. Card borders form the grid lines.
 
 ### Components
 
-| Component  | Element              | Purpose                               |
-| ---------- | -------------------- | ------------------------------------- |
-| `CardGrid` | `<div>`, `<ul>`, etc | Grid container with border-r border-b |
-| `GridCard` | `<div>`, `<li>`, etc | Grid cell with border-l border-t      |
+| Component  | Element              | Purpose                                           |
+| ---------- | -------------------- | ------------------------------------------------- |
+| `CardGrid` | `<div>`, `<ul>`, etc | Grid container with border-r border-b             |
+| `GridCard` | `<div>`, `<li>`, etc | Grid cell with border-l border-t + hover bg-accent |
 
 ### How It Works
 
 ```
 CardGrid: border-r border-b (closes the grid on right and bottom)
 GridCard: border-l border-t (forms the grid with left and top borders)
+         + hover:bg-accent (subtle background highlight on hover)
 
 ┌─────────┬─────────┬─────────┐
-│ border-l│ border-l│ border-l│  <- border-t on each GridCard
-├─────────┼─────────┼─────────┤
+│ border-l│ border-l│ HOVER   │  <- border-t on each GridCard
+├─────────┼─────────┼─────────┤     bg-accent on hovered cell
 │ GridCard│ GridCard│ GridCard│
 │    1    │    2    │    3    │
 └─────────┴─────────┴─────────┘
                     ↑
           CardGrid has border-r border-b
 ```
+
+### Hover Effects
+
+| Element       | Hover Effect                              | Implementation                          |
+| ------------- | ----------------------------------------- | --------------------------------------- |
+| `GridCard`    | Subtle background highlight               | `transition-colors hover:bg-accent`     |
+| `ArticleCard` | Image desaturation                        | `grayscale-0 group-hover:grayscale`     |
+| Inner `Card`  | None (transparent bg lets GridCard show)  | `bg-transparent`                        |
 
 ### Responsive Grid (2/8 Columns)
 
@@ -690,6 +699,7 @@ import { CardGrid, GridCard } from "@/components/ui/card-grid";
 import { ArticleCard } from "@/features/articles/components/article-card";
 
 // CardGrid automatically uses grid-cols-2 md:grid-cols-8
+// GridCard provides hover:bg-accent automatically
 <CardGrid as="ul">
   {articles.map((article) => (
     <GridCard
@@ -714,12 +724,14 @@ import { ArticleCard } from "@/features/articles/components/article-card";
 
 ### ArticleCard Grid Variant
 
-When using `ArticleCard` inside a `GridCard`, use `variant="grid"` to remove the card's own borders:
+When using `ArticleCard` inside a `GridCard`, use `variant="grid"`:
 
 ```tsx
-// ArticleCard variant="grid" removes:
-// - border (handled by GridCard)
-// - shadow (no shadow in grid layout)
+// ArticleCard variant="grid":
+// - Removes border (CardGrid handles it)
+// - Removes shadow (no shadow in grid layout)
+// - Sets bg-transparent (lets GridCard hover show through)
+// - Image goes grayscale on hover
 
 <ArticleCard article={article} variant="grid" />
 ```
@@ -727,9 +739,9 @@ When using `ArticleCard` inside a `GridCard`, use `variant="grid"` to remove the
 ### Benefits
 
 1. **No alignment issues** - Card edges ARE the grid lines
-2. **Simpler CSS** - No z-index, no fixed positioning overlay
-3. **Responsive** - Syncs with GridLines via media queries
-4. **Performance** - No extra DOM elements for grid overlay
+2. **Integrated hover** - GridCard handles hover state, consistent across all cards
+3. **Performance** - CSS filter (grayscale) instead of Canvas manipulation
+4. **Responsive** - Syncs with GridLines via media queries
 
 ---
 

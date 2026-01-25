@@ -1,10 +1,9 @@
 import { cn } from "@/lib/utils";
 
 /**
- * SectionDivider - Full-width horizontal line that spans the entire viewport.
+ * SectionDivider - Horizontal line that spans the container width.
  *
- * Used to visually separate sections with a line that extends beyond
- * the container width to the edges of the screen.
+ * Used to visually separate sections. Stays within the container bounds.
  *
  * Usage:
  * ```tsx
@@ -19,10 +18,7 @@ export function SectionDivider({ className }: SectionDividerProps) {
   return (
     <div
       aria-hidden="true"
-      className={cn(
-        "relative right-1/2 left-1/2 -mr-[50vw] -ml-[50vw] w-screen border-t border-border opacity-60",
-        className,
-      )}
+      className={cn("w-full border-t border-border opacity-60", className)}
       data-slot="section-divider"
     />
   );

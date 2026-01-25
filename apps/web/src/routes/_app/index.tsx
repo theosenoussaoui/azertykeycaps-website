@@ -194,7 +194,7 @@ function HomeComponent() {
                   preload="viewport"
                   className="block h-full"
                 >
-                  <Card className="h-full border-0 shadow-none transition-colors hover:bg-accent">
+                  <Card className="h-full border-0 bg-transparent shadow-none">
                     <CardHeader>
                       <CardTitle className="flex items-center justify-between">
                         <span>{profile.title}</span>
