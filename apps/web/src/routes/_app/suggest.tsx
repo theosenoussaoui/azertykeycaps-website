@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/page-container";
 import { getSuggestContent } from "@/features/globals/api/get-suggest-content";
 import { t } from "@/i18n";
+import { buildCacheHeaders } from "@/lib/cache-tags";
 import {
   generateCanonical,
   generateJsonLd,
@@ -31,17 +32,14 @@ import {
 export const Route = createFileRoute("/_app/suggest")({
   component: SuggestPage,
   loader: async () => {
-    const content = await getSuggestContent();
-    return { content };
+    const [content, i18n] = await Promise.all([getSuggestContent(), t()]);
+    return { content, i18n };
   },
-  headers: () => ({
-    "Cache-Control":
-      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
-  }),
+  headers: () => buildCacheHeaders({ global: ["suggest"] }),
   staleTime: 60 * 60_000,
   gcTime: 24 * 60 * 60_000,
   head: ({ loaderData }) => {
-    const i18n = t();
+    const i18n = loaderData?.i18n ?? t();
     const content = loaderData?.content;
 
     // Use CMS content with i18n fallbacks
@@ -74,8 +72,7 @@ export const Route = createFileRoute("/_app/suggest")({
 });
 
 function SuggestPage() {
-  const { content } = Route.useLoaderData();
-  const i18n = t();
+  const { content, i18n } = Route.useLoaderData();
 
   return (
     <PageContainer>

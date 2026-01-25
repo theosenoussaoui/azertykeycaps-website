@@ -12,6 +12,7 @@ import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { GridLines } from "@/components/ui/grid-lines";
 import { getLayoutData } from "@/features/globals/api/get-layout-data";
+import { buildCacheHeaders } from "@/lib/cache-tags";
 
 export interface AppLayoutContext {
   socialNetworks: SocialNetworks | null;
@@ -26,10 +27,7 @@ export const Route = createFileRoute("/_app")({
       profiles: data.profiles,
     };
   },
-  headers: () => ({
-    "Cache-Control":
-      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
-  }),
+  headers: () => buildCacheHeaders({}),
   staleTime: 10 * 60_000,
   gcTime: 60 * 60_000,
   shouldReload: false,

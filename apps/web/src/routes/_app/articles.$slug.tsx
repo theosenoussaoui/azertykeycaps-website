@@ -23,6 +23,7 @@ import { getRelatedArticles } from "@/features/articles/api/get-related-articles
 import { ArticleCard } from "@/features/articles/components/article-card";
 import { ArticleContent } from "@/features/articles/components/article-content";
 import { t } from "@/i18n";
+import { buildCacheHeaders } from "@/lib/cache-tags";
 import { getPreloadImageUrl } from "@/lib/image-utils";
 import {
   generateArticleSchema,
@@ -34,7 +35,10 @@ import {
 export const Route = createFileRoute("/_app/articles/$slug")({
   component: ArticleDetailPage,
   loader: async ({ params }) => {
-    const article = await getArticleBySlug({ data: { slug: params.slug } });
+    const [article, i18n] = await Promise.all([
+      getArticleBySlug({ data: { slug: params.slug } }),
+      t(),
+    ]);
 
     if (!article) {
       throw notFound();
@@ -51,14 +55,14 @@ export const Route = createFileRoute("/_app/articles/$slug")({
         })
       : { docs: [] };
 
-    return { article, relatedArticles: relatedArticles.docs };
+    return { article, relatedArticles: relatedArticles.docs, i18n };
   },
   head: ({ loaderData, params }) => {
     const article = loaderData?.article;
     // Use optimized image URL for preloading (matches what OptimizedImage renders)
     const heroImageUrl = getPreloadImageUrl(article?.img.url, "hero");
     const path = `/articles/${params.slug}`;
-    const i18n = t();
+    const i18n = loaderData?.i18n ?? t();
 
     // Use CMS SEO data with fallbacks to article content
     const title = article?.title ?? "Article";
@@ -103,18 +107,18 @@ export const Route = createFileRoute("/_app/articles/$slug")({
       ).filter(Boolean),
     };
   },
-  headers: () => ({
-    "Cache-Control":
-      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
-  }),
+  headers: ({ loaderData }) =>
+    buildCacheHeaders({
+      articleSlug: loaderData?.article?.slug,
+      profileArticlesSlug: loaderData?.article?.profile?.slug,
+    }),
   staleTime: 5 * 60_000,
   gcTime: 30 * 60_000,
   errorComponent: PageErrorWithBack,
 });
 
 function ArticleDetailPage() {
-  const { article, relatedArticles } = Route.useLoaderData();
-  const i18n = t();
+  const { article, relatedArticles, i18n } = Route.useLoaderData();
 
   return (
     <PageContainer>

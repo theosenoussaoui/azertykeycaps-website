@@ -34,6 +34,7 @@ import { getLatestArticles } from "@/features/articles/api/get-latest-articles";
 import { ArticleCard } from "@/features/articles/components/article-card";
 import { getHomepageContent } from "@/features/globals/api/get-homepage-content";
 import { t } from "@/i18n";
+import { buildCacheHeaders } from "@/lib/cache-tags";
 import { getPreloadImageUrl } from "@/lib/image-utils";
 import {
   generateCanonical,
@@ -47,20 +48,18 @@ const appRouteApi = getRouteApi("/_app");
 export const Route = createFileRoute("/_app/")({
   component: HomeComponent,
   loader: async () => {
-    const [articlesData, homepage] = await Promise.all([
+    const [articlesData, homepage, i18n] = await Promise.all([
       getLatestArticles(),
       getHomepageContent(),
+      t(),
     ]);
-    return { ...articlesData, homepage };
+    return { ...articlesData, homepage, i18n };
   },
-  headers: () => ({
-    "Cache-Control":
-      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
-  }),
+  headers: () => buildCacheHeaders({ global: ["homepage"] }),
   staleTime: 60_000,
   gcTime: 5 * 60_000,
   head: ({ loaderData }) => {
-    const i18n = t();
+    const i18n = loaderData?.i18n ?? t();
     const articles = loaderData?.articles?.docs ?? [];
     const homepage = loaderData?.homepage;
     const firstArticle = articles[0];
@@ -104,9 +103,8 @@ export const Route = createFileRoute("/_app/")({
 });
 
 function HomeComponent() {
-  const { articles, homepage } = Route.useLoaderData();
+  const { articles, homepage, i18n } = Route.useLoaderData();
   const { profiles } = appRouteApi.useLoaderData();
-  const i18n = t();
 
   // Use CMS content with i18n fallbacks
   const title = homepage?.title ?? i18n.home.title;

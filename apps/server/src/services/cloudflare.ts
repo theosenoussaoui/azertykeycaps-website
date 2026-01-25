@@ -1,24 +1,25 @@
-import type { CacheInvalidationPayload } from "@azertykeycaps-app/schemas";
-
-import { buildUrlsToPurge } from "../lib/cache-keys";
-
-export async function purgeCloudflareCDN(
+/**
+ * Purge Cloudflare CDN cache by cache tags.
+ *
+ * Cache tags are set on responses via the `Cache-Tag` HTTP header.
+ * When we purge by tag, Cloudflare invalidates all cached responses
+ * that have that tag, without needing to know the exact URLs.
+ *
+ * @see https://developers.cloudflare.com/cache/how-to/purge-cache/purge-by-tags/
+ */
+export async function purgeCloudflareCDNByTags(
   zoneId: string,
   apiToken: string,
-  webUrl: string,
-  payload: CacheInvalidationPayload,
-): Promise<{ success: boolean; message: string; purgedUrls?: string[] }> {
-  const urlsToPurge = buildUrlsToPurge(webUrl, payload);
-
-  if (urlsToPurge.length === 0) {
+  tags: string[],
+): Promise<{ success: boolean; message: string; purgedTags?: string[] }> {
+  if (tags.length === 0) {
     return {
       success: true,
-      message: "No CDN URLs to purge for this content type",
+      message: "No cache tags to purge",
     };
   }
 
-  // URLs logged in production could leak internal structure - log count only
-  console.log(`[cache] Purging ${urlsToPurge.length} URLs`);
+  console.log(`[cache] Purging ${tags.length} cache tags`);
 
   try {
     const response = await fetch(
@@ -29,12 +30,11 @@ export async function purgeCloudflareCDN(
           Authorization: `Bearer ${apiToken}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ files: urlsToPurge }),
+        body: JSON.stringify({ tags }),
       },
     );
 
     const responseData = await response.json();
-    // Avoid logging full API response - only log success/failure
 
     if (!response.ok) {
       return {
@@ -45,8 +45,8 @@ export async function purgeCloudflareCDN(
 
     return {
       success: true,
-      message: `Purged ${urlsToPurge.length} URLs`,
-      purgedUrls: urlsToPurge,
+      message: `Purged ${tags.length} cache tags`,
+      purgedTags: tags,
     };
   } catch (error) {
     return {

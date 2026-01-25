@@ -1,5 +1,8 @@
 import type { CacheInvalidationPayload } from "@azertykeycaps-app/schemas";
 
+/**
+ * Build tRPC cache keys to invalidate in Workers Cache API.
+ */
 export function buildCacheKeys(
   serverUrl: string,
   _type: "collection" | "global",
@@ -26,58 +29,71 @@ export function buildCacheKeys(
   return keys;
 }
 
-export function buildUrlsToPurge(
-  webUrl: string,
+/**
+ * Build cache tags for Cloudflare CDN purge.
+ *
+ * Tag naming conventions (must match apps/web/src/lib/cache-tags.ts):
+ * - page:all                    → Universal tag, purges ALL pages
+ * - global:homepage             → Homepage-specific content
+ * - global:about                → About page content
+ * - global:suggest              → Suggestion page content
+ * - article:{slug}              → Individual article page
+ * - profile:{slug}              → Individual profile page
+ * - profile-articles:{slug}     → All articles belonging to a profile
+ */
+export function buildCacheTagsToPurge(
   payload: CacheInvalidationPayload,
 ): string[] {
-  const urls: string[] = [];
-  const { type, slug, articleSlug, profileSlug, relatedArticleSlugs } = payload;
+  const tags: string[] = [];
+  const { type, slug, articleSlug, profileSlug } = payload;
 
   if (type === "collection") {
     switch (slug) {
       case "articles":
-        urls.push(`${webUrl}/`);
+        // Homepage shows latest articles
+        tags.push("global:homepage");
+        // The specific article page
         if (articleSlug) {
-          urls.push(`${webUrl}/articles/${articleSlug}`);
+          tags.push(`article:${articleSlug}`);
         }
+        // Profile page that lists this article
         if (profileSlug) {
-          urls.push(`${webUrl}/profile/${profileSlug}`);
+          tags.push(`profile:${profileSlug}`);
         }
         break;
 
       case "keycap-profiles":
-        urls.push(`${webUrl}/`);
+        // Homepage shows profiles
+        tags.push("global:homepage");
         if (profileSlug) {
-          urls.push(`${webUrl}/profile/${profileSlug}`);
-        }
-        if (relatedArticleSlugs && relatedArticleSlugs.length > 0) {
-          for (const relatedSlug of relatedArticleSlugs) {
-            urls.push(`${webUrl}/articles/${relatedSlug}`);
-          }
+          // The profile page itself
+          tags.push(`profile:${profileSlug}`);
+          // All articles belonging to this profile
+          tags.push(`profile-articles:${profileSlug}`);
         }
         break;
 
       case "media":
+        // Media changes don't affect HTML cache
         break;
     }
   } else if (type === "global") {
     switch (slug) {
+      case "homepage":
+        tags.push("global:homepage");
+        break;
       case "informations-page":
-        urls.push(`${webUrl}/about`);
+        tags.push("global:about");
         break;
       case "suggestion-page":
-        urls.push(`${webUrl}/suggest`);
+        tags.push("global:suggest");
         break;
       case "social-networks":
-        urls.push(`${webUrl}/`);
-        urls.push(`${webUrl}/about`);
-        urls.push(`${webUrl}/suggest`);
-        break;
-      case "homepage":
-        urls.push(`${webUrl}/`);
+        // Social links are in the footer - purge ALL pages
+        tags.push("page:all");
         break;
     }
   }
 
-  return [...new Set(urls)];
+  return [...new Set(tags)];
 }

@@ -32,6 +32,7 @@ import { ArticleCard } from "@/features/articles/components/article-card";
 import { ArticleFilters } from "@/features/articles/components/article-filters";
 import { ArticlesPagination } from "@/features/articles/components/articles-pagination";
 import { t } from "@/i18n";
+import { buildCacheHeaders } from "@/lib/cache-tags";
 import {
   generateCanonical,
   generateCollectionPageSchema,
@@ -50,19 +51,22 @@ export const Route = createFileRoute("/_app/profile/$slug")({
     search: search.search,
   }),
   loader: async ({ params, deps }) => {
-    const data = await getArticlesByProfile({
-      data: { slug: params.slug, ...deps },
-    });
-    return data;
+    const [data, i18n] = await Promise.all([
+      getArticlesByProfile({
+        data: { slug: params.slug, ...deps },
+      }),
+      t(),
+    ]);
+    return { ...data, i18n };
   },
-  headers: () => ({
-    "Cache-Control":
-      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
-  }),
+  headers: ({ loaderData }) =>
+    buildCacheHeaders({
+      profileSlug: loaderData?.profile?.slug ?? loaderData?.profileSlug,
+    }),
   staleTime: 5 * 60_000,
   gcTime: 30 * 60_000,
   head: ({ loaderData, params }) => {
-    const i18n = t();
+    const i18n = loaderData?.i18n ?? t();
     const articles = loaderData?.articles.docs ?? [];
     const profile = loaderData?.profile;
     const profileTitle =
@@ -105,8 +109,7 @@ function ProfilePage() {
   const navigate = useNavigate();
   const params = Route.useParams();
   const search = Route.useSearch();
-  const { articles, profileSlug, profile } = Route.useLoaderData();
-  const i18n = t();
+  const { articles, profileSlug, profile, i18n } = Route.useLoaderData();
 
   // Use full profile data if available, otherwise fall back to article's profile ref
   const profileInfo = profile ?? articles.docs[0]?.profile;

@@ -11,6 +11,7 @@ import {
 import { getAboutContent } from "@/features/globals/api/get-about-content";
 import { RichTextContent } from "@/features/globals/components/rich-text-content";
 import { t } from "@/i18n";
+import { buildCacheHeaders } from "@/lib/cache-tags";
 import {
   generateAboutPageSchema,
   generateCanonical,
@@ -21,11 +22,11 @@ import {
 export const Route = createFileRoute("/_app/about")({
   component: AboutPage,
   loader: async () => {
-    const content = await getAboutContent();
-    return { content };
+    const [content, i18n] = await Promise.all([getAboutContent(), t()]);
+    return { content, i18n };
   },
   head: ({ loaderData }) => {
-    const i18n = t();
+    const i18n = loaderData?.i18n ?? t();
     const content = loaderData?.content;
 
     // Use CMS content with i18n fallbacks
@@ -51,18 +52,14 @@ export const Route = createFileRoute("/_app/about")({
       ].filter(Boolean),
     };
   },
-  headers: () => ({
-    "Cache-Control":
-      "public, max-age=300, s-maxage=300, stale-while-revalidate=3600",
-  }),
+  headers: () => buildCacheHeaders({ global: ["about"] }),
   staleTime: 60 * 60_000,
   gcTime: 24 * 60 * 60_000,
   errorComponent: PageError,
 });
 
 function AboutPage() {
-  const { content } = Route.useLoaderData();
-  const i18n = t();
+  const { content, i18n } = Route.useLoaderData();
 
   return (
     <PageContainer>
