@@ -197,14 +197,20 @@ export const articlesRouter = router({
             depth: 1,
             sort: "-createdAt",
             ...(Object.keys(where).length > 0 && { where }),
-            // Only select fields needed for article list/cards
+            // Select fields needed for rich article cards
             select: {
               id: true,
               title: true,
               slug: true,
               img: true,
               profile: true,
+              material: true,
               status: true,
+              startDate: true,
+              endDate: true,
+              url: true,
+              additionalUrl: true,
+              warningText: true,
               isNew: true,
             },
           },

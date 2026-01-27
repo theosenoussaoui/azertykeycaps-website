@@ -99,14 +99,20 @@ export const articleSchema = z
 // UI SCHEMAS (derived from base schema)
 // ============================================
 
-// Article card schema - only fields needed for list/grid display
+// Article card schema - fields needed for rich list/grid display
 export const articleCardSchema = articleSchema.pick({
   id: true,
   title: true,
   slug: true,
   img: true,
   profile: true,
+  material: true,
   status: true,
+  startDate: true,
+  endDate: true,
+  url: true,
+  additionalUrl: true,
+  warningText: true,
   isNew: true,
 });
 

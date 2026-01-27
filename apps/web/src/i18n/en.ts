@@ -52,9 +52,18 @@ export const en = {
     viewArticle: "View article",
     affiliateLink: "Affiliate link",
     additionalLink: "Additional link",
-    startDate: "Start",
-    endDate: "End",
+    startDate: "Start date",
+    endDate: "End date",
     related: "Similar keysets",
+    // Card labels
+    profile: "Profile",
+    material: "Material",
+    statusLabel: "Status",
+    noDate: "None",
+    indications: "Keyset indications",
+    noIndications: "No indication on this keyset.",
+    viewSet: "View set",
+    secondaryKit: "Secondary kit",
   },
   pages: {
     about: {
