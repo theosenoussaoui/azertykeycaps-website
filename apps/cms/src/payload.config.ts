@@ -22,6 +22,7 @@ import { Users } from "./collections/Users";
 // Globals
 import { Homepage } from "./globals/Homepage";
 import { InformationsPage } from "./globals/InformationsPage";
+import { NotFoundPage } from "./globals/NotFoundPage";
 import { SocialNetworks } from "./globals/SocialNetworks";
 import { SuggestionPage } from "./globals/SuggestionPage";
 
@@ -64,7 +65,13 @@ export default buildConfig({
     fallbackLanguage: "fr",
   },
   collections: [Users, Media, Articles, KeycapProfiles],
-  globals: [Homepage, SocialNetworks, InformationsPage, SuggestionPage],
+  globals: [
+    Homepage,
+    SocialNetworks,
+    InformationsPage,
+    SuggestionPage,
+    NotFoundPage,
+  ],
   editor: lexicalEditor(),
   secret:
     process.env.PAYLOAD_SECRET || (cloudflare.env as any).PAYLOAD_SECRET || "",
@@ -109,7 +116,12 @@ export default buildConfig({
     }),
     seoPlugin({
       collections: ["articles", "keycap-profiles"],
-      globals: ["homepage", "informations-page", "suggestion-page"],
+      globals: [
+        "homepage",
+        "informations-page",
+        "suggestion-page",
+        "not-found-page",
+      ],
       uploadsCollection: "media",
       tabbedUI: true,
       generateTitle: ({ doc }) => (doc as { title?: string })?.title ?? "",
@@ -137,6 +149,9 @@ export default buildConfig({
         }
         if (globalSlug === "suggestion-page") {
           return `${baseUrl}/suggest`;
+        }
+        if (globalSlug === "not-found-page") {
+          return `${baseUrl}/404`;
         }
         return baseUrl;
       },

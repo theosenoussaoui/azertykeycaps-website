@@ -1,6 +1,7 @@
 import type { ProfilePageFilters } from "@azertykeycaps-app/schemas";
 import { createServerFn } from "@tanstack/react-start";
 
+import { formatDate } from "@/lib/date-utils";
 import { serverTRPCClient } from "@/lib/server-trpc";
 
 type ProfilePageInput = { slug: string } & ProfilePageFilters;
@@ -14,7 +15,6 @@ type ProfilePageInput = { slug: string } & ProfilePageFilters;
 export const getArticlesByProfile = createServerFn({ method: "GET" })
   .inputValidator((data: ProfilePageInput) => data)
   .handler(async ({ data }) => {
-    // Fetch articles and profile data in parallel
     const [articlesResponse, profile] = await Promise.all([
       serverTRPCClient.articles.list.query({
         profile: data.slug,
@@ -28,8 +28,17 @@ export const getArticlesByProfile = createServerFn({ method: "GET" })
       serverTRPCClient.articles.profileBySlug.query({ slug: data.slug }),
     ]);
 
+    const articlesWithFormattedDates = {
+      ...articlesResponse,
+      docs: articlesResponse.docs.map((article) => ({
+        ...article,
+        startDate: formatDate(article.startDate),
+        endDate: formatDate(article.endDate),
+      })),
+    };
+
     return {
-      articles: articlesResponse,
+      articles: articlesWithFormattedDates,
       profileSlug: data.slug,
       profile,
     };

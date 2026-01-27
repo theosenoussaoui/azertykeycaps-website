@@ -57,6 +57,18 @@ export const suggestionPageSchema = z
   .merge(seoFieldsSchema);
 
 // ============================================
+// NOT FOUND PAGE GLOBAL
+// ============================================
+
+export const notFoundPageSchema = z
+  .object({
+    title: z.string(),
+    description: z.string(),
+    ctaText: z.string(),
+  })
+  .merge(seoFieldsSchema);
+
+// ============================================
 // TYPES
 // ============================================
 
@@ -65,3 +77,4 @@ export type SocialNetworks = z.infer<typeof socialNetworksSchema>;
 export type Homepage = z.infer<typeof homepageSchema>;
 export type InformationsPage = z.infer<typeof informationsPageSchema>;
 export type SuggestionPage = z.infer<typeof suggestionPageSchema>;
+export type NotFoundPage = z.infer<typeof notFoundPageSchema>;

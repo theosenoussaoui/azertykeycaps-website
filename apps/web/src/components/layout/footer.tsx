@@ -18,7 +18,7 @@ export default function Footer({ socialNetworks }: FooterProps) {
             href="https://github.com/theosenoussaoui"
             target="_blank"
             rel="noreferrer"
-            className="font-medium underline underline-offset-4"
+            className="font-mono font-semibold tracking-tight uppercase underline underline-offset-4"
           >
             @theosenoussaoui
           </a>{" "}
@@ -27,7 +27,7 @@ export default function Footer({ socialNetworks }: FooterProps) {
             href="https://www.instagram.com/plaketdebeur/"
             target="_blank"
             rel="noreferrer"
-            className="font-medium underline underline-offset-4"
+            className="font-mono font-semibold tracking-tight uppercase underline underline-offset-4"
           >
             @plaketdebeur
           </a>
@@ -40,7 +40,7 @@ export default function Footer({ socialNetworks }: FooterProps) {
                 href={network.url}
                 target="_blank"
                 rel="noreferrer"
-                className="font-mono text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="font-mono text-sm font-semibold tracking-tight text-muted-foreground uppercase transition-colors hover:text-foreground"
               >
                 {network.title}
               </a>

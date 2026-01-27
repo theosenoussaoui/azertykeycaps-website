@@ -1,7 +1,4 @@
-import "@fontsource/geist-mono/400.css";
-import "@fontsource/geist-sans/400.css";
-import "@fontsource/geist-sans/500.css";
-import "@fontsource/geist-sans/600.css";
+import "@fontsource-variable/inter";
 import "@payloadcms/next/css";
 import "./custom.scss";
 

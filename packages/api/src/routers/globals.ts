@@ -3,10 +3,12 @@ import {
   homepageSchema,
   informationsPageSchema,
   suggestionPageSchema,
+  notFoundPageSchema,
   type SocialNetworks,
   type Homepage,
   type InformationsPage,
   type SuggestionPage,
+  type NotFoundPage,
 } from "@azertykeycaps-app/schemas";
 
 import { publicProcedure, router } from "../index";
@@ -182,6 +184,41 @@ export const globalsRouter = router({
         return data;
       } catch (error) {
         console.error("Failed to fetch suggestion page:", error);
+        return null;
+      }
+    }),
+
+  /**
+   * Get not found page global (404 page content)
+   */
+  notFoundPage: publicProcedure
+    .output(notFoundPageSchema.nullable())
+    .query(async ({ ctx }) => {
+      try {
+        const response = await fetchCMS(
+          `${ctx.env.CMS_API_URL}/api/globals/not-found-page`,
+          ctx.env.CMS_API_KEY,
+          ctx.isDev ? undefined : CMS_CACHE_TTL,
+        );
+
+        if (!response.ok) {
+          console.error(`CMS API error: ${response.status}`);
+          return null;
+        }
+
+        const data = (await response.json()) as NotFoundPage;
+
+        const validation = notFoundPageSchema.safeParse(data);
+        if (!validation.success) {
+          console.error(
+            "[globals.notFoundPage] Output validation failed:",
+            JSON.stringify(validation.error.issues, null, 2),
+          );
+        }
+
+        return data;
+      } catch (error) {
+        console.error("Failed to fetch not found page:", error);
         return null;
       }
     }),

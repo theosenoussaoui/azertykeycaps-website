@@ -2,16 +2,24 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
-/* Self-hosted Geist fonts - eliminates render-blocking Google Fonts request */
+/* Self-hosted fonts - eliminates render-blocking Google Fonts request */
 @import "@fontsource-variable/geist";
-@import "@fontsource-variable/geist-mono";
+
+/* Berkeley Mono Variable - custom font for primary typography */
+@font-face {
+  font-family: "Berkeley Mono Variable";
+  src: url("/fonts/BerkeleyMonoVariable.woff2") format("woff2-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
 
 @custom-variant dark (&:is(.dark *));
 
 /* =============================================================================
    DESIGN SYSTEM: Azertykeycaps
-   
-   Typography: Geist Sans / Geist Mono
+
+   Typography: Berkeley Mono Variable (primary) / Inter Variable (classical text)
    Colors: Cool-tinted grays (hue ~250 for subtle blue tint)
    Borders: Sharp corners (--radius: 0)
    ============================================================================= */
@@ -118,17 +126,18 @@
 }
 
 @theme inline {
-  /* Typography - Geist for modern clean aesthetic */
   --font-sans:
     "Geist Variable", ui-sans-serif, system-ui, -apple-system,
     BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono:
-    "Geist Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+    "Berkeley Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
     Consolas, "Liberation Mono", monospace;
-  /* Heading font - Geist Mono for distinctive headings */
   --font-heading:
-    "Geist Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
+    "Berkeley Mono Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo,
     Consolas, "Liberation Mono", monospace;
+  --font-classical:
+    "Geist Variable", ui-sans-serif, system-ui, -apple-system,
+    BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 
   /* Color mappings */
   --color-sidebar-ring: var(--sidebar-ring);
@@ -215,7 +224,7 @@
   h4,
   h5,
   h6 {
-    @apply font-heading font-bold tracking-tight;
+    @apply font-heading leading-14 font-bold tracking-tight;
   }
 
   h1 {

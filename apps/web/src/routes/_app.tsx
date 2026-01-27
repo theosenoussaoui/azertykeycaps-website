@@ -1,5 +1,6 @@
 import type {
   KeycapProfileRef,
+  NotFoundPage,
   SocialNetworks,
 } from "@azertykeycaps-app/schemas";
 import {
@@ -12,19 +13,25 @@ import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { GridLines } from "@/components/ui/grid-lines";
 import { getLayoutData } from "@/features/globals/api/get-layout-data";
+import { getNotFoundContent } from "@/features/globals/api/get-not-found-content";
 import { buildCacheHeaders } from "@/lib/cache-tags";
 
 export interface AppLayoutContext {
   socialNetworks: SocialNetworks | null;
   profiles: KeycapProfileRef[];
+  notFoundContent: NotFoundPage | null;
 }
 
 export const Route = createFileRoute("/_app")({
   loader: async (): Promise<AppLayoutContext> => {
-    const data = await getLayoutData();
+    const [layoutData, notFoundContent] = await Promise.all([
+      getLayoutData(),
+      getNotFoundContent(),
+    ]);
     return {
-      socialNetworks: data.socialNetworks,
-      profiles: data.profiles,
+      socialNetworks: layoutData.socialNetworks,
+      profiles: layoutData.profiles,
+      notFoundContent,
     };
   },
   headers: () => buildCacheHeaders({}),
@@ -33,7 +40,6 @@ export const Route = createFileRoute("/_app")({
   shouldReload: false,
   component: AppLayout,
   errorComponent: ({ error }) => {
-    // Layout errors are critical - fall back to default error display
     return <ErrorComponent error={error} />;
   },
 });

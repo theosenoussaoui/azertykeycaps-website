@@ -1,3 +1,8 @@
+import type {
+  KeycapProfileRef,
+  NotFoundPage,
+  SocialNetworks,
+} from "@azertykeycaps-app/schemas";
 import type { QueryClient } from "@tanstack/react-query";
 import {
   HeadContent,
@@ -7,8 +12,17 @@ import {
 } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 
+import { NotFound } from "@/components/errors/not-found";
+import { getLayoutData } from "@/features/globals/api/get-layout-data";
+import { getNotFoundContent } from "@/features/globals/api/get-not-found-content";
 import appCss from "@/index.css?url";
 import { siteConfig } from "@/lib/seo";
+
+export interface RootLoaderData {
+  profiles: KeycapProfileRef[];
+  socialNetworks: SocialNetworks | null;
+  notFoundContent: NotFoundPage | null;
+}
 
 // Lazy load Toaster - toasts are rare, no need to block initial render
 const Toaster = lazy(() =>
@@ -39,6 +53,17 @@ export interface RouterAppContext {
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
+  loader: async (): Promise<RootLoaderData> => {
+    const [layoutData, notFoundContent] = await Promise.all([
+      getLayoutData(),
+      getNotFoundContent(),
+    ]);
+    return {
+      profiles: layoutData.profiles,
+      socialNetworks: layoutData.socialNetworks,
+      notFoundContent,
+    };
+  },
   head: () => ({
     meta: [
       {
@@ -72,6 +97,7 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
   }),
 
   component: RootDocument,
+  notFoundComponent: NotFound,
 });
 
 function RootDocument() {

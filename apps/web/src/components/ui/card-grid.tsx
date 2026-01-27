@@ -71,7 +71,7 @@ export function GridCard({
   return (
     <Component
       className={cn(
-        "h-full border-l border-border/60 bg-card text-card-foreground transition-[background-color] duration-150 hover:bg-accent/50",
+        "h-full border-l border-border/60 bg-card/50 text-card-foreground transition-[background-color] duration-150 hover:bg-accent/20",
         className,
       )}
       data-slot="grid-card"

@@ -1,5 +1,5 @@
 import type { Article } from "@azertykeycaps-app/schemas";
-import { Link } from "@tanstack/react-router";
+import { ClientOnly, Link } from "@tanstack/react-router";
 import { AlertTriangleIcon, ExternalLinkIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -154,7 +154,9 @@ export function ArticleContent({ article }: ArticleContentProps) {
                   </dt>
                   <dd>
                     <time dateTime={article.startDate}>
-                      {formatDate(article.startDate)}
+                      <ClientOnly fallback={article.startDate}>
+                        {formatDate(article.startDate)}
+                      </ClientOnly>
                     </time>
                   </dd>
                 </div>
@@ -166,7 +168,9 @@ export function ArticleContent({ article }: ArticleContentProps) {
                   </dt>
                   <dd>
                     <time dateTime={article.endDate}>
-                      {formatDate(article.endDate)}
+                      <ClientOnly fallback={article.endDate}>
+                        {formatDate(article.endDate)}
+                      </ClientOnly>
                     </time>
                   </dd>
                 </div>

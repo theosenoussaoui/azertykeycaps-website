@@ -67,12 +67,17 @@ function ProfileShapeMenu({
   return (
     <NavigationMenuItem>
       <NavigationMenuTrigger
-        render={<Button variant="ghost" className="font-mono" />}
+        render={
+          <Button
+            variant="ghost"
+            className="font-mono text-sm font-semibold tracking-tight uppercase"
+          />
+        }
       >
         {label}
       </NavigationMenuTrigger>
       <NavigationMenuContent>
-        <ul className="w-70 space-y-0.5 p-2">
+        <ul className="grid w-120 grid-cols-2 gap-1 p-2">
           {profiles.map((profile) => (
             <li key={profile.id}>
               <NavigationMenuLink
@@ -82,17 +87,17 @@ function ProfileShapeMenu({
                     to="/profile/$slug"
                     params={{ slug: profile.slug }}
                     preload="intent"
-                    className="font-mono font-medium"
+                    className="flex h-full flex-col gap-1 p-3"
                   />
                 }
                 active={location.pathname === `/profile/${profile.slug}`}
                 closeOnClick
               >
-                <span className="font-mono text-sm font-medium">
+                <span className="font-mono text-sm font-semibold tracking-tight uppercase">
                   {profile.title}
                 </span>
                 {profile.navbarDescription && (
-                  <span className="mt-0.5 block text-xs text-muted-foreground">
+                  <span className="block font-sans text-sm text-muted-foreground">
                     {profile.navbarDescription}
                   </span>
                 )}
@@ -122,7 +127,7 @@ function DesktopNav({ profiles }: { profiles: KeycapProfileRef[] }) {
             href="/"
             render={<Link to="/" />}
             active={location.pathname === "/"}
-            className="inline-flex h-9 items-center px-3 py-2 font-mono text-sm font-medium"
+            className="inline-flex h-9 items-center px-3 py-2 font-mono text-sm font-semibold tracking-tight uppercase"
           >
             {i18n.nav.home}
           </NavigationMenuLink>
@@ -146,7 +151,7 @@ function DesktopNav({ profiles }: { profiles: KeycapProfileRef[] }) {
             href="/about"
             render={<Link to="/about" />}
             active={location.pathname === "/about"}
-            className="inline-flex h-9 items-center px-3 py-2 font-mono text-sm font-medium"
+            className="inline-flex h-9 items-center px-3 py-2 font-mono text-sm font-semibold tracking-tight uppercase"
           >
             {i18n.nav.about}
           </NavigationMenuLink>
@@ -158,7 +163,7 @@ function DesktopNav({ profiles }: { profiles: KeycapProfileRef[] }) {
             href="/suggest"
             render={<Link to="/suggest" />}
             active={location.pathname === "/suggest"}
-            className="inline-flex h-9 items-center px-3 py-2 font-mono text-sm font-medium"
+            className="inline-flex h-9 items-center px-3 py-2 font-mono text-sm font-semibold tracking-tight uppercase"
           >
             {i18n.nav.suggest}
           </NavigationMenuLink>
@@ -208,7 +213,7 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
               render={
                 <Link
                   to="/"
-                  className="py-2 font-mono text-base font-medium text-foreground data-[active]:text-primary"
+                  className="py-2 font-mono text-base font-semibold tracking-tight text-foreground uppercase data-[active]:text-primary"
                   data-active={location.pathname === "/" || undefined}
                 />
               }
@@ -219,7 +224,7 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
               render={
                 <Link
                   to="/about"
-                  className="py-2 font-mono text-base font-medium text-foreground data-[active]:text-primary"
+                  className="py-2 font-mono text-base font-semibold tracking-tight text-foreground uppercase data-[active]:text-primary"
                   data-active={location.pathname === "/about" || undefined}
                 />
               }
@@ -230,7 +235,7 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
               render={
                 <Link
                   to="/suggest"
-                  className="py-2 font-mono text-base font-medium text-foreground data-[active]:text-primary"
+                  className="py-2 font-mono text-base font-semibold tracking-tight text-foreground uppercase data-[active]:text-primary"
                   data-active={location.pathname === "/suggest" || undefined}
                 />
               }
@@ -248,7 +253,7 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
                 {groupedProfiles.sculpted &&
                   groupedProfiles.sculpted.length > 0 && (
                     <div className="flex flex-col gap-1">
-                      <h3 className="py-2 text-xs font-semibold text-muted-foreground uppercase">
+                      <h3 className="py-2 text-xs font-semibold tracking-tight text-muted-foreground uppercase">
                         {i18n.nav.profileShapes.sculpted}
                       </h3>
                       {groupedProfiles.sculpted.map((profile) => (
@@ -259,7 +264,7 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
                               to="/profile/$slug"
                               params={{ slug: profile.slug }}
                               preload="intent"
-                              className="py-2 font-mono text-base font-medium text-foreground data-[active]:text-primary"
+                              className="py-2 font-mono text-base font-semibold tracking-tight text-foreground uppercase data-[active]:text-primary"
                               data-active={
                                 location.pathname ===
                                   `/profile/${profile.slug}` || undefined
@@ -277,7 +282,7 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
                 {groupedProfiles.uniform &&
                   groupedProfiles.uniform.length > 0 && (
                     <div className="flex flex-col gap-1">
-                      <h3 className="py-2 text-xs font-semibold text-muted-foreground uppercase">
+                      <h3 className="py-2 text-xs font-semibold tracking-tight text-muted-foreground uppercase">
                         {i18n.nav.profileShapes.uniform}
                       </h3>
                       {groupedProfiles.uniform.map((profile) => (
@@ -288,7 +293,7 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
                               to="/profile/$slug"
                               params={{ slug: profile.slug }}
                               preload="intent"
-                              className="py-2 font-mono text-base font-medium text-foreground data-[active]:text-primary"
+                              className="py-2 font-mono text-base font-semibold tracking-tight text-foreground uppercase data-[active]:text-primary"
                               data-active={
                                 location.pathname ===
                                   `/profile/${profile.slug}` || undefined

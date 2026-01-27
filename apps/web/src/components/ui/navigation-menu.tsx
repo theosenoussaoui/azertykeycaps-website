@@ -83,7 +83,7 @@ function NavigationMenuTrigger(props: NavigationMenuPrimitive.Trigger.Props) {
     <NavigationMenuPrimitive.Trigger
       data-slot="navigation-menu-trigger"
       className={cn(
-        "group inline-flex h-9 items-center justify-center gap-1 px-3 py-2 text-sm font-medium transition-colors",
+        "group inline-flex h-9 items-center justify-center gap-1 px-3 py-2 text-sm font-semibold transition-colors",
         "text-muted-foreground hover:text-foreground",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none",
         "data-[popup-open]:text-foreground",

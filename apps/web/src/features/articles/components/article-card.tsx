@@ -1,6 +1,7 @@
 import type { ArticleCard as ArticleCardType } from "@azertykeycaps-app/schemas";
 import { Link } from "@tanstack/react-router";
-import { ChevronDownIcon, ExternalLinkIcon } from "lucide-react";
+import { ChevronDownIcon } from "lucide-react";
+import { useState } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,9 +23,9 @@ import {
 } from "@/components/ui/optimized-image";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tooltip, TooltipPopup, TooltipTrigger } from "@/components/ui/tooltip";
 import { STATUS_VARIANTS } from "@/features/articles/utils/article-utils";
 import { t } from "@/i18n";
-import { formatDate } from "@/lib/date-utils";
 
 interface ArticleCardProps {
   article: ArticleCardType;
@@ -33,12 +34,23 @@ interface ArticleCardProps {
   variant?: "default" | "grid";
 }
 
+function DateDisplay({
+  date,
+}: {
+  date: string | null | undefined;
+  label: string;
+}) {
+  const i18n = t();
+  return <>{date ?? i18n.articles.noDate}</>;
+}
+
 export function ArticleCard({
   article,
   preload = "intent",
   variant = "default",
 }: ArticleCardProps) {
   const i18n = t();
+  const [isIndicationsOpen, setIsIndicationsOpen] = useState(false);
 
   // Grid variant: no borders (CardGrid handles them), no shadow, transparent bg for GridCard hover
   // Default variant: full border and shadow
@@ -51,15 +63,14 @@ export function ArticleCard({
   const hasIndications = !!article.warningText;
 
   return (
-    <article className="h-full">
-      <Link
-        to="/articles/$slug"
-        params={{ slug: article.slug }}
-        preload={preload}
-        className="group block h-full"
-      >
-        <Card className={`${cardClassName} gap-0`}>
-          {/* Image with "Nouveau" badge */}
+    <article className="group h-full">
+      <Card className={`${cardClassName} gap-0`}>
+        <Link
+          to="/articles/$slug"
+          params={{ slug: article.slug }}
+          preload={preload}
+          className="block"
+        >
           <figure className="relative aspect-video overflow-hidden">
             <OptimizedImage
               src={article.img.url}
@@ -76,149 +87,158 @@ export function ArticleCard({
               </Badge>
             )}
           </figure>
+        </Link>
 
-          {/* Title */}
-          <CardHeader className="py-4">
-            <CardTitle className="line-clamp-2">{article.title}</CardTitle>
-          </CardHeader>
-
-          <Separator className="opacity-60" />
-
-          {/* Metadata: Profile + Material */}
-          <CardContent className="py-4">
-            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-              <dt className="text-muted-foreground">
-                {i18n.articles.profile} :
-              </dt>
-              <dd>{article.profile?.title ?? "—"}</dd>
-
-              <dt className="text-muted-foreground">
-                {i18n.articles.material} :
-              </dt>
-              <dd>
-                {article.material ? i18n.materials[article.material] : "—"}
-              </dd>
-            </dl>
-          </CardContent>
-
-          <Separator className="opacity-60" />
-
-          {/* Status */}
-          <CardContent className="py-4">
-            <dl className="grid grid-cols-[auto_1fr] items-center gap-x-4 text-sm">
-              <dt className="text-muted-foreground">
-                {i18n.articles.statusLabel} :
-              </dt>
-              <dd>
-                <Badge variant={STATUS_VARIANTS[article.status]} size="sm">
-                  {i18n.status[article.status]}
-                </Badge>
-              </dd>
-            </dl>
-          </CardContent>
-
-          <Separator className="opacity-60" />
-
-          {/* Dates */}
-          <CardContent className="py-4">
-            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-              <dt className="text-muted-foreground">
-                {i18n.articles.startDate} :
-              </dt>
-              <dd className="tabular-nums">
-                {formatDate(article.startDate) ?? i18n.articles.noDate}
-              </dd>
-
-              <dt className="text-muted-foreground">
-                {i18n.articles.endDate} :
-              </dt>
-              <dd className="tabular-nums">
-                {formatDate(article.endDate) ?? i18n.articles.noDate}
-              </dd>
-            </dl>
-          </CardContent>
-
-          <Separator className="opacity-60" />
-
-          {/* Indications */}
-          <CardContent className="py-4">
-            {hasIndications ? (
-              <Collapsible defaultOpen={false}>
-                <CollapsibleTrigger
-                  className="flex w-full items-center justify-between text-sm hover:text-foreground"
-                  onClick={(e) => e.preventDefault()}
+        <CardHeader className="flex! h-14! items-center! py-0!">
+          <CardTitle className="w-full font-bold">
+            <Tooltip>
+              <TooltipTrigger className="block w-full text-left">
+                <Link
+                  to="/articles/$slug"
+                  params={{ slug: article.slug }}
+                  preload={preload}
+                  className="line-clamp-1 leading-tight hover:underline"
                 >
-                  <span>{i18n.articles.indications}</span>
-                  <ChevronDownIcon className="size-4 transition-transform duration-200 [[data-panel-open]_&]:rotate-180" />
-                </CollapsibleTrigger>
-                <CollapsiblePanel>
-                  <p className="pt-3 text-sm text-muted-foreground">
-                    {article.warningText}
-                  </p>
-                </CollapsiblePanel>
-              </Collapsible>
-            ) : (
-              <p className="text-sm text-muted-foreground">
-                {i18n.articles.noIndications}
-              </p>
-            )}
-          </CardContent>
+                  {article.title}
+                </Link>
+              </TooltipTrigger>
+              <TooltipPopup>{article.title}</TooltipPopup>
+            </Tooltip>
+          </CardTitle>
+        </CardHeader>
 
-          {/* Action Buttons */}
-          <CardFooter className="flex-wrap gap-2 pt-4">
-            {article.additionalUrl ? (
-              <>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  render={
-                    <a
-                      href={article.additionalUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  }
-                >
-                  {i18n.articles.secondaryKit}
-                </Button>
-                <Button
-                  variant="default"
-                  size="sm"
-                  render={
-                    <a
-                      href={article.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                    />
-                  }
-                >
-                  {i18n.articles.viewSet}
-                  <ExternalLinkIcon className="size-4" />
-                </Button>
-              </>
-            ) : (
+        <Separator className="opacity-60" />
+
+        {/* Metadata: Profile + Material */}
+        <CardContent className="py-4">
+          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+            <dt className="text-muted-foreground">{i18n.articles.profile} :</dt>
+            <dd>{article.profile?.title ?? "—"}</dd>
+
+            <dt className="text-muted-foreground">
+              {i18n.articles.material} :
+            </dt>
+            <dd>{article.material ? i18n.materials[article.material] : "—"}</dd>
+          </dl>
+        </CardContent>
+
+        <Separator className="opacity-60" />
+
+        {/* Status */}
+        <CardContent className="py-4">
+          <dl className="grid grid-cols-[auto_1fr] items-center gap-x-4 text-sm">
+            <dt className="text-muted-foreground">
+              {i18n.articles.statusLabel} :
+            </dt>
+            <dd>
+              <Badge variant={STATUS_VARIANTS[article.status]} size="sm">
+                {i18n.status[article.status]}
+              </Badge>
+            </dd>
+          </dl>
+        </CardContent>
+
+        <Separator className="opacity-60" />
+
+        {/* Dates */}
+        <CardContent className="py-4">
+          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+            <dt className="text-muted-foreground">
+              {i18n.articles.startDate} :
+            </dt>
+            <dd className="tabular-nums">
+              <DateDisplay date={article.startDate} label="Start" />
+            </dd>
+
+            <dt className="text-muted-foreground">{i18n.articles.endDate} :</dt>
+            <dd className="tabular-nums">
+              <DateDisplay date={article.endDate} label="End" />
+            </dd>
+          </dl>
+        </CardContent>
+
+        <Separator className="opacity-60" />
+
+        {/* Indications */}
+        <CardContent className="py-4">
+          {hasIndications ? (
+            <Collapsible
+              open={isIndicationsOpen}
+              onOpenChange={setIsIndicationsOpen}
+            >
+              <CollapsibleTrigger
+                className="flex w-full items-center justify-between text-sm hover:text-foreground"
+                onClick={(e) => e.preventDefault()}
+              >
+                <span>{i18n.articles.indications}</span>
+                <ChevronDownIcon className="size-4 transition-transform duration-200 [[data-panel-open]_&]:rotate-180" />
+              </CollapsibleTrigger>
+              <CollapsiblePanel>
+                <p className="pt-3 text-sm text-muted-foreground">
+                  {article.warningText}
+                </p>
+              </CollapsiblePanel>
+            </Collapsible>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              {i18n.articles.noIndications}
+            </p>
+          )}
+        </CardContent>
+
+        <Separator className="opacity-60" />
+
+        {/* Action Buttons */}
+        <CardFooter className="flex-wrap gap-2 pt-4">
+          {article.additionalUrl ? (
+            <>
+              <Button
+                variant="outline"
+                size="lg"
+                className="flex-1 font-mono font-semibold tracking-tight uppercase"
+                render={
+                  <a
+                    href={article.additionalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  />
+                }
+              >
+                {i18n.articles.secondaryKit}
+              </Button>
               <Button
                 variant="default"
-                size="sm"
-                className="w-full"
+                size="lg"
+                className="flex-1 font-mono font-semibold tracking-tight uppercase"
                 render={
                   <a
                     href={article.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
                   />
                 }
               >
                 {i18n.articles.viewSet}
-                <ExternalLinkIcon className="size-4" />
               </Button>
-            )}
-          </CardFooter>
-        </Card>
-      </Link>
+            </>
+          ) : (
+            <Button
+              variant="default"
+              size="lg"
+              className="w-full font-mono font-semibold tracking-tight uppercase"
+              render={
+                <a
+                  href={article.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              }
+            >
+              {i18n.articles.viewSet}
+            </Button>
+          )}
+        </CardFooter>
+      </Card>
     </article>
   );
 }
@@ -230,7 +250,7 @@ export function ArticleCardSkeleton() {
       <Skeleton className="aspect-video w-full" />
 
       {/* Title skeleton */}
-      <CardHeader className="py-4">
+      <CardHeader className="py-3">
         <Skeleton className="h-5 w-3/4" />
       </CardHeader>
 

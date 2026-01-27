@@ -53,6 +53,7 @@ temp
 /.mcp.json
 /.mcp.json.bak
 **/CLAUDE.md
+**/AGENTS.md
 **/CLAUDE.md.bak
 # END Ruler Generated Files
 
@@ -64,3 +65,5 @@ temp
 .contentful/.env
 .contentful/images/
 .contentful/*.json
+
+.sisyphus

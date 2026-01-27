@@ -104,6 +104,7 @@ export interface Config {
     "social-networks": SocialNetwork;
     "informations-page": InformationsPage;
     "suggestion-page": SuggestionPage;
+    "not-found-page": NotFoundPage;
   };
   globalsSelect: {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
@@ -112,6 +113,7 @@ export interface Config {
       | InformationsPageSelect<false>
       | InformationsPageSelect<true>;
     "suggestion-page": SuggestionPageSelect<false> | SuggestionPageSelect<true>;
+    "not-found-page": NotFoundPageSelect<false> | NotFoundPageSelect<true>;
   };
   locale: null;
   user: User & {
@@ -656,6 +658,35 @@ export interface SuggestionPage {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "not-found-page".
+ */
+export interface NotFoundPage {
+  id: number;
+  /**
+   * Title displayed on the 404 page (typically '404')
+   */
+  title: string;
+  /**
+   * Error message displayed below the title
+   */
+  description: string;
+  /**
+   * Text for the back to home button
+   */
+  ctaText: string;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "homepage_select".
  */
 export interface HomepageSelect<T extends boolean = true> {
@@ -723,6 +754,25 @@ export interface SuggestionPageSelect<T extends boolean = true> {
         image?: T;
       };
   formEnabled?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "not-found-page_select".
+ */
+export interface NotFoundPageSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  ctaText?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

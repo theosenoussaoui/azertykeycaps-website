@@ -72,23 +72,25 @@
 - **Headings**: `font-heading font-bold tracking-tight` (uses Geist Mono)
 - **Body text**: `font-sans` (uses Geist Sans)
 - **Badges**: `font-mono` (uses Geist Mono)
-- **Nav links**: `font-mono` (uses Geist Mono)
+- **Nav links**: `font-mono font-semibold uppercase tracking-tight` (uses Geist Mono)
+- **Action links/buttons**: `font-mono font-semibold uppercase tracking-tight`
 - **h1**: `text-wrap: balance` (prevents orphans)
 - **h2, h3**: `text-wrap: pretty`
 - **Body**: `font-variant-numeric: tabular-nums` (aligned numbers)
 
 ### Font Usage Guidelines
 
-| Element        | Font Class     | Font Family |
-| -------------- | -------------- | ----------- |
-| Page titles    | `font-heading` | Geist Mono  |
-| Section titles | `font-heading` | Geist Mono  |
-| Card titles    | `font-heading` | Geist Mono  |
-| Body text      | `font-sans`    | Geist Sans  |
-| Badges         | `font-mono`    | Geist Mono  |
-| Navigation     | `font-mono`    | Geist Mono  |
-| Code           | `font-mono`    | Geist Mono  |
-| Footer links   | `font-mono`    | Geist Mono  |
+| Element        | Font Class                                         | Font Family |
+| -------------- | -------------------------------------------------- | ----------- |
+| Page titles    | `font-heading`                                     | Geist Mono  |
+| Section titles | `font-heading`                                     | Geist Mono  |
+| Card titles    | `font-heading`                                     | Geist Mono  |
+| Body text      | `font-sans`                                        | Geist Sans  |
+| Badges         | `font-mono`                                        | Geist Mono  |
+| Navigation     | `font-mono font-semibold uppercase tracking-tight` | Geist Mono  |
+| Action buttons | `font-mono font-semibold uppercase tracking-tight` | Geist Mono  |
+| Code           | `font-mono`                                        | Geist Mono  |
+| Footer links   | `font-mono font-semibold uppercase tracking-tight` | Geist Mono  |
 
 ### Heading Sizes (with Container Queries)
 

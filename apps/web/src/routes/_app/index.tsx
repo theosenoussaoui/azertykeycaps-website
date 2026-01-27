@@ -103,7 +103,7 @@ function HomeComponent() {
     <PageContainer>
       {/* Hero Section - left aligned, bigger title */}
       <PageHeader>
-        <PageTitle className="text-4xl @sm:text-5xl @md:text-6xl @lg:text-7xl">
+        <PageTitle className="mb-6 text-5xl leading-16 @sm:text-4xl @md:text-5xl @lg:text-6xl">
           {title}
         </PageTitle>
         <PageDescription>{subtitle}</PageDescription>
@@ -184,7 +184,7 @@ function HomeComponent() {
                   className="block h-full"
                 >
                   <Card className="h-full border-0 bg-transparent shadow-none">
-                    <CardHeader>
+                    <CardHeader className="gap-3">
                       <CardTitle className="flex items-center justify-between">
                         <span>{profile.title}</span>
                         <span className="text-sm font-normal text-muted-foreground">
