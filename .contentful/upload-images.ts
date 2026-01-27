@@ -55,6 +55,78 @@ interface ManifestEntry {
 }
 
 /**
+ * Detect actual MIME type from file content using magic bytes
+ * This fixes issues where Contentful stored wrong MIME types
+ */
+function detectMimeType(buffer: Buffer): string {
+  // Check magic bytes
+  if (buffer[0] === 0xff && buffer[1] === 0xd8 && buffer[2] === 0xff) {
+    return "image/jpeg";
+  }
+  if (
+    buffer[0] === 0x89 &&
+    buffer[1] === 0x50 &&
+    buffer[2] === 0x4e &&
+    buffer[3] === 0x47
+  ) {
+    return "image/png";
+  }
+  if (buffer[0] === 0x47 && buffer[1] === 0x49 && buffer[2] === 0x46) {
+    return "image/gif";
+  }
+  if (
+    buffer[0] === 0x52 &&
+    buffer[1] === 0x49 &&
+    buffer[2] === 0x46 &&
+    buffer[3] === 0x46 &&
+    buffer[8] === 0x57 &&
+    buffer[9] === 0x45 &&
+    buffer[10] === 0x42 &&
+    buffer[11] === 0x50
+  ) {
+    return "image/webp";
+  }
+  // AVIF: starts with ftyp box containing 'avif' or 'avis'
+  if (
+    buffer[4] === 0x66 &&
+    buffer[5] === 0x74 &&
+    buffer[6] === 0x79 &&
+    buffer[7] === 0x70
+  ) {
+    const brand = buffer.slice(8, 12).toString("ascii");
+    if (brand === "avif" || brand === "avis" || brand === "mif1") {
+      return "image/avif";
+    }
+  }
+  if (buffer[0] === 0x3c && buffer[1] === 0x73 && buffer[2] === 0x76) {
+    return "image/svg+xml";
+  }
+  if (buffer[0] === 0x3c && buffer[1] === 0x3f && buffer[2] === 0x78) {
+    return "image/svg+xml";
+  }
+
+  // Default fallback
+  return "application/octet-stream";
+}
+
+/**
+ * Get correct file extension for MIME type
+ */
+function getExtensionForMime(mimeType: string): string {
+  const mimeToExt: Record<string, string> = {
+    "image/jpeg": ".jpeg",
+    "image/png": ".png",
+    "image/gif": ".gif",
+    "image/webp": ".webp",
+    "image/avif": ".avif",
+    "image/svg+xml": ".svg",
+  };
+  return mimeToExt[mimeType] || "";
+}
+
+
+
+/**
  * Get authorization headers
  */
 function getAuthHeaders(): Record<string, string> {
@@ -124,10 +196,30 @@ async function uploadImages() {
       // Read file
       const fileBuffer = fs.readFileSync(imagePath);
 
-      // Create form data
+      // Detect actual MIME type from file content (don't trust manifest)
+      const actualMimeType = detectMimeType(fileBuffer);
+      const correctExtension = getExtensionForMime(actualMimeType);
+
+      // Fix filename extension if it doesn't match actual content
+      let fileName = asset.fileName;
+      if (correctExtension) {
+        const currentExt = path.extname(fileName).toLowerCase();
+        const expectedExts =
+          actualMimeType === "image/jpeg"
+            ? [".jpg", ".jpeg", ".jpe"]
+            : [correctExtension];
+
+        if (!expectedExts.includes(currentExt)) {
+          const baseName = fileName.replace(/\.[^.]+$/, "");
+          fileName = baseName + correctExtension;
+          console.log(`   Renamed: ${asset.fileName} -> ${fileName} (actual: ${actualMimeType})`);
+        }
+      }
+
+      // Create form data with correct MIME type and fixed filename
       const formData = new FormData();
-      const blob = new Blob([fileBuffer], { type: asset.mimeType || "image/jpeg" });
-      formData.append("file", blob, asset.fileName);
+      const blob = new Blob([fileBuffer], { type: actualMimeType });
+      formData.append("file", blob, fileName);
       formData.append("alt", asset.title || "Image");
       formData.append("_payload", JSON.stringify({ alt: asset.title || "Image" }));
 
