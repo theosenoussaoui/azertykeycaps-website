@@ -20,6 +20,38 @@ const IS_DEV = process.env.NODE_ENV !== "production";
 /** Default image quality (1-100). 85 is a good balance of quality and file size. */
 export const DEFAULT_IMAGE_QUALITY = 85;
 
+/**
+ * Supported INPUT formats for Cloudflare Images transformations.
+ * AVIF is only supported as OUTPUT, not INPUT.
+ *
+ * @see https://developers.cloudflare.com/images/transform-images/#supported-input-formats
+ */
+const SUPPORTED_INPUT_EXTENSIONS = new Set([
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "webp",
+  "svg",
+  "heic",
+  "heif",
+]);
+
+/**
+ * Check if a URL points to an image format that Cloudflare Images can transform.
+ * AVIF files are NOT supported as input (only as output).
+ */
+function isTransformableFormat(url: string): boolean {
+  try {
+    const pathname = new URL(url).pathname.toLowerCase();
+    const extension = pathname.split(".").pop();
+    return extension ? SUPPORTED_INPUT_EXTENSIONS.has(extension) : true;
+  } catch {
+    // If URL parsing fails, assume it's transformable (will fail gracefully)
+    return true;
+  }
+}
+
 /** Default quality for slow connections (2G/3G networks) */
 export const SLOW_CONNECTION_QUALITY = 60;
 
@@ -337,6 +369,13 @@ export function getOptimizedImageUrl(
 
   // In local development, skip transformations (CF Images not available)
   if (IS_DEV) {
+    return src;
+  }
+
+  // Skip transformations for unsupported input formats (e.g., AVIF)
+  // AVIF is only supported as OUTPUT format, not INPUT
+  // These files are already highly optimized, so serve them directly
+  if (!isTransformableFormat(src)) {
     return src;
   }
 

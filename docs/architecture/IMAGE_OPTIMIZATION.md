@@ -695,17 +695,34 @@ export function getProductImageUrl(
 
 ## Troubleshooting
 
+### Supported Input vs Output Formats
+
+**Important:** Cloudflare Images has different format support for input (source) and output (result).
+
+| Format | Input (Source) | Output (Result) |
+| ------ | -------------- | --------------- |
+| JPEG   | ✅             | ✅              |
+| PNG    | ✅             | ✅              |
+| GIF    | ✅             | ✅              |
+| WebP   | ✅             | ✅              |
+| SVG    | ✅             | ✅ (sanitized)  |
+| HEIC   | ✅             | ❌              |
+| AVIF   | ❌             | ✅              |
+
+**AVIF files cannot be transformed** - they are only supported as output format.
+Our `image-utils.ts` automatically detects AVIF source files and serves them directly without transformation (they're already highly optimized).
+
 ### Common Error Codes
 
-| Code | Meaning             | Solution                                         |
-| ---- | ------------------- | ------------------------------------------------ |
-| 9401 | Invalid arguments   | Check transformation parameters                  |
-| 9402 | Image too large     | Reduce source image size (max 100MP)             |
-| 9403 | Request loop        | Check Worker isn't fetching its own URL          |
-| 9404 | Image not found     | Verify source URL is accessible                  |
-| 9413 | Exceeds 100MP limit | Use smaller source image                         |
-| 9422 | Rate limit exceeded | Upgrade to paid plan or reduce unique transforms |
-| 9520 | Unsupported format  | Use supported input format                       |
+| Code | Meaning             | Solution                                                  |
+| ---- | ------------------- | --------------------------------------------------------- |
+| 9401 | Invalid arguments   | Check transformation parameters                           |
+| 9402 | Image too large     | Reduce source image size (max 100MP)                      |
+| 9403 | Request loop        | Check Worker isn't fetching its own URL                   |
+| 9404 | Image not found     | Verify source URL is accessible                           |
+| 9413 | Exceeds 100MP limit | Use smaller source image                                  |
+| 9422 | Rate limit exceeded | Upgrade to paid plan or reduce unique transforms          |
+| 9520 | Unsupported format  | Source format not supported (e.g., AVIF) - serve directly |
 
 ### Debug Tips
 
