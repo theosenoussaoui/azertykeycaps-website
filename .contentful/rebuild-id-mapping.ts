@@ -48,7 +48,7 @@ async function rebuildMapping() {
   }
 
   const manifest: ManifestEntry[] = JSON.parse(
-    fs.readFileSync(MANIFEST_PATH, "utf-8")
+    fs.readFileSync(MANIFEST_PATH, "utf-8"),
   );
   console.log(`   Found ${manifest.length} entries in manifest`);
 
@@ -56,7 +56,7 @@ async function rebuildMapping() {
   console.log("   Querying production D1...");
   const result = execSync(
     'cd apps/cms && bunx wrangler d1 execute D1 --env=prod --remote --json --command="SELECT id, filename FROM media;"',
-    { encoding: "utf-8" }
+    { encoding: "utf-8" },
   );
 
   // Parse wrangler output (skip the wrangler banner lines)
@@ -68,9 +68,20 @@ async function rebuildMapping() {
   console.log(`   Found ${records.length} media records in production D1`);
 
   // Create filename -> id map from production
+  // Payload adds -N suffix for duplicates, so we need to match base names
   const filenameToId = new Map<string, number>();
+  const baseNameToId = new Map<string, number>();
+
   for (const record of records) {
     filenameToId.set(record.filename, record.id);
+
+    // Also create a map without the -N suffix that Payload adds
+    // e.g., "cartoon-1.jpeg" -> "cartoon.jpeg"
+    const match = record.filename.match(/^(.+)-\d+(\.[^.]+)$/);
+    if (match) {
+      const baseName = match[1] + match[2];
+      baseNameToId.set(baseName, record.id);
+    }
   }
 
   // Build contentfulId -> productionId mapping
@@ -79,7 +90,12 @@ async function rebuildMapping() {
   let missing = 0;
 
   for (const entry of manifest) {
-    const productionId = filenameToId.get(entry.fileName);
+    // Try exact match first, then base name match
+    let productionId = filenameToId.get(entry.fileName);
+    if (!productionId) {
+      productionId = baseNameToId.get(entry.fileName);
+    }
+
     if (productionId) {
       newMapping[entry.contentfulId] = productionId;
       matched++;

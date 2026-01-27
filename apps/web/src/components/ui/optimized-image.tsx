@@ -2,6 +2,7 @@ import {
   generateSrcSet,
   getOptimizedImageUrl,
   RESPONSIVE_WIDTHS,
+  SLOW_CONNECTION_QUALITY,
   type ImageTransformOptions,
 } from "@/lib/image-utils";
 
@@ -47,6 +48,24 @@ export interface OptimizedImageProps extends Omit<
    * Applied to all generated variants.
    */
   transformOptions?: Omit<ImageTransformOptions, "width" | "height">;
+  /**
+   * Enable adaptive quality for slow connections.
+   * Reduces quality on 2G/3G networks for faster loading.
+   * @default true
+   */
+  adaptiveQuality?: boolean;
+  /**
+   * Apply sharpening to downscaled images.
+   * Recommended for most images to maintain crispness.
+   * @default true
+   */
+  sharpen?: boolean;
+  /**
+   * Fallback to original image on transformation error.
+   * Only works for same-domain images.
+   * @default false
+   */
+  fallbackOnError?: boolean;
 }
 
 /**
@@ -76,6 +95,16 @@ export interface OptimizedImageProps extends Omit<
  *   width={1200}
  *   height={675}
  * />
+ *
+ * @example
+ * // Image with face-aware cropping (avatar)
+ * <OptimizedImage
+ *   src={user.avatar}
+ *   alt={user.name}
+ *   width={200}
+ *   height={200}
+ *   transformOptions={{ gravity: "face", fit: "cover" }}
+ * />
  */
 export function OptimizedImage({
   src,
@@ -86,6 +115,9 @@ export function OptimizedImage({
   width,
   height,
   transformOptions = {},
+  adaptiveQuality = true,
+  sharpen = true,
+  fallbackOnError = false,
   className,
   ...props
 }: OptimizedImageProps) {
@@ -93,20 +125,35 @@ export function OptimizedImage({
     return null;
   }
 
+  // Build the base options for all variants
+  const baseOptions: Omit<ImageTransformOptions, "width"> = {
+    ...transformOptions,
+    // Add sharpening for downscaled images (recommended by Cloudflare)
+    ...(sharpen && !transformOptions.sharpen && { sharpen: 1 }),
+    // Enable adaptive quality for slow connections
+    ...(adaptiveQuality &&
+      !transformOptions.slowConnectionQuality && {
+        slowConnectionQuality: SLOW_CONNECTION_QUALITY,
+      }),
+    // Add error fallback if requested
+    ...(fallbackOnError &&
+      !transformOptions.onerror && { onerror: "redirect" }),
+  };
+
   // Generate srcset for responsive images
-  const srcSet = generateSrcSet(src, widths, transformOptions);
+  const srcSet = generateSrcSet(src, widths, baseOptions);
 
   // Use the largest width as the fallback src
   const fallbackWidth = width ?? Math.max(...widths);
   const fallbackSrc = getOptimizedImageUrl(src, {
-    ...transformOptions,
+    ...baseOptions,
     width: fallbackWidth,
   });
 
   return (
     <img
       src={fallbackSrc}
-      srcSet={srcSet}
+      srcSet={srcSet || undefined}
       sizes={sizes}
       alt={alt}
       width={width}
@@ -120,9 +167,72 @@ export function OptimizedImage({
   );
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Specialized Image Components
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AvatarImageProps extends Omit<
+  React.ImgHTMLAttributes<HTMLImageElement>,
+  "src"
+> {
+  /** Source URL of the avatar image */
+  src: string | null | undefined;
+  /** Alt text (typically person's name) */
+  alt: string;
+  /** Size in pixels (square) */
+  size?: number;
+}
+
+/**
+ * Avatar image component with face-aware cropping.
+ *
+ * Uses AI-powered face detection to keep faces centered in the crop.
+ *
+ * @example
+ * <AvatarImage src={user.avatar} alt={user.name} size={80} />
+ */
+export function AvatarImage({
+  src,
+  alt,
+  size = 80,
+  className,
+  ...props
+}: AvatarImageProps) {
+  if (!src) {
+    return null;
+  }
+
+  const optimizedSrc = getOptimizedImageUrl(src, {
+    width: size,
+    height: size,
+    fit: "cover",
+    gravity: "face",
+    zoom: 0.3,
+    sharpen: 1,
+  });
+
+  return (
+    <img
+      src={optimizedSrc}
+      alt={alt}
+      width={size}
+      height={size}
+      loading="lazy"
+      decoding="async"
+      className={className}
+      {...props}
+    />
+  );
+}
+
 // Re-export utilities and constants for convenience
 export {
   RESPONSIVE_WIDTHS,
   getOptimizedImageUrl,
   generateSrcSet,
+  getPreloadLinkAttributes,
+  getAvatarUrl,
+  getProductImageUrl,
+  getOgImageUrl,
+  getGrayscaleImageUrl,
 } from "@/lib/image-utils";

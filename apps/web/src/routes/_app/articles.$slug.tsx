@@ -24,7 +24,7 @@ import { ArticleCard } from "@/features/articles/components/article-card";
 import { ArticleContent } from "@/features/articles/components/article-content";
 import { t } from "@/i18n";
 import { buildCacheHeaders } from "@/lib/cache-tags";
-import { getPreloadImageUrl } from "@/lib/image-utils";
+import { getPreloadLinkAttributes } from "@/lib/image-utils";
 import {
   generateArticleSchema,
   generateCanonical,
@@ -59,8 +59,8 @@ export const Route = createFileRoute("/_app/articles/$slug")({
   },
   head: ({ loaderData, params }) => {
     const article = loaderData?.article;
-    // Use optimized image URL for preloading (matches what OptimizedImage renders)
-    const heroImageUrl = getPreloadImageUrl(article?.img.url, "hero");
+    // Use enhanced preload with responsive hints for optimal LCP
+    const preloadLink = getPreloadLinkAttributes(article?.img.url, "hero");
     const path = `/articles/${params.slug}`;
     const i18n = loaderData?.i18n ?? t();
 
@@ -77,18 +77,7 @@ export const Route = createFileRoute("/_app/articles/$slug")({
         type: "article",
         seo: article,
       }),
-      links: [
-        generateCanonical(path),
-        ...(heroImageUrl
-          ? [
-              {
-                rel: "preload" as const,
-                as: "image" as const,
-                href: heroImageUrl,
-              },
-            ]
-          : []),
-      ],
+      links: [generateCanonical(path), ...(preloadLink ? [preloadLink] : [])],
       scripts: (article
         ? [
             generateJsonLd(

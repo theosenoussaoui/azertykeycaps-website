@@ -124,8 +124,6 @@ function getExtensionForMime(mimeType: string): string {
   return mimeToExt[mimeType] || "";
 }
 
-
-
 /**
  * Get authorization headers
  */
@@ -158,16 +156,18 @@ async function uploadImages() {
   // Check if ID mapping exists
   if (!fs.existsSync(ID_MAPPING_PATH)) {
     console.error(`❌ ID mapping not found: ${ID_MAPPING_PATH}`);
-    console.error("   Run the migration first: cd apps/cms && bun run payload migrate");
+    console.error(
+      "   Run the migration first: cd apps/cms && bun run payload migrate",
+    );
     process.exit(1);
   }
 
   const manifest: ManifestEntry[] = JSON.parse(
-    fs.readFileSync(MANIFEST_PATH, "utf-8")
+    fs.readFileSync(MANIFEST_PATH, "utf-8"),
   );
 
   const idMapping: Record<string, number> = JSON.parse(
-    fs.readFileSync(ID_MAPPING_PATH, "utf-8")
+    fs.readFileSync(ID_MAPPING_PATH, "utf-8"),
   );
 
   console.log(`   Found ${manifest.length} images in manifest`);
@@ -212,7 +212,9 @@ async function uploadImages() {
         if (!expectedExts.includes(currentExt)) {
           const baseName = fileName.replace(/\.[^.]+$/, "");
           fileName = baseName + correctExtension;
-          console.log(`   Renamed: ${asset.fileName} -> ${fileName} (actual: ${actualMimeType})`);
+          console.log(
+            `   Renamed: ${asset.fileName} -> ${fileName} (actual: ${actualMimeType})`,
+          );
         }
       }
 
@@ -221,7 +223,10 @@ async function uploadImages() {
       const blob = new Blob([fileBuffer], { type: actualMimeType });
       formData.append("file", blob, fileName);
       formData.append("alt", asset.title || "Image");
-      formData.append("_payload", JSON.stringify({ alt: asset.title || "Image" }));
+      formData.append(
+        "_payload",
+        JSON.stringify({ alt: asset.title || "Image" }),
+      );
 
       // Upload via PATCH to update existing record
       const response = await fetch(`${CMS_BASE_URL}/api/media/${payloadId}`, {
@@ -241,7 +246,7 @@ async function uploadImages() {
       }
     } catch (error) {
       console.log(
-        `❌ Failed ${asset.fileName}: ${error instanceof Error ? error.message : error}`
+        `❌ Failed ${asset.fileName}: ${error instanceof Error ? error.message : error}`,
       );
       failed++;
     }

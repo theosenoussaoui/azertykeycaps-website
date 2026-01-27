@@ -28,6 +28,9 @@
     "check-types": "turbo run check-types",
     "check-types:cms": "turbo run check-types --filter=@azertykeycaps-app/cms",
     "check-types:no-cms": "turbo run check-types --filter=!@azertykeycaps-app/cms",
+    "contentful:download": "cd .contentful && bun run download-images.ts",
+    "contentful:rebuild-mapping": "bun run .contentful/rebuild-id-mapping.ts",
+    "contentful:upload": "cd .contentful && bun run upload-images.ts",
     "db:generate": "turbo run db:generate --filter=@azertykeycaps-app/db",
     "db:push": "turbo run db:push --filter=@azertykeycaps-app/db",
     "deploy": "turbo run deploy --filter=@azertykeycaps-app/infra",
@@ -41,10 +44,7 @@
     "dev:no-cms": "turbo run dev --filter=!@azertykeycaps-app/cms",
     "dev:server": "turbo run dev --filter=server",
     "dev:web": "turbo run dev --filter=web",
-    "ruler:apply": "bunx @intellectronica/ruler@latest apply --local-only",
-    "contentful:download": "cd .contentful && bun run download-images.ts",
-    "contentful:upload": "cd .contentful && bun run upload-images.ts",
-    "contentful:rebuild-mapping": "bun run .contentful/rebuild-id-mapping.ts"
+    "ruler:apply": "bunx @intellectronica/ruler@latest apply --local-only"
   },
   "dependencies": {
     "@azertykeycaps-app/env": "workspace:*",

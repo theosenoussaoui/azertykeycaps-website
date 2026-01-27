@@ -35,7 +35,7 @@ import { ArticleCard } from "@/features/articles/components/article-card";
 import { getHomepageContent } from "@/features/globals/api/get-homepage-content";
 import { t } from "@/i18n";
 import { buildCacheHeaders } from "@/lib/cache-tags";
-import { getPreloadImageUrl } from "@/lib/image-utils";
+import { getPreloadLinkAttributes } from "@/lib/image-utils";
 import {
   generateCanonical,
   generateItemListSchema,
@@ -63,8 +63,8 @@ export const Route = createFileRoute("/_app/")({
     const articles = loaderData?.articles?.docs ?? [];
     const homepage = loaderData?.homepage;
     const firstArticle = articles[0];
-    // Use optimized image URL for preloading (matches what OptimizedImage renders)
-    const preloadImageUrl = getPreloadImageUrl(firstArticle?.img.url, "card");
+    // Use enhanced preload with responsive hints for optimal LCP
+    const preloadLink = getPreloadLinkAttributes(firstArticle?.img.url, "card");
 
     // Use CMS content with i18n fallbacks
     const title = homepage?.title ?? i18n.home.title;
@@ -78,18 +78,7 @@ export const Route = createFileRoute("/_app/")({
         image: firstArticle?.img.url,
         seo: homepage,
       }),
-      links: [
-        generateCanonical("/"),
-        ...(preloadImageUrl
-          ? [
-              {
-                rel: "preload",
-                as: "image",
-                href: preloadImageUrl,
-              },
-            ]
-          : []),
-      ],
+      links: [generateCanonical("/"), ...(preloadLink ? [preloadLink] : [])],
       scripts: [
         generateJsonLd(
           generateItemListSchema(

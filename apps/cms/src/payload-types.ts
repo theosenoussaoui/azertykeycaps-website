@@ -13,53 +13,53 @@
  * via the `definition` "supportedTimezones".
  */
 export type SupportedTimezones =
-  | 'Pacific/Midway'
-  | 'Pacific/Niue'
-  | 'Pacific/Honolulu'
-  | 'Pacific/Rarotonga'
-  | 'America/Anchorage'
-  | 'Pacific/Gambier'
-  | 'America/Los_Angeles'
-  | 'America/Tijuana'
-  | 'America/Denver'
-  | 'America/Phoenix'
-  | 'America/Chicago'
-  | 'America/Guatemala'
-  | 'America/New_York'
-  | 'America/Bogota'
-  | 'America/Caracas'
-  | 'America/Santiago'
-  | 'America/Buenos_Aires'
-  | 'America/Sao_Paulo'
-  | 'Atlantic/South_Georgia'
-  | 'Atlantic/Azores'
-  | 'Atlantic/Cape_Verde'
-  | 'Europe/London'
-  | 'Europe/Berlin'
-  | 'Africa/Lagos'
-  | 'Europe/Athens'
-  | 'Africa/Cairo'
-  | 'Europe/Moscow'
-  | 'Asia/Riyadh'
-  | 'Asia/Dubai'
-  | 'Asia/Baku'
-  | 'Asia/Karachi'
-  | 'Asia/Tashkent'
-  | 'Asia/Calcutta'
-  | 'Asia/Dhaka'
-  | 'Asia/Almaty'
-  | 'Asia/Jakarta'
-  | 'Asia/Bangkok'
-  | 'Asia/Shanghai'
-  | 'Asia/Singapore'
-  | 'Asia/Tokyo'
-  | 'Asia/Seoul'
-  | 'Australia/Brisbane'
-  | 'Australia/Sydney'
-  | 'Pacific/Guam'
-  | 'Pacific/Noumea'
-  | 'Pacific/Auckland'
-  | 'Pacific/Fiji';
+  | "Pacific/Midway"
+  | "Pacific/Niue"
+  | "Pacific/Honolulu"
+  | "Pacific/Rarotonga"
+  | "America/Anchorage"
+  | "Pacific/Gambier"
+  | "America/Los_Angeles"
+  | "America/Tijuana"
+  | "America/Denver"
+  | "America/Phoenix"
+  | "America/Chicago"
+  | "America/Guatemala"
+  | "America/New_York"
+  | "America/Bogota"
+  | "America/Caracas"
+  | "America/Santiago"
+  | "America/Buenos_Aires"
+  | "America/Sao_Paulo"
+  | "Atlantic/South_Georgia"
+  | "Atlantic/Azores"
+  | "Atlantic/Cape_Verde"
+  | "Europe/London"
+  | "Europe/Berlin"
+  | "Africa/Lagos"
+  | "Europe/Athens"
+  | "Africa/Cairo"
+  | "Europe/Moscow"
+  | "Asia/Riyadh"
+  | "Asia/Dubai"
+  | "Asia/Baku"
+  | "Asia/Karachi"
+  | "Asia/Tashkent"
+  | "Asia/Calcutta"
+  | "Asia/Dhaka"
+  | "Asia/Almaty"
+  | "Asia/Jakarta"
+  | "Asia/Bangkok"
+  | "Asia/Shanghai"
+  | "Asia/Singapore"
+  | "Asia/Tokyo"
+  | "Asia/Seoul"
+  | "Australia/Brisbane"
+  | "Australia/Sydney"
+  | "Pacific/Guam"
+  | "Pacific/Noumea"
+  | "Pacific/Auckland"
+  | "Pacific/Fiji";
 
 export interface Config {
   auth: {
@@ -70,24 +70,30 @@ export interface Config {
     users: User;
     media: Media;
     articles: Article;
-    'keycap-profiles': KeycapProfile;
+    "keycap-profiles": KeycapProfile;
     search: Search;
-    'payload-kv': PayloadKv;
-    'payload-locked-documents': PayloadLockedDocument;
-    'payload-preferences': PayloadPreference;
-    'payload-migrations': PayloadMigration;
+    "payload-kv": PayloadKv;
+    "payload-locked-documents": PayloadLockedDocument;
+    "payload-preferences": PayloadPreference;
+    "payload-migrations": PayloadMigration;
   };
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     articles: ArticlesSelect<false> | ArticlesSelect<true>;
-    'keycap-profiles': KeycapProfilesSelect<false> | KeycapProfilesSelect<true>;
+    "keycap-profiles": KeycapProfilesSelect<false> | KeycapProfilesSelect<true>;
     search: SearchSelect<false> | SearchSelect<true>;
-    'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
-    'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
-    'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
-    'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
+    "payload-kv": PayloadKvSelect<false> | PayloadKvSelect<true>;
+    "payload-locked-documents":
+      | PayloadLockedDocumentsSelect<false>
+      | PayloadLockedDocumentsSelect<true>;
+    "payload-preferences":
+      | PayloadPreferencesSelect<false>
+      | PayloadPreferencesSelect<true>;
+    "payload-migrations":
+      | PayloadMigrationsSelect<false>
+      | PayloadMigrationsSelect<true>;
   };
   db: {
     defaultIDType: number;
@@ -95,19 +101,21 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     homepage: Homepage;
-    'social-networks': SocialNetwork;
-    'informations-page': InformationsPage;
-    'suggestion-page': SuggestionPage;
+    "social-networks": SocialNetwork;
+    "informations-page": InformationsPage;
+    "suggestion-page": SuggestionPage;
   };
   globalsSelect: {
     homepage: HomepageSelect<false> | HomepageSelect<true>;
-    'social-networks': SocialNetworksSelect<false> | SocialNetworksSelect<true>;
-    'informations-page': InformationsPageSelect<false> | InformationsPageSelect<true>;
-    'suggestion-page': SuggestionPageSelect<false> | SuggestionPageSelect<true>;
+    "social-networks": SocialNetworksSelect<false> | SocialNetworksSelect<true>;
+    "informations-page":
+      | InformationsPageSelect<false>
+      | InformationsPageSelect<true>;
+    "suggestion-page": SuggestionPageSelect<false> | SuggestionPageSelect<true>;
   };
   locale: null;
   user: User & {
-    collection: 'users';
+    collection: "users";
   };
   jobs: {
     tasks: unknown;
@@ -141,7 +149,7 @@ export interface User {
   /**
    * API role is for server integrations using API keys
    */
-  role: 'admin' | 'api';
+  role: "admin" | "api";
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
@@ -196,13 +204,13 @@ export interface Article {
   profile: number | KeycapProfile;
   material?:
     | (
-        | 'abs_double_shot'
-        | 'abs_pad_printed'
-        | 'abs_simple'
-        | 'aluminium'
-        | 'pbt_double_shot'
-        | 'pbt_dye_sub'
-        | 'pbt_laser_printed'
+        | "abs_double_shot"
+        | "abs_pad_printed"
+        | "abs_simple"
+        | "aluminium"
+        | "pbt_double_shot"
+        | "pbt_dye_sub"
+        | "pbt_laser_printed"
       )
     | null;
   /**
@@ -237,7 +245,14 @@ export interface Article {
      */
     image?: (number | null) | Media;
   };
-  status: 'in_stock' | 'extras_gb' | 'extras_in_stock' | 'gb_running' | 'gb_ended' | 'interest_check' | 'out_of_stock';
+  status:
+    | "in_stock"
+    | "extras_gb"
+    | "extras_in_stock"
+    | "gb_running"
+    | "gb_ended"
+    | "interest_check"
+    | "out_of_stock";
   /**
    * Displays a 'New' badge on the article
    */
@@ -278,7 +293,7 @@ export interface KeycapProfile {
      */
     image?: (number | null) | Media;
   };
-  shape: 'sculpted' | 'uniform';
+  shape: "sculpted" | "uniform";
   updatedAt: string;
   createdAt: string;
 }
@@ -294,11 +309,11 @@ export interface Search {
   priority?: number | null;
   doc:
     | {
-        relationTo: 'articles';
+        relationTo: "articles";
         value: number | Article;
       }
     | {
-        relationTo: 'keycap-profiles';
+        relationTo: "keycap-profiles";
         value: number | KeycapProfile;
       };
   slug?: string | null;
@@ -330,28 +345,28 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
+        relationTo: "users";
         value: number | User;
       } | null)
     | ({
-        relationTo: 'media';
+        relationTo: "media";
         value: number | Media;
       } | null)
     | ({
-        relationTo: 'articles';
+        relationTo: "articles";
         value: number | Article;
       } | null)
     | ({
-        relationTo: 'keycap-profiles';
+        relationTo: "keycap-profiles";
         value: number | KeycapProfile;
       } | null)
     | ({
-        relationTo: 'search';
+        relationTo: "search";
         value: number | Search;
       } | null);
   globalSlug?: string | null;
   user: {
-    relationTo: 'users';
+    relationTo: "users";
     value: number | User;
   };
   updatedAt: string;
@@ -364,7 +379,7 @@ export interface PayloadLockedDocument {
 export interface PayloadPreference {
   id: number;
   user: {
-    relationTo: 'users';
+    relationTo: "users";
     value: number | User;
   };
   key?: string | null;
@@ -598,8 +613,8 @@ export interface InformationsPage {
         version: number;
         [k: string]: unknown;
       }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      direction: ("ltr" | "rtl") | null;
+      format: "left" | "start" | "center" | "right" | "end" | "justify" | "";
       indent: number;
       version: number;
     };
@@ -720,7 +735,6 @@ export interface Auth {
   [k: string]: unknown;
 }
 
-
-declare module 'payload' {
+declare module "payload" {
   export interface GeneratedTypes extends Config {}
 }

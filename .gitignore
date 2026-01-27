@@ -59,7 +59,8 @@ temp
 .opencode
 .agents
 
-# Contentful migration (one-time, keep locally)
+# Contentful migration (temporary - remove after migration complete)
+# Only ignore the .env file with API keys
+.contentful/.env
 .contentful/images/
 .contentful/*.json
-.contentful/.env
