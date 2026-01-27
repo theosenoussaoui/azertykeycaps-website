@@ -191,7 +191,7 @@ function HomeComponent() {
                 <Link
                   to="/profile/$slug"
                   params={{ slug: profile.slug }}
-                  preload="viewport"
+                  preload="intent"
                   className="block h-full"
                 >
                   <Card className="h-full border-0 bg-transparent shadow-none">

@@ -177,7 +177,7 @@ function ArticleDetailPage() {
                 >
                   <ArticleCard
                     article={relatedArticle}
-                    preload="viewport"
+                    preload="intent"
                     variant="grid"
                   />
                 </GridCard>

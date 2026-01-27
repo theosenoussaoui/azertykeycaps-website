@@ -65,6 +65,11 @@ async function getRelatedArticleSlugs(
 async function sendInvalidationToServer(
   payload: CacheInvalidationPayload,
 ): Promise<void> {
+  // Skip cache invalidation in development/migration mode
+  if (process.env.NODE_ENV !== "production") {
+    return;
+  }
+
   const invalidationUrl = process.env.CACHE_INVALIDATION_URL;
   const invalidationSecret = process.env.CACHE_INVALIDATION_SECRET;
 

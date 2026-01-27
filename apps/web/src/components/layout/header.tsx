@@ -81,7 +81,7 @@ function ProfileShapeMenu({
                   <Link
                     to="/profile/$slug"
                     params={{ slug: profile.slug }}
-                    preload="viewport"
+                    preload="intent"
                     className="font-mono font-medium"
                   />
                 }
@@ -258,7 +258,7 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
                             <Link
                               to="/profile/$slug"
                               params={{ slug: profile.slug }}
-                              preload="viewport"
+                              preload="intent"
                               className="py-2 font-mono text-base font-medium text-foreground data-[active]:text-primary"
                               data-active={
                                 location.pathname ===
@@ -287,7 +287,7 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
                             <Link
                               to="/profile/$slug"
                               params={{ slug: profile.slug }}
-                              preload="viewport"
+                              preload="intent"
                               className="py-2 font-mono text-base font-medium text-foreground data-[active]:text-primary"
                               data-active={
                                 location.pathname ===

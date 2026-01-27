@@ -73,8 +73,9 @@ export default buildConfig({
   },
   db: sqliteD1Adapter({
     binding: (cloudflare.env as any).D1,
-    // Migrations are run in CI via `bun run payload migrate` after Alchemy deploy
-    // This avoids cold start latency from running migrations at Worker startup
+    // Disable push mode - use migrations only
+    // This prevents conflicts when dev mode tries to sync schema
+    push: false,
   }),
   // Note: sharp is not available on Cloudflare Workers
   // Image processing disabled - originals served directly

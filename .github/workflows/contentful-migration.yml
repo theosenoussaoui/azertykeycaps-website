@@ -1,0 +1,75 @@
+name: Contentful Migration (Production)
+
+on:
+  workflow_dispatch:
+    inputs:
+      step:
+        description: "Which step to run"
+        required: true
+        type: choice
+        options:
+          - 1-migrate-database
+          - 2-upload-images
+          - all
+
+concurrency:
+  group: contentful-migration
+  cancel-in-progress: false
+
+env:
+  SKIP_INSTALL_SIMPLE_GIT_HOOKS: 1
+
+jobs:
+  # Step 1: Run database migration against production D1
+  migrate-database:
+    if: ${{ inputs.step == '1-migrate-database' || inputs.step == 'all' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run Payload migrations (Production)
+        run: |
+          echo "Running migrations against production D1..."
+          export CLOUDFLARE_ENV=prod
+          bun run deploy:database
+        working-directory: apps/cms
+        env:
+          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  # Step 2: Upload images to production CMS via HTTP API
+  upload-images:
+    needs: migrate-database
+    # Allow this job to run even if migrate-database was skipped
+    # (when running '2-upload-images' directly)
+    if: ${{ always() && (inputs.step == '2-upload-images' || inputs.step == 'all') && (needs.migrate-database.result == 'success' || needs.migrate-database.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Rebuild ID mapping from Production D1
+        run: bun run contentful:rebuild-mapping
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Upload images to Production CMS
+        run: bun run contentful:upload
+        env:
+          CMS_BASE_URL: https://cms.azertykeycaps.fr
+          CMS_API_KEY: ${{ secrets.CMS_API_KEY }}

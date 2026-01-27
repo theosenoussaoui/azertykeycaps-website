@@ -58,3 +58,8 @@ temp
 
 .opencode
 .agents
+
+# Contentful migration (one-time, keep locally)
+.contentful/images/
+.contentful/*.json
+.contentful/.env

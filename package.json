@@ -41,7 +41,10 @@
     "dev:no-cms": "turbo run dev --filter=!@azertykeycaps-app/cms",
     "dev:server": "turbo run dev --filter=server",
     "dev:web": "turbo run dev --filter=web",
-    "ruler:apply": "bunx @intellectronica/ruler@latest apply --local-only"
+    "ruler:apply": "bunx @intellectronica/ruler@latest apply --local-only",
+    "contentful:download": "cd .contentful && bun run download-images.ts",
+    "contentful:upload": "cd .contentful && bun run upload-images.ts",
+    "contentful:rebuild-mapping": "bun run .contentful/rebuild-id-mapping.ts"
   },
   "dependencies": {
     "@azertykeycaps-app/env": "workspace:*",

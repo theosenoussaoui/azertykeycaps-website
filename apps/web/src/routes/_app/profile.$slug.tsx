@@ -248,7 +248,7 @@ function ProfilePage() {
                   >
                     <ArticleCard
                       article={article}
-                      preload="viewport"
+                      preload="intent"
                       variant="grid"
                     />
                   </GridCard>
