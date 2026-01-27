@@ -651,9 +651,9 @@ Integrated grid borders with hover effects. Card borders form the grid lines.
 
 ### Components
 
-| Component  | Element              | Purpose                                           |
-| ---------- | -------------------- | ------------------------------------------------- |
-| `CardGrid` | `<div>`, `<ul>`, etc | Grid container with border-r border-b             |
+| Component  | Element              | Purpose                                            |
+| ---------- | -------------------- | -------------------------------------------------- |
+| `CardGrid` | `<div>`, `<ul>`, etc | Grid container with border-r border-b              |
 | `GridCard` | `<div>`, `<li>`, etc | Grid cell with border-l border-t + hover bg-accent |
 
 ### How It Works
@@ -675,11 +675,11 @@ GridCard: border-l border-t (forms the grid with left and top borders)
 
 ### Hover Effects
 
-| Element       | Hover Effect                              | Implementation                          |
-| ------------- | ----------------------------------------- | --------------------------------------- |
-| `GridCard`    | Subtle background highlight               | `transition-colors hover:bg-accent`     |
-| `ArticleCard` | Image desaturation                        | `grayscale-0 group-hover:grayscale`     |
-| Inner `Card`  | None (transparent bg lets GridCard show)  | `bg-transparent`                        |
+| Element       | Hover Effect                             | Implementation                      |
+| ------------- | ---------------------------------------- | ----------------------------------- |
+| `GridCard`    | Subtle background highlight              | `transition-colors hover:bg-accent` |
+| `ArticleCard` | Image desaturation                       | `grayscale-0 group-hover:grayscale` |
+| Inner `Card`  | None (transparent bg lets GridCard show) | `bg-transparent`                    |
 
 ### Responsive Grid (2/8 Columns)
 

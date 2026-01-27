@@ -17,8 +17,23 @@
  * - profile-articles:{slug}     → All articles belonging to a profile
  */
 
+/**
+ * Cache-Control values:
+ * - max-age=300 (5 min): Browser cache freshness
+ * - stale-while-revalidate=3600 (1 hour): Browser serves stale while revalidating
+ *
+ * CDN-Cache-Control (Cloudflare-specific):
+ * - max-age=86400 (24 hours): CDN cache freshness (safe because we have cache-tag invalidation)
+ * - stale-while-revalidate=604800 (7 days): CDN serves stale during origin issues
+ *
+ * This split strategy gives users fresh content (5 min browser cache) while
+ * dramatically reducing origin load (24 hour CDN cache). Cache-tags ensure
+ * instant invalidation when content changes in CMS.
+ */
 const DEFAULT_CACHE_CONTROL =
-  "public, max-age=300, s-maxage=300, stale-while-revalidate=3600";
+  "public, max-age=300, stale-while-revalidate=3600";
+const DEFAULT_CDN_CACHE_CONTROL =
+  "max-age=86400, stale-while-revalidate=604800";
 
 export type GlobalTag = "homepage" | "about" | "suggest";
 
@@ -89,12 +104,50 @@ export function buildCacheTags(options: CacheTagsOptions = {}): string {
  *   "public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400"
  * )
  */
+export interface CacheHeadersConfig {
+  /** Override browser Cache-Control header */
+  cacheControl?: string;
+  /** Override CDN-Cache-Control header (Cloudflare-specific) */
+  cdnCacheControl?: string;
+}
+
+/**
+ * Build cache headers including Cache-Control, CDN-Cache-Control, and Cache-Tag.
+ *
+ * @example
+ * // In route definition (uses defaults: 5min browser, 24h CDN)
+ * headers: () => buildCacheHeaders({ global: ["homepage"] })
+ *
+ * @example
+ * // With custom cache control for frequently changing content
+ * headers: () => buildCacheHeaders(
+ *   { articleSlug: "foo" },
+ *   { cacheControl: "public, max-age=60, stale-while-revalidate=300" }
+ * )
+ *
+ * @example
+ * // Disable CDN caching for private pages
+ * headers: () => buildCacheHeaders(
+ *   {},
+ *   { cacheControl: "private, max-age=0" }
+ * )
+ */
 export function buildCacheHeaders(
   options: CacheTagsOptions = {},
-  cacheControl: string = DEFAULT_CACHE_CONTROL,
+  config: CacheHeadersConfig = {},
 ): Record<string, string> {
-  return {
+  const cacheControl = config.cacheControl ?? DEFAULT_CACHE_CONTROL;
+  const cdnCacheControl = config.cdnCacheControl ?? DEFAULT_CDN_CACHE_CONTROL;
+
+  const headers: Record<string, string> = {
     "Cache-Control": cacheControl,
     "Cache-Tag": buildCacheTags(options),
   };
+
+  // Only add CDN-Cache-Control if not using private caching
+  if (!cacheControl.includes("private")) {
+    headers["CDN-Cache-Control"] = cdnCacheControl;
+  }
+
+  return headers;
 }

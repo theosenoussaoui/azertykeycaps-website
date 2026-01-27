@@ -2,7 +2,8 @@
 
 ## Quick Summary
 
-- **CDN caching**: Pages cached for 5 minutes, stale content served for up to 1 hour while refreshing
+- **Browser caching**: 5 minutes fresh, 1 hour stale-while-revalidate
+- **CDN caching**: 24 hours fresh, 7 days stale-while-revalidate (via `CDN-Cache-Control`)
 - **Cache invalidation**: Uses Cloudflare cache-tags for instant, surgical purges
 - **No manual URL tracking**: Pages declare their own cache tags, Cloudflare handles the rest
 
@@ -71,11 +72,30 @@ Article updated → Server must figure out all affected URLs:
 
 ### Layer 1: Cloudflare CDN (HTML Pages)
 
+We use a **split caching strategy** with separate headers for browsers and CDN:
+
+#### Browser Cache (`Cache-Control`)
+
 | Setting                  | Value         | Meaning                                            |
 | ------------------------ | ------------- | -------------------------------------------------- |
 | `max-age`                | 300 (5 min)   | Browser considers content fresh for 5 minutes      |
-| `s-maxage`               | 300 (5 min)   | CDN considers content fresh for 5 minutes          |
 | `stale-while-revalidate` | 3600 (1 hour) | Serve stale content while refreshing in background |
+
+#### CDN Cache (`CDN-Cache-Control`)
+
+| Setting                  | Value            | Meaning                                          |
+| ------------------------ | ---------------- | ------------------------------------------------ |
+| `max-age`                | 86400 (24 hours) | CDN considers content fresh for 24 hours         |
+| `stale-while-revalidate` | 604800 (7 days)  | CDN serves stale during origin issues for 7 days |
+
+#### Why This Split Strategy?
+
+1. **Users get fresh content**: 5-minute browser cache means users see updates within minutes
+2. **Origin load is minimal**: 24-hour CDN cache dramatically reduces requests to origin
+3. **Instant invalidation**: Cache-tags allow immediate purge when content changes in CMS
+4. **Resilience**: 7-day stale-while-revalidate means the site stays up even during origin issues
+
+The `CDN-Cache-Control` header is Cloudflare-specific and **overrides** the standard `Cache-Control` for edge caching while leaving browser caching unchanged.
 
 ### Layer 2: Workers Cache API (Media)
 
@@ -241,13 +261,25 @@ export const Route = createFileRoute("/_app/new-page")({
   loader: async () => {
     // ... fetch data
   },
+  // Uses defaults: 5min browser, 24h CDN
   headers: () => buildCacheHeaders({ global: ["homepage"] }),
-  // or with dynamic tags:
+
+  // With dynamic tags:
   headers: ({ loaderData }) =>
     buildCacheHeaders({
       articleSlug: loaderData?.article?.slug,
       profileArticlesSlug: loaderData?.article?.profile?.slug,
     }),
+
+  // With custom cache times (e.g., for frequently changing content):
+  headers: () =>
+    buildCacheHeaders(
+      { global: ["homepage"] },
+      {
+        cacheControl: "public, max-age=60, stale-while-revalidate=300",
+        cdnCacheControl: "max-age=300, stale-while-revalidate=3600",
+      },
+    ),
 });
 ```
 
@@ -257,3 +289,22 @@ export const Route = createFileRoute("/_app/new-page")({
 2. Update routes to use the new tag
 3. Add purge logic to `apps/server/src/lib/cache-keys.ts` in `buildCacheTagsToPurge()`
 4. Update CMS hooks if needed in `apps/cms/src/hooks/cache-invalidation.ts`
+
+## CDN-Specific Headers Reference
+
+### Cloudflare
+
+| Header              | Purpose                                         |
+| ------------------- | ----------------------------------------------- |
+| `CDN-Cache-Control` | Overrides `Cache-Control` for edge caching only |
+| `Cache-Tag`         | Tags for surgical cache purging (Pro plan+)     |
+| `cf-cache-status`   | Response header showing HIT/MISS/EXPIRED status |
+
+### Header Priority (Cloudflare)
+
+1. `CDN-Cache-Control` (if present, used for edge)
+2. `Surrogate-Control` (legacy, not used)
+3. `Cache-Control` with `s-maxage` (shared cache directive)
+4. `Cache-Control` with `max-age` (fallback)
+
+Our setup uses `CDN-Cache-Control` for explicit CDN control while keeping `Cache-Control` simple for browsers.
