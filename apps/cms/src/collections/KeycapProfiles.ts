@@ -1,8 +1,24 @@
-import type { CollectionConfig } from "payload";
+import type { CollectionConfig, FieldHook } from "payload";
+import slugify from "slugify";
 
 import { isAuthenticated } from "@/access/authenticated";
 import { isAdminOrApi, isAdminOrEditorOrApi } from "@/access/roles";
 import { PROFILE_SHAPES } from "@/constants";
+
+/**
+ * Auto-generates a slug from the title field.
+ * Only generates on create, not on update (to preserve existing slugs).
+ */
+const generateSlugFromTitle: FieldHook = ({ data, operation, value }) => {
+  if (operation === "create" && !value && data?.title) {
+    return slugify(data.title, {
+      lower: true,
+      strict: true,
+      locale: "fr",
+    });
+  }
+  return value;
+};
 import {
   collectionAfterChangeHook,
   collectionAfterDeleteHook,
@@ -79,10 +95,17 @@ export const KeycapProfiles: CollectionConfig = {
               unique: true,
               index: true,
               label: { fr: "Slug", en: "Slug" },
+              hooks: {
+                beforeValidate: [generateSlugFromTitle],
+              },
               admin: {
+                readOnly: true,
                 description: {
-                  fr: "Identifiant URL unique du profil",
-                  en: "Unique URL identifier for the profile",
+                  fr: "Identifiant URL unique (généré automatiquement depuis le titre)",
+                  en: "Unique URL identifier (auto-generated from title)",
+                },
+                components: {
+                  Field: "@/components/fields/SlugField#SlugField",
                 },
               },
             },
