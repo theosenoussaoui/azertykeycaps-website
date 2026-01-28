@@ -2,6 +2,7 @@ import type { CollectionConfig, FieldHook } from "payload";
 import slugify from "slugify";
 
 import { isAuthenticated } from "@/access/authenticated";
+import { isAdminOrApi, isAdminOrEditorOrApi } from "@/access/roles";
 import { ARTICLE_MATERIALS, ARTICLE_STATUS } from "@/constants";
 import {
   collectionAfterChangeHook,
@@ -36,7 +37,10 @@ export const Articles: CollectionConfig = {
     group: { fr: "Contenu", en: "Content" },
   },
   access: {
+    create: isAdminOrEditorOrApi,
     read: isAuthenticated,
+    update: isAdminOrEditorOrApi,
+    delete: isAdminOrApi,
   },
   hooks: {
     afterChange: [collectionAfterChangeHook],

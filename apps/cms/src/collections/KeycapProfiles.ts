@@ -1,6 +1,7 @@
 import type { CollectionConfig } from "payload";
 
 import { isAuthenticated } from "@/access/authenticated";
+import { isAdminOrApi, isAdminOrEditorOrApi } from "@/access/roles";
 import { PROFILE_SHAPES } from "@/constants";
 import {
   collectionAfterChangeHook,
@@ -28,7 +29,10 @@ export const KeycapProfiles: CollectionConfig = {
     group: { fr: "Contenu", en: "Content" },
   },
   access: {
+    create: isAdminOrEditorOrApi,
     read: isAuthenticated,
+    update: isAdminOrEditorOrApi,
+    delete: isAdminOrApi,
   },
   hooks: {
     afterChange: [collectionAfterChangeHook],

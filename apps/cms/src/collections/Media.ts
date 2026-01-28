@@ -1,5 +1,7 @@
 import type { CollectionConfig } from "payload";
 
+import { isAdminOrApi, isAdminOrEditorOrApi } from "@/access/roles";
+
 import {
   collectionAfterChangeHook,
   collectionAfterDeleteHook,
@@ -8,9 +10,12 @@ import {
 export const Media: CollectionConfig = {
   slug: "media",
   access: {
+    create: isAdminOrEditorOrApi,
     // Media files remain public - they're served via proxy and need to be accessible
     // The actual file URLs are hidden behind the server's /api/media/* proxy
     read: () => true,
+    update: isAdminOrEditorOrApi,
+    delete: isAdminOrApi,
   },
   // When media is populated from relationships, include filename for URL generation
   defaultPopulate: {

@@ -1,6 +1,7 @@
 import type { GlobalConfig } from "payload";
 
 import { isAuthenticated } from "@/access/authenticated";
+import { isAdminOrEditorOrApi } from "@/access/roles";
 import { globalAfterChangeHook } from "@/hooks/cache-invalidation";
 
 export const NotFoundPage: GlobalConfig = {
@@ -11,6 +12,7 @@ export const NotFoundPage: GlobalConfig = {
   },
   access: {
     read: isAuthenticated,
+    update: isAdminOrEditorOrApi,
   },
   hooks: {
     afterChange: [globalAfterChangeHook],

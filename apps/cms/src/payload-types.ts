@@ -149,9 +149,9 @@ export interface UserAuthOperations {
 export interface User {
   id: number;
   /**
-   * API role is for server integrations using API keys
+   * Admin: full access | Editor: create/update content, no delete | API: server integrations
    */
-  role: "admin" | "api";
+  role: "admin" | "api" | "editor";
   updatedAt: string;
   createdAt: string;
   enableAPIKey?: boolean | null;
