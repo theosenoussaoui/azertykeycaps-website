@@ -198,7 +198,7 @@ function MobileNav({ profiles }: { profiles: KeycapProfileRef[] }) {
       >
         <MenuIcon className="size-5" />
       </SheetTrigger>
-      <SheetContent side="left" showCloseButton>
+      <SheetContent side="left" showCloseButton className={"overflow-y-auto"}>
         <SheetHeader>
           <SheetTitle>
             <Link to="/" className="font-mono font-bold">
