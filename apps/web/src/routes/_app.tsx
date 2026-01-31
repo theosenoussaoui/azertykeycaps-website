@@ -1,43 +1,17 @@
-import type {
-  KeycapProfileRef,
-  NotFoundPage,
-  SocialNetworks,
-} from "@azertykeycaps-app/schemas";
+import type { RootLoaderData } from "./__root";
 import {
   createFileRoute,
   ErrorComponent,
   Outlet,
+  rootRouteId,
+  useMatch,
 } from "@tanstack/react-router";
 
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
 import { GridLines } from "@/components/ui/grid-lines";
-import { getLayoutData } from "@/features/globals/api/get-layout-data";
-import { getNotFoundContent } from "@/features/globals/api/get-not-found-content";
-import { buildCacheHeaders } from "@/lib/cache-tags";
-
-export interface AppLayoutContext {
-  socialNetworks: SocialNetworks | null;
-  profiles: KeycapProfileRef[];
-  notFoundContent: NotFoundPage | null;
-}
 
 export const Route = createFileRoute("/_app")({
-  loader: async (): Promise<AppLayoutContext> => {
-    const [layoutData, notFoundContent] = await Promise.all([
-      getLayoutData(),
-      getNotFoundContent(),
-    ]);
-    return {
-      socialNetworks: layoutData.socialNetworks,
-      profiles: layoutData.profiles,
-      notFoundContent,
-    };
-  },
-  headers: () => buildCacheHeaders({}),
-  staleTime: 10 * 60_000,
-  gcTime: 60 * 60_000,
-  shouldReload: false,
   component: AppLayout,
   errorComponent: ({ error }) => {
     return <ErrorComponent error={error} />;
@@ -45,7 +19,11 @@ export const Route = createFileRoute("/_app")({
 });
 
 function AppLayout() {
-  const { socialNetworks, profiles } = Route.useLoaderData();
+  // Read shared data from root loader (avoids duplicate API calls)
+  const rootMatch = useMatch({ from: rootRouteId, shouldThrow: false });
+  const rootData = rootMatch?.loaderData as RootLoaderData | undefined;
+  const socialNetworks = rootData?.socialNetworks ?? null;
+  const profiles = rootData?.profiles ?? [];
 
   return (
     <div className="relative flex min-h-svh flex-col">

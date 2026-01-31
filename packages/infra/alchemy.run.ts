@@ -75,6 +75,7 @@ export const server = await Worker("server", {
   entrypoint: "src/index.ts",
   compatibility: "node",
   domains: isProd && API_DOMAIN ? [API_DOMAIN] : undefined,
+  // Smart placement optimizes worker location based on traffic patterns to backend
   placement: { mode: "smart" },
   bindings: {
     DB: db,

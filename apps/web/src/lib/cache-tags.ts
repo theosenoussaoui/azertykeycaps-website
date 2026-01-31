@@ -18,20 +18,24 @@
  */
 
 /**
- * Cache-Control values:
+ * Cache-Control values (ISR pattern for Cloudflare Workers):
  * - max-age=300 (5 min): Browser cache freshness
- * - stale-while-revalidate=3600 (1 hour): Browser serves stale while revalidating
+ * - s-maxage=86400 (24 hours): CDN/shared cache freshness (standard HTTP directive)
+ * - stale-while-revalidate=3600 (1 hour): Serve stale while revalidating in background
  *
- * CDN-Cache-Control (Cloudflare-specific):
- * - max-age=86400 (24 hours): CDN cache freshness (safe because we have cache-tag invalidation)
+ * CDN-Cache-Control (Cloudflare-specific backup):
+ * - max-age=86400 (24 hours): CDN cache freshness
  * - stale-while-revalidate=604800 (7 days): CDN serves stale during origin issues
  *
- * This split strategy gives users fresh content (5 min browser cache) while
- * dramatically reducing origin load (24 hour CDN cache). Cache-tags ensure
- * instant invalidation when content changes in CMS.
+ * This ISR strategy gives:
+ * - Users see updates within 5 minutes (browser cache)
+ * - CDN caches for 24 hours (reduces origin load dramatically)
+ * - Cache-tags enable instant invalidation when CMS content changes
+ *
+ * @see https://tanstack.com/start/latest/docs/framework/react/hosting#cloudflare-workers
  */
 const DEFAULT_CACHE_CONTROL =
-  "public, max-age=300, stale-while-revalidate=3600";
+  "public, max-age=300, s-maxage=86400, stale-while-revalidate=3600";
 const DEFAULT_CDN_CACHE_CONTROL =
   "max-age=86400, stale-while-revalidate=604800";
 

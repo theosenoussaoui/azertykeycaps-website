@@ -1,4 +1,10 @@
-import { createFileRoute, getRouteApi, Link } from "@tanstack/react-router";
+import type { RootLoaderData } from "../__root";
+import {
+  createFileRoute,
+  Link,
+  rootRouteId,
+  useMatch,
+} from "@tanstack/react-router";
 import { AlertCircleIcon, InboxIcon, ArrowRightIcon } from "lucide-react";
 
 import { PageError } from "@/components/errors/page-error";
@@ -42,8 +48,6 @@ import {
   generateJsonLd,
   generateMeta,
 } from "@/lib/seo";
-
-const appRouteApi = getRouteApi("/_app");
 
 export const Route = createFileRoute("/_app/")({
   component: HomeComponent,
@@ -93,7 +97,10 @@ export const Route = createFileRoute("/_app/")({
 
 function HomeComponent() {
   const { articles, homepage, i18n } = Route.useLoaderData();
-  const { profiles } = appRouteApi.useLoaderData();
+  // Read profiles from root loader (shared data, avoids duplicate API calls)
+  const rootMatch = useMatch({ from: rootRouteId, shouldThrow: false });
+  const rootData = rootMatch?.loaderData as RootLoaderData | undefined;
+  const profiles = rootData?.profiles ?? [];
 
   // Use CMS content with i18n fallbacks
   const title = homepage?.title ?? i18n.home.title;

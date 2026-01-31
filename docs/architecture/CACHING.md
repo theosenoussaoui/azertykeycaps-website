@@ -97,6 +97,38 @@ We use a **split caching strategy** with separate headers for browsers and CDN:
 
 The `CDN-Cache-Control` header is Cloudflare-specific and **overrides** the standard `Cache-Control` for edge caching while leaving browser caching unchanged.
 
+#### Cloudflare Workers ISR Configuration
+
+TanStack Start uses standard HTTP cache headers that Cloudflare respects for edge caching:
+
+```typescript
+// Cache-Control with s-maxage for CDN caching
+"Cache-Control": "public, max-age=300, s-maxage=86400, stale-while-revalidate=3600"
+
+// Cloudflare-specific header for additional control
+"CDN-Cache-Control": "max-age=86400, stale-while-revalidate=604800"
+```
+
+**How it works:**
+
+1. `max-age=300` → Browser caches for 5 minutes
+2. `s-maxage=86400` → CDN caches for 24 hours (standard HTTP shared cache directive)
+3. `CDN-Cache-Control` → Cloudflare-specific override with extended stale-while-revalidate
+4. `Cache-Tag` → Enables surgical cache purging when CMS content changes
+
+**Verify caching is working:**
+
+```bash
+curl -I https://www.azertykeycaps.fr/
+
+# Look for:
+# cf-cache-status: HIT    (served from CDN cache)
+# cf-cache-status: MISS   (first request, fetched from origin)
+# age: 123                (seconds since cached)
+```
+
+@see https://tanstack.com/start/latest/docs/framework/react/hosting#cloudflare-workers
+
 ### Layer 2: Workers Cache API (Media)
 
 - Media files proxied from CMS are cached for 7 days
