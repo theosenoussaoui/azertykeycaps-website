@@ -8,6 +8,7 @@ import { bodyLimit } from "hono/body-limit";
 import {
   buildCacheKeys,
   buildCacheTagsToPurge,
+  buildDynamicPageDataCacheKeys,
   buildPageDataCacheKeys,
 } from "@/lib/cache-keys";
 import { CACHE_NAMES, invalidateCache } from "@/middleware";
@@ -32,11 +33,21 @@ const cache = new Hono()
       const cacheKeys = buildCacheKeys(env.SERVER_URL, type, slug);
       const cmsResult = await invalidateCache(CACHE_NAMES.CMS_API, cacheKeys);
 
-      // Invalidate Page Data cache (aggregated endpoints)
+      // Invalidate Page Data cache (static aggregated endpoints)
       const pageDataKeys = buildPageDataCacheKeys(env.SERVER_URL, type, slug);
       const pageDataResult = await invalidateCache(
         CACHE_NAMES.PAGE_DATA,
         pageDataKeys,
+      );
+
+      // Invalidate dynamic Page Data cache (slug-based endpoints)
+      const dynamicPageDataKeys = buildDynamicPageDataCacheKeys(
+        env.SERVER_URL,
+        payload,
+      );
+      const dynamicPageDataResult = await invalidateCache(
+        CACHE_NAMES.PAGE_DATA,
+        dynamicPageDataKeys,
       );
 
       // Invalidate media cache if applicable
@@ -71,6 +82,7 @@ const cache = new Hono()
         results: {
           cms: cmsResult,
           pageData: pageDataResult,
+          dynamicPageData: dynamicPageDataResult,
           media: mediaResult,
           cdn: cdnResult,
         },

@@ -18,10 +18,9 @@ import {
   PageSectionTitle,
 } from "@/components/ui/page-container";
 import { SectionDivider } from "@/components/ui/section-divider";
-import { getArticleBySlug } from "@/features/articles/api/get-article-by-slug";
-import { getRelatedArticles } from "@/features/articles/api/get-related-articles";
 import { ArticleCard } from "@/features/articles/components/article-card";
 import { ArticleContent } from "@/features/articles/components/article-content";
+import { getArticlePageData } from "@/features/pages/api/get-article-page-data";
 import { t } from "@/i18n";
 import { buildCacheHeaders } from "@/lib/cache-tags";
 import { getPreloadLinkAttributes } from "@/lib/image-utils";
@@ -35,27 +34,20 @@ import {
 export const Route = createFileRoute("/_app/articles/$slug")({
   component: ArticleDetailPage,
   loader: async ({ params }) => {
-    const [article, i18n] = await Promise.all([
-      getArticleBySlug({ data: { slug: params.slug } }),
+    const [data, i18n] = await Promise.all([
+      getArticlePageData({ data: { slug: params.slug } }),
       t(),
     ]);
 
-    if (!article) {
+    if (!data) {
       throw notFound();
     }
 
-    // Fetch related articles (same profile, excluding current)
-    const relatedArticles = article.profile
-      ? await getRelatedArticles({
-          data: {
-            profileSlug: article.profile.slug,
-            excludeSlug: article.slug,
-            limit: 4,
-          },
-        })
-      : { docs: [] };
-
-    return { article, relatedArticles: relatedArticles.docs, i18n };
+    return {
+      article: data.article,
+      relatedArticles: data.relatedArticles,
+      i18n,
+    };
   },
   head: ({ loaderData, params }) => {
     const article = loaderData?.article;

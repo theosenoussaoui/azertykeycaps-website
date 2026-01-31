@@ -1,4 +1,4 @@
-import type { MiddlewareHandler } from "hono";
+import type { Context, MiddlewareHandler } from "hono";
 import { cache } from "hono/cache";
 
 export const CACHE_NAMES = {
@@ -58,6 +58,92 @@ export const pageDataCacheMiddleware: MiddlewareHandler = isDevMode()
       cacheControl: PAGE_DATA_CACHE_CONTROL,
       keyGenerator: (c) => c.req.url,
     });
+
+// ============================================
+// CONFIGURABLE CACHE MIDDLEWARE FACTORY
+// ============================================
+
+interface CacheStrategyOptions {
+  cacheName: string;
+  cacheControl: string;
+  /** Custom cache key generator. Defaults to full URL. */
+  keyGenerator?: (c: Context) => string;
+  /** Conditionally skip caching. Returns true to cache, false to bypass. */
+  shouldCache?: (c: Context) => boolean;
+}
+
+/**
+ * Factory to create cache middleware with custom strategy.
+ * Supports conditional caching and custom cache keys.
+ */
+export function createCacheMiddleware(
+  options: CacheStrategyOptions,
+): MiddlewareHandler {
+  const {
+    cacheName,
+    cacheControl,
+    keyGenerator = (c) => c.req.url,
+    shouldCache = () => true,
+  } = options;
+
+  if (isDevMode()) {
+    return createDevCacheLogger(cacheName, cacheControl);
+  }
+
+  // Create base cache middleware
+  const cacheMiddleware = cache({
+    cacheName,
+    cacheControl,
+    keyGenerator,
+  });
+
+  // Wrap with conditional caching
+  return async (c, next) => {
+    if (!shouldCache(c)) {
+      // Skip cache, go directly to origin
+      await next();
+      return;
+    }
+
+    return cacheMiddleware(c, next);
+  };
+}
+
+/**
+ * Cache middleware for profile page data endpoint.
+ * Only caches base requests (no filters, page 1).
+ * Filtered/paginated views bypass cache and go to origin.
+ */
+export const profilePageCacheMiddleware = createCacheMiddleware({
+  cacheName: CACHE_NAMES.PAGE_DATA,
+  cacheControl: PAGE_DATA_CACHE_CONTROL,
+  keyGenerator: (c) => {
+    // Strip query params - cache key is base URL only
+    const url = new URL(c.req.url);
+    return `${url.origin}${url.pathname}`;
+  },
+  shouldCache: (c) => {
+    const url = new URL(c.req.url);
+    const page = url.searchParams.get("page");
+    // Only cache: no filters AND (no page OR page=1)
+    return (
+      !url.searchParams.has("status") &&
+      !url.searchParams.has("material") &&
+      !url.searchParams.has("search") &&
+      !url.searchParams.has("isNew") &&
+      (!page || page === "1")
+    );
+  },
+});
+
+/**
+ * Cache middleware for article page data endpoint.
+ * Always caches - slug is the unique key.
+ */
+export const articlePageCacheMiddleware = createCacheMiddleware({
+  cacheName: CACHE_NAMES.PAGE_DATA,
+  cacheControl: PAGE_DATA_CACHE_CONTROL,
+});
 
 export async function invalidateCache(
   cacheName: string,

@@ -3,7 +3,12 @@ import {
   type ArticleMaterial,
   type ArticleStatus,
 } from "@azertykeycaps-app/schemas";
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  notFound,
+  useNavigate,
+} from "@tanstack/react-router";
 import { ArrowLeftIcon, SearchXIcon } from "lucide-react";
 
 import { PageErrorWithBack } from "@/components/errors/page-error";
@@ -27,10 +32,10 @@ import {
   PageTitle,
 } from "@/components/ui/page-container";
 import { SectionDivider } from "@/components/ui/section-divider";
-import { getArticlesByProfile } from "@/features/articles/api/get-articles-by-profile";
 import { ArticleCard } from "@/features/articles/components/article-card";
 import { ArticleFilters } from "@/features/articles/components/article-filters";
 import { ArticlesPagination } from "@/features/articles/components/articles-pagination";
+import { getProfilePageData } from "@/features/pages/api/get-profile-page-data";
 import { t } from "@/i18n";
 import { buildCacheHeaders } from "@/lib/cache-tags";
 import {
@@ -52,11 +57,16 @@ export const Route = createFileRoute("/_app/profile/$slug")({
   }),
   loader: async ({ params, deps }) => {
     const [data, i18n] = await Promise.all([
-      getArticlesByProfile({
+      getProfilePageData({
         data: { slug: params.slug, ...deps },
       }),
       t(),
     ]);
+
+    if (!data) {
+      throw notFound();
+    }
+
     return { ...data, i18n };
   },
   headers: ({ loaderData }) =>

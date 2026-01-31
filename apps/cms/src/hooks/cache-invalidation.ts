@@ -11,6 +11,7 @@ export interface CacheInvalidationPayload {
   id?: string;
   articleSlug?: string;
   profileSlug?: string;
+  previousProfileSlug?: string;
   relatedArticleSlugs?: string[];
 }
 
@@ -104,6 +105,7 @@ async function sendInvalidationToServer(
 export const collectionAfterChangeHook: CollectionAfterChangeHook = ({
   collection,
   doc,
+  previousDoc,
   req,
 }) => {
   const buildAndSendPayload = async () => {
@@ -116,6 +118,20 @@ export const collectionAfterChangeHook: CollectionAfterChangeHook = ({
     if (collection.slug === "articles") {
       payload.articleSlug = doc.slug;
       payload.profileSlug = await getProfileSlug(doc.profile, req);
+
+      // Detect profile change - invalidate both old and new profile pages
+      if (previousDoc) {
+        const previousProfileSlug = await getProfileSlug(
+          previousDoc.profile,
+          req,
+        );
+        if (
+          previousProfileSlug &&
+          previousProfileSlug !== payload.profileSlug
+        ) {
+          payload.previousProfileSlug = previousProfileSlug;
+        }
+      }
     }
 
     if (collection.slug === "keycap-profiles") {

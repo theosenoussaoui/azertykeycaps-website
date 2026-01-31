@@ -57,10 +57,13 @@ export const TRPC_ENDPOINTS = trpcEndpointSchema.options;
 
 /**
  * Page data endpoint paths that can be cache-invalidated.
+ * Note: /api/pages/article and /api/pages/profile are patterns (require slug).
  */
 export const pageDataEndpointSchema = z.enum([
   "/api/pages/layout",
   "/api/pages/home",
+  "/api/pages/article",
+  "/api/pages/profile",
 ]);
 export type PageDataEndpoint = z.infer<typeof pageDataEndpointSchema>;
 export const PAGE_DATA_ENDPOINTS = pageDataEndpointSchema.options;
@@ -89,6 +92,7 @@ export const cacheInvalidationPayloadSchema = z.object({
   id: z.string().optional(),
   articleSlug: z.string().optional(),
   profileSlug: z.string().optional(),
+  previousProfileSlug: z.string().optional(),
   relatedArticleSlugs: z.array(z.string()).optional(),
 });
 

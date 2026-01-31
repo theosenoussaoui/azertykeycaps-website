@@ -61,7 +61,7 @@ export function buildCacheTagsToPurge(
   payload: CacheInvalidationPayload,
 ): string[] {
   const tags: string[] = [];
-  const { type, slug, articleSlug, profileSlug } = payload;
+  const { type, slug, articleSlug, profileSlug, previousProfileSlug } = payload;
 
   if (type === "collection") {
     switch (slug) {
@@ -75,6 +75,10 @@ export function buildCacheTagsToPurge(
         // Profile page that lists this article
         if (profileSlug) {
           tags.push(tag("profile", profileSlug));
+        }
+        // Previous profile page (when article's profile changed)
+        if (previousProfileSlug) {
+          tags.push(tag("profile", previousProfileSlug));
         }
         break;
 
@@ -120,22 +124,32 @@ export function buildCacheTagsToPurge(
 /**
  * Mapping from content slugs to page data endpoints that need invalidation.
  * Uses Zod enum types for compile-time safety.
+ *
+ * Note: /api/pages/article and /api/pages/profile are patterns that require
+ * slug-based invalidation via buildDynamicPageDataCacheKeys().
  */
 const SLUG_TO_PAGE_DATA_ENDPOINTS: Partial<
   Record<CacheSlug, PageDataEndpoint[]>
 > = {
   // Layout data (root loader)
   "social-networks": ["/api/pages/layout"],
-  "keycap-profiles": ["/api/pages/layout", "/api/pages/home"],
+  "keycap-profiles": [
+    "/api/pages/layout",
+    "/api/pages/home",
+    "/api/pages/profile",
+  ],
   "not-found-page": ["/api/pages/layout"],
-  // Homepage data
-  articles: ["/api/pages/home"],
+  // Homepage and article data
+  articles: ["/api/pages/home", "/api/pages/article"],
   homepage: ["/api/pages/home"],
 };
 
 /**
  * Build page data cache keys to invalidate.
  * These are the aggregated page data endpoints (/api/pages/*).
+ *
+ * Note: This only handles static endpoints. For slug-based endpoints
+ * like /api/pages/article/:slug, use buildDynamicPageDataCacheKeys().
  */
 export function buildPageDataCacheKeys(
   serverUrl: string,
@@ -144,5 +158,48 @@ export function buildPageDataCacheKeys(
 ): string[] {
   const endpoints = SLUG_TO_PAGE_DATA_ENDPOINTS[slug] ?? [];
 
-  return endpoints.map((endpoint) => `${serverUrl}${endpoint}`);
+  // Filter out pattern endpoints that require dynamic handling
+  return endpoints
+    .filter((e) => e !== "/api/pages/article" && e !== "/api/pages/profile")
+    .map((endpoint) => `${serverUrl}${endpoint}`);
+}
+
+/**
+ * Build dynamic page data cache keys for slug-based endpoints.
+ * These require specific slugs from the invalidation payload.
+ *
+ * Handles:
+ * - /api/pages/article/:articleSlug
+ * - /api/pages/profile/:profileSlug (base URL only, no query params)
+ * - /api/pages/profile/:previousProfileSlug (when article's profile changed)
+ */
+export function buildDynamicPageDataCacheKeys(
+  serverUrl: string,
+  payload: CacheInvalidationPayload,
+): string[] {
+  const keys: string[] = [];
+
+  // Article detail page - uses articleSlug
+  if (payload.articleSlug) {
+    keys.push(`${serverUrl}/api/pages/article/${payload.articleSlug}`);
+  }
+
+  // Profile page - uses profileSlug (base URL only, no query params)
+  if (payload.profileSlug) {
+    keys.push(`${serverUrl}/api/pages/profile/${payload.profileSlug}`);
+  }
+
+  // Previous profile page - when article's profile changed
+  if (payload.previousProfileSlug) {
+    keys.push(`${serverUrl}/api/pages/profile/${payload.previousProfileSlug}`);
+  }
+
+  // Related articles (when profile changes, invalidate their article pages)
+  if (payload.relatedArticleSlugs) {
+    for (const slug of payload.relatedArticleSlugs) {
+      keys.push(`${serverUrl}/api/pages/article/${slug}`);
+    }
+  }
+
+  return keys;
 }

@@ -1,8 +1,11 @@
 export {
+  articlePageCacheMiddleware,
+  CACHE_NAMES,
+  createCacheMiddleware,
+  invalidateCache,
   mediaCacheMiddleware,
   pageDataCacheMiddleware,
-  invalidateCache,
-  CACHE_NAMES,
+  profilePageCacheMiddleware,
 } from "@/middleware/cache";
 export {
   createCorsMiddleware,

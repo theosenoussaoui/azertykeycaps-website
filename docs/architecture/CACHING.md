@@ -138,18 +138,50 @@ curl -I https://www.azertykeycaps.fr/
 
 The `/api/pages/*` endpoints aggregate multiple tRPC calls into single requests for performance optimization. Instead of making multiple HTTP calls from the Web Worker to the Server Worker, these endpoints fetch all required CMS data in parallel with a single request.
 
-| Endpoint            | Data Included                          | Cache TTL | Cache Name        |
-| ------------------- | -------------------------------------- | --------- | ----------------- |
-| `/api/pages/layout` | socialNetworks, profiles, notFoundPage | 24 hours  | `page-data-cache` |
-| `/api/pages/home`   | latest articles (4), homepage content  | 24 hours  | `page-data-cache` |
+| Endpoint                   | Data Included                          | Cache Strategy            | Cache Name        |
+| -------------------------- | -------------------------------------- | ------------------------- | ----------------- |
+| `/api/pages/layout`        | socialNetworks, profiles, notFoundPage | Always cached (24 hours)  | `page-data-cache` |
+| `/api/pages/home`          | latest articles (4), homepage content  | Always cached (24 hours)  | `page-data-cache` |
+| `/api/pages/article/:slug` | article (full), relatedArticles (4)    | Always cached (24 hours)  | `page-data-cache` |
+| `/api/pages/profile/:slug` | profile (full), articles (paginated)   | **Base URL only** (below) | `page-data-cache` |
 
 These endpoints use the Cloudflare Workers Cache API (via Hono cache middleware) with the same invalidation strategy as tRPC endpoints.
+
+#### Profile Endpoint Cache Strategy
+
+The profile endpoint supports query params for filtering and pagination:
+
+```
+GET /api/pages/profile/:slug?page=1&status=in_stock&material=pbt_double_shot&isNew=true&search=foo
+```
+
+**Cache behavior:**
+
+- **Base requests** (no filters, page 1): Cached for 24 hours
+- **Filtered/paginated requests**: Bypass cache, go directly to origin
+
+This ensures fresh content for filtered views while still caching the most common requests (unfiltered first page).
+
+```typescript
+// Cache condition (from apps/server/src/middleware/cache.ts)
+shouldCache: (c) => {
+  const url = new URL(c.req.url);
+  const page = url.searchParams.get("page");
+  return (
+    !url.searchParams.has("status") &&
+    !url.searchParams.has("material") &&
+    !url.searchParams.has("search") &&
+    !url.searchParams.has("isNew") &&
+    (!page || page === "1")
+  );
+};
+```
 
 #### Performance Benefits
 
 | Metric                     | Before (tRPC)      | After (Page Data) |
 | -------------------------- | ------------------ | ----------------- |
-| HTTP calls from Web Worker | 2 sequential       | 2 sequential      |
+| HTTP calls from Web Worker | 2 sequential       | 1 request         |
 | CMS calls per request      | Sequential batches | Fully parallel    |
 | Data structure             | Generic tRPC       | Page-optimized    |
 
@@ -159,13 +191,15 @@ The main performance win is ensuring **all CMS calls within each request are tru
 
 The page data cache is invalidated alongside tRPC cache when content changes:
 
-| Content Change  | Page Data Endpoints Invalidated        |
-| --------------- | -------------------------------------- |
-| social-networks | `/api/pages/layout`                    |
-| keycap-profiles | `/api/pages/layout`, `/api/pages/home` |
-| not-found-page  | `/api/pages/layout`                    |
-| articles        | `/api/pages/home`                      |
-| homepage        | `/api/pages/home`                      |
+| Content Change  | Static Endpoints Invalidated           | Dynamic Endpoints Invalidated                                         |
+| --------------- | -------------------------------------- | --------------------------------------------------------------------- |
+| social-networks | `/api/pages/layout`                    | -                                                                     |
+| keycap-profiles | `/api/pages/layout`, `/api/pages/home` | `/api/pages/profile/:profileSlug`                                     |
+| not-found-page  | `/api/pages/layout`                    | -                                                                     |
+| articles        | `/api/pages/home`                      | `/api/pages/article/:articleSlug`, profile pages (current & previous) |
+| homepage        | `/api/pages/home`                      | -                                                                     |
+
+**Profile change detection:** When an article's profile changes (e.g., moved from "cherry" to "sa"), both the old and new profile pages are invalidated. The CMS hook uses Payload's `previousDoc` to detect this change and sends `previousProfileSlug` in the invalidation payload.
 
 ### Layer 3: TanStack Query (Client-Side)
 
@@ -186,13 +220,15 @@ The page data cache is invalidated alongside tRPC cache when content changes:
 
 ## What Gets Purged When Content Changes
 
-| Content Change          | Tags Purged                                                    | Pages Affected                                 |
-| ----------------------- | -------------------------------------------------------------- | ---------------------------------------------- |
-| Article created/updated | `global:homepage`, `article:{slug}`, `profile:{profileSlug}`   | Homepage, article page, profile page           |
-| Profile updated         | `global:homepage`, `profile:{slug}`, `profile-articles:{slug}` | Homepage, profile page, all profile's articles |
-| Homepage global         | `global:homepage`                                              | Homepage only                                  |
-| About page global       | `global:about`                                                 | About page only                                |
-| Social networks         | `page:all`                                                     | ALL pages (footer is everywhere)               |
+| Content Change          | Tags Purged                                                                                   | Pages Affected                                           |
+| ----------------------- | --------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| Article created/updated | `global:homepage`, `article:{slug}`, `profile:{profileSlug}`, `profile:{previousProfileSlug}` | Homepage, article page, current & previous profile pages |
+| Profile updated         | `global:homepage`, `profile:{slug}`, `profile-articles:{slug}`                                | Homepage, profile page, all profile's articles           |
+| Homepage global         | `global:homepage`                                                                             | Homepage only                                            |
+| About page global       | `global:about`                                                                                | About page only                                          |
+| Social networks         | `page:all`                                                                                    | ALL pages (footer is everywhere)                         |
+
+**Note:** When an article's profile changes, both `profile:{profileSlug}` (new) and `profile:{previousProfileSlug}` (old) are purged to ensure both profile pages show correct article counts.
 
 ## Cache Invalidation Flow
 
@@ -202,19 +238,33 @@ CMS Content Changed
         v
 +------------------+
 | Payload Hook     |  afterChange / afterDelete
+| (uses previousDoc to detect profile changes)
 +------------------+
         |
         | POST /api/cache/invalidate
-        | { type: "collection", slug: "articles", articleSlug: "foo", profileSlug: "bar" }
+        | {
+        |   type: "collection",
+        |   slug: "articles",
+        |   articleSlug: "foo",
+        |   profileSlug: "bar",
+        |   previousProfileSlug: "baz"  (if profile changed)
+        | }
         v
 +------------------+
 | Hono Server      |
-| buildCacheTagsToPurge() → ["global:homepage", "article:foo", "profile:bar"]
 +------------------+
         |
-        +---> Workers Cache API (invalidate tRPC cache)
+        +---> buildCacheKeys() → tRPC endpoint URLs
+        |     Workers Cache API (invalidate tRPC cache)
         |
-        +---> Cloudflare API: POST /purge_cache { tags: [...] }
+        +---> buildPageDataCacheKeys() → static page data URLs
+        |     Workers Cache API (invalidate /api/pages/layout, /api/pages/home)
+        |
+        +---> buildDynamicPageDataCacheKeys() → slug-based URLs
+        |     Workers Cache API (invalidate /api/pages/article/:slug, /api/pages/profile/:slug)
+        |
+        +---> buildCacheTagsToPurge() → ["global:homepage", "article:foo", "profile:bar", "profile:baz"]
+              Cloudflare API: POST /purge_cache { tags: [...] }
 ```
 
 ## Environment Variables
@@ -307,18 +357,23 @@ curl -X POST "https://api.cloudflare.com/client/v4/zones/{zone_id}/purge_cache" 
 
 ## Implementation Files
 
-| File                                       | Purpose                                      |
-| ------------------------------------------ | -------------------------------------------- |
-| `apps/web/src/lib/cache-tags.ts`           | `buildCacheHeaders()` utility for routes     |
-| `apps/web/src/routes/_app/*.tsx`           | Routes with `headers()` returning cache tags |
-| `apps/web/src/features/pages/api/*.ts`     | Server functions for page data endpoints     |
-| `apps/server/src/lib/cache-keys.ts`        | `buildCacheTagsToPurge()` for invalidation   |
-| `apps/server/src/routes/pages/layout.ts`   | Aggregated layout data endpoint              |
-| `apps/server/src/routes/pages/home.ts`     | Aggregated homepage data endpoint            |
-| `apps/server/src/services/cloudflare.ts`   | `purgeCloudflareCDNByTags()` API call        |
-| `apps/server/src/routes/cache.ts`          | `/api/cache/invalidate` endpoint             |
-| `apps/cms/src/hooks/cache-invalidation.ts` | Payload CMS hooks                            |
-| `packages/utils/src/date.ts`               | Shared date formatting utility               |
+| File                                       | Purpose                                                      |
+| ------------------------------------------ | ------------------------------------------------------------ |
+| `apps/web/src/lib/cache-tags.ts`           | `buildCacheHeaders()` utility for routes                     |
+| `apps/web/src/routes/_app/*.tsx`           | Routes with `headers()` returning cache tags                 |
+| `apps/web/src/features/pages/api/*.ts`     | Server functions for page data endpoints                     |
+| `apps/server/src/middleware/cache.ts`      | Cache middleware factory with route-specific strategies      |
+| `apps/server/src/lib/cache-keys.ts`        | `buildCacheTagsToPurge()`, `buildDynamicPageDataCacheKeys()` |
+| `apps/server/src/routes/pages/layout.ts`   | Aggregated layout data endpoint                              |
+| `apps/server/src/routes/pages/home.ts`     | Aggregated homepage data endpoint                            |
+| `apps/server/src/routes/pages/article.ts`  | Aggregated article detail data endpoint                      |
+| `apps/server/src/routes/pages/profile.ts`  | Aggregated profile page data endpoint (with query params)    |
+| `apps/server/src/services/cloudflare.ts`   | `purgeCloudflareCDNByTags()` API call                        |
+| `apps/server/src/routes/cache.ts`          | `/api/cache/invalidate` endpoint                             |
+| `apps/cms/src/hooks/cache-invalidation.ts` | Payload CMS hooks (with `previousDoc` support)               |
+| `packages/schemas/src/filters.ts`          | `profilePageQueryParamsSchema` for Hono validation           |
+| `packages/schemas/src/responses.ts`        | `ArticlePageDataResponse`, `ProfilePageDataResponse`         |
+| `packages/utils/src/date.ts`               | Shared date formatting utility                               |
 
 ## Adding Cache Tags to New Routes
 
