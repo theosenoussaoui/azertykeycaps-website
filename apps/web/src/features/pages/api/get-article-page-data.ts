@@ -13,17 +13,31 @@ import { serverEnv } from "@/lib/server-env";
 export const getArticlePageData = createServerFn({ method: "GET" })
   .inputValidator((data: { slug: string }) => data)
   .handler(async ({ data }): Promise<ArticlePageDataResponse | null> => {
-    const response = await fetch(
-      `${serverEnv.SERVER_URL}/api/pages/article/${data.slug}`,
-    );
+    const url = `${serverEnv.SERVER_URL}/api/pages/article/${data.slug}`;
 
-    if (response.status === 404) {
-      return null;
+    // Add timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (response.status === 404) {
+        return null;
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch article data: ${response.status}`);
+      }
+
+      // Explicitly await json() to ensure body is fully consumed
+      return await response.json();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error("Article data request timed out");
+      }
+      throw error;
     }
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch article data: ${response.status}`);
-    }
-
-    return response.json();
   });

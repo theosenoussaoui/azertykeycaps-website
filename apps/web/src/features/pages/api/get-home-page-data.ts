@@ -14,12 +14,28 @@ import { serverEnv } from "@/lib/server-env";
  */
 export const getHomePageData = createServerFn({ method: "GET" }).handler(
   async (): Promise<HomePageDataResponse> => {
-    const response = await fetch(`${serverEnv.SERVER_URL}/api/pages/home`);
+    const url = `${serverEnv.SERVER_URL}/api/pages/home`;
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch homepage data: ${response.status}`);
+    // Add timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
+
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch homepage data: ${response.status}`);
+      }
+
+      // Explicitly await json() to ensure body is fully consumed
+      return await response.json();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error("Homepage data request timed out");
+      }
+      throw error;
     }
-
-    return response.json();
   },
 );

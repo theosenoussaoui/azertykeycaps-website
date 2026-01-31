@@ -33,15 +33,29 @@ export const getProfilePageData = createServerFn({ method: "GET" })
     const queryString = params.toString();
     const url = `${serverEnv.SERVER_URL}/api/pages/profile/${slug}${queryString ? `?${queryString}` : ""}`;
 
-    const response = await fetch(url);
+    // Add timeout to prevent hanging requests
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 25000);
 
-    if (response.status === 404) {
-      return null;
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (response.status === 404) {
+        return null;
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch profile data: ${response.status}`);
+      }
+
+      // Explicitly await json() to ensure body is fully consumed
+      return await response.json();
+    } catch (error) {
+      clearTimeout(timeoutId);
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new Error("Profile data request timed out");
+      }
+      throw error;
     }
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch profile data: ${response.status}`);
-    }
-
-    return response.json();
   });
