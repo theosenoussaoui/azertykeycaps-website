@@ -5,9 +5,13 @@ import { Hono } from "hono";
 import { bearerAuth } from "hono/bearer-auth";
 import { bodyLimit } from "hono/body-limit";
 
-import { buildCacheKeys, buildCacheTagsToPurge } from "../lib/cache-keys";
-import { CACHE_NAMES, invalidateCache } from "../middleware";
-import { purgeCloudflareCDNByTags } from "../services/cloudflare";
+import {
+  buildCacheKeys,
+  buildCacheTagsToPurge,
+  buildPageDataCacheKeys,
+} from "@/lib/cache-keys";
+import { CACHE_NAMES, invalidateCache } from "@/middleware";
+import { purgeCloudflareCDNByTags } from "@/services/cloudflare";
 
 const MAX_BODY_SIZE = 50 * 1024;
 
@@ -27,6 +31,13 @@ const cache = new Hono()
       // Invalidate Workers Cache API (tRPC endpoints)
       const cacheKeys = buildCacheKeys(env.SERVER_URL, type, slug);
       const cmsResult = await invalidateCache(CACHE_NAMES.CMS_API, cacheKeys);
+
+      // Invalidate Page Data cache (aggregated endpoints)
+      const pageDataKeys = buildPageDataCacheKeys(env.SERVER_URL, type, slug);
+      const pageDataResult = await invalidateCache(
+        CACHE_NAMES.PAGE_DATA,
+        pageDataKeys,
+      );
 
       // Invalidate media cache if applicable
       let mediaResult = { success: true, message: "Skipped (not media)" };
@@ -59,6 +70,7 @@ const cache = new Hono()
         payload,
         results: {
           cms: cmsResult,
+          pageData: pageDataResult,
           media: mediaResult,
           cdn: cdnResult,
         },

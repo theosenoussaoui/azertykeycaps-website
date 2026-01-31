@@ -36,9 +36,8 @@ import {
   PageTitle,
 } from "@/components/ui/page-container";
 import { SectionDivider } from "@/components/ui/section-divider";
-import { getLatestArticles } from "@/features/articles/api/get-latest-articles";
 import { ArticleCard } from "@/features/articles/components/article-card";
-import { getHomepageContent } from "@/features/globals/api/get-homepage-content";
+import { getHomePageData } from "@/features/pages/api/get-home-page-data";
 import { t } from "@/i18n";
 import { buildCacheHeaders } from "@/lib/cache-tags";
 import { getPreloadLinkAttributes } from "@/lib/image-utils";
@@ -52,12 +51,12 @@ import {
 export const Route = createFileRoute("/_app/")({
   component: HomeComponent,
   loader: async () => {
-    const [articlesData, homepage, i18n] = await Promise.all([
-      getLatestArticles(),
-      getHomepageContent(),
-      t(),
-    ]);
-    return { ...articlesData, homepage, i18n };
+    const [pageData, i18n] = await Promise.all([getHomePageData(), t()]);
+    return {
+      articles: pageData.articles,
+      homepage: pageData.homepage,
+      i18n,
+    };
   },
   headers: () => buildCacheHeaders({ global: ["homepage"] }),
   staleTime: 60_000,

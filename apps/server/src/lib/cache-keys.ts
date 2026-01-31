@@ -1,4 +1,26 @@
-import type { CacheInvalidationPayload } from "@azertykeycaps-app/schemas";
+import type {
+  CacheInvalidationPayload,
+  CacheSlug,
+  TrpcEndpoint,
+  PageDataEndpoint,
+} from "@azertykeycaps-app/schemas";
+
+/**
+ * Mapping from content slugs to tRPC endpoints that need invalidation.
+ * Uses Zod enum types for compile-time safety.
+ */
+const SLUG_TO_TRPC_ENDPOINTS: Record<CacheSlug, TrpcEndpoint[]> = {
+  // Collections
+  articles: ["articles.list", "articles.bySlug"],
+  "keycap-profiles": ["articles.profiles", "articles.list"],
+  media: [],
+  // Globals
+  homepage: ["articles.list", "articles.profiles", "globals.homepage"],
+  "social-networks": ["globals.socialNetworks"],
+  "informations-page": ["globals.informationsPage"],
+  "suggestion-page": ["globals.suggestionPage"],
+  "not-found-page": ["globals.notFoundPage"],
+};
 
 /**
  * Build tRPC cache keys to invalidate in Workers Cache API.
@@ -6,27 +28,21 @@ import type { CacheInvalidationPayload } from "@azertykeycaps-app/schemas";
 export function buildCacheKeys(
   serverUrl: string,
   _type: "collection" | "global",
-  slug: string,
+  slug: CacheSlug,
 ): string[] {
-  const keys: string[] = [];
+  const endpoints = SLUG_TO_TRPC_ENDPOINTS[slug] ?? [];
 
-  const endpointMap: Record<string, string[]> = {
-    articles: ["articles.list", "articles.bySlug"],
-    "keycap-profiles": ["articles.profiles", "articles.list"],
-    media: [],
-    homepage: ["articles.list", "articles.profiles"],
-    "social-networks": ["globals.socialNetworks"],
-    "informations-page": ["globals.informationsPage"],
-    "suggestion-page": ["globals.suggestionPage"],
-  };
+  return endpoints.map((endpoint) => `${serverUrl}/trpc/${endpoint}`);
+}
 
-  const endpoints = endpointMap[slug] || [];
-
-  for (const endpoint of endpoints) {
-    keys.push(`${serverUrl}/trpc/${endpoint}`);
-  }
-
-  return keys;
+/**
+ * Cache tag builder helpers using typed prefixes.
+ */
+function tag(
+  prefix: "page" | "global" | "article" | "profile" | "profile-articles",
+  value: string,
+): string {
+  return `${prefix}:${value}`;
 }
 
 /**
@@ -51,25 +67,25 @@ export function buildCacheTagsToPurge(
     switch (slug) {
       case "articles":
         // Homepage shows latest articles
-        tags.push("global:homepage");
+        tags.push(tag("global", "homepage"));
         // The specific article page
         if (articleSlug) {
-          tags.push(`article:${articleSlug}`);
+          tags.push(tag("article", articleSlug));
         }
         // Profile page that lists this article
         if (profileSlug) {
-          tags.push(`profile:${profileSlug}`);
+          tags.push(tag("profile", profileSlug));
         }
         break;
 
       case "keycap-profiles":
         // Homepage shows profiles
-        tags.push("global:homepage");
+        tags.push(tag("global", "homepage"));
         if (profileSlug) {
           // The profile page itself
-          tags.push(`profile:${profileSlug}`);
+          tags.push(tag("profile", profileSlug));
           // All articles belonging to this profile
-          tags.push(`profile-articles:${profileSlug}`);
+          tags.push(tag("profile-articles", profileSlug));
         }
         break;
 
@@ -80,20 +96,53 @@ export function buildCacheTagsToPurge(
   } else if (type === "global") {
     switch (slug) {
       case "homepage":
-        tags.push("global:homepage");
+        tags.push(tag("global", "homepage"));
         break;
       case "informations-page":
-        tags.push("global:about");
+        tags.push(tag("global", "about"));
         break;
       case "suggestion-page":
-        tags.push("global:suggest");
+        tags.push(tag("global", "suggest"));
         break;
       case "social-networks":
         // Social links are in the footer - purge ALL pages
-        tags.push("page:all");
+        tags.push(tag("page", "all"));
+        break;
+      case "not-found-page":
+        // 404 page content - no specific tag needed
         break;
     }
   }
 
   return [...new Set(tags)];
+}
+
+/**
+ * Mapping from content slugs to page data endpoints that need invalidation.
+ * Uses Zod enum types for compile-time safety.
+ */
+const SLUG_TO_PAGE_DATA_ENDPOINTS: Partial<
+  Record<CacheSlug, PageDataEndpoint[]>
+> = {
+  // Layout data (root loader)
+  "social-networks": ["/api/pages/layout"],
+  "keycap-profiles": ["/api/pages/layout", "/api/pages/home"],
+  "not-found-page": ["/api/pages/layout"],
+  // Homepage data
+  articles: ["/api/pages/home"],
+  homepage: ["/api/pages/home"],
+};
+
+/**
+ * Build page data cache keys to invalidate.
+ * These are the aggregated page data endpoints (/api/pages/*).
+ */
+export function buildPageDataCacheKeys(
+  serverUrl: string,
+  _type: "collection" | "global",
+  slug: CacheSlug,
+): string[] {
+  const endpoints = SLUG_TO_PAGE_DATA_ENDPOINTS[slug] ?? [];
+
+  return endpoints.map((endpoint) => `${serverUrl}${endpoint}`);
 }

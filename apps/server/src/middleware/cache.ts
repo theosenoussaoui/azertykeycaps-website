@@ -4,6 +4,7 @@ import { cache } from "hono/cache";
 export const CACHE_NAMES = {
   MEDIA: "media-cache",
   CMS_API: "cms-api-cache",
+  PAGE_DATA: "page-data-cache",
 } as const;
 
 function isDevMode(): boolean {
@@ -40,6 +41,21 @@ export const mediaCacheMiddleware: MiddlewareHandler = isDevMode()
   : cache({
       cacheName: CACHE_NAMES.MEDIA,
       cacheControl: MEDIA_CACHE_CONTROL,
+      keyGenerator: (c) => c.req.url,
+    });
+
+/**
+ * Cache middleware for aggregated page data endpoints.
+ * Same TTL as CMS API cache (24 hours) for consistency.
+ */
+const PAGE_DATA_CACHE_CONTROL =
+  "public, max-age=86400, stale-while-revalidate=3600";
+
+export const pageDataCacheMiddleware: MiddlewareHandler = isDevMode()
+  ? createDevCacheLogger(CACHE_NAMES.PAGE_DATA, PAGE_DATA_CACHE_CONTROL)
+  : cache({
+      cacheName: CACHE_NAMES.PAGE_DATA,
+      cacheControl: PAGE_DATA_CACHE_CONTROL,
       keyGenerator: (c) => c.req.url,
     });
 

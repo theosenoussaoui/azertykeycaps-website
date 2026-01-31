@@ -1,5 +1,10 @@
-export { mediaCacheMiddleware, invalidateCache, CACHE_NAMES } from "./cache";
+export {
+  mediaCacheMiddleware,
+  pageDataCacheMiddleware,
+  invalidateCache,
+  CACHE_NAMES,
+} from "@/middleware/cache";
 export {
   createCorsMiddleware,
   createSecureHeadersMiddleware,
-} from "./security";
+} from "@/middleware/security";

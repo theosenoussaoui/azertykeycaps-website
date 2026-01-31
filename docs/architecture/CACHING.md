@@ -134,6 +134,39 @@ curl -I https://www.azertykeycaps.fr/
 - Media files proxied from CMS are cached for 7 days
 - Invalidated when media is updated in CMS
 
+### Layer 2b: Page Data Cache (Aggregated Endpoints)
+
+The `/api/pages/*` endpoints aggregate multiple tRPC calls into single requests for performance optimization. Instead of making multiple HTTP calls from the Web Worker to the Server Worker, these endpoints fetch all required CMS data in parallel with a single request.
+
+| Endpoint            | Data Included                          | Cache TTL | Cache Name        |
+| ------------------- | -------------------------------------- | --------- | ----------------- |
+| `/api/pages/layout` | socialNetworks, profiles, notFoundPage | 24 hours  | `page-data-cache` |
+| `/api/pages/home`   | latest articles (4), homepage content  | 24 hours  | `page-data-cache` |
+
+These endpoints use the Cloudflare Workers Cache API (via Hono cache middleware) with the same invalidation strategy as tRPC endpoints.
+
+#### Performance Benefits
+
+| Metric                     | Before (tRPC)      | After (Page Data) |
+| -------------------------- | ------------------ | ----------------- |
+| HTTP calls from Web Worker | 2 sequential       | 2 sequential      |
+| CMS calls per request      | Sequential batches | Fully parallel    |
+| Data structure             | Generic tRPC       | Page-optimized    |
+
+The main performance win is ensuring **all CMS calls within each request are truly parallel**, eliminating tRPC batching overhead and reducing total response time.
+
+#### Cache Invalidation
+
+The page data cache is invalidated alongside tRPC cache when content changes:
+
+| Content Change  | Page Data Endpoints Invalidated        |
+| --------------- | -------------------------------------- |
+| social-networks | `/api/pages/layout`                    |
+| keycap-profiles | `/api/pages/layout`, `/api/pages/home` |
+| not-found-page  | `/api/pages/layout`                    |
+| articles        | `/api/pages/home`                      |
+| homepage        | `/api/pages/home`                      |
+
 ### Layer 3: TanStack Query (Client-Side)
 
 - Loader data cached in browser memory
@@ -278,10 +311,14 @@ curl -X POST "https://api.cloudflare.com/client/v4/zones/{zone_id}/purge_cache" 
 | ------------------------------------------ | -------------------------------------------- |
 | `apps/web/src/lib/cache-tags.ts`           | `buildCacheHeaders()` utility for routes     |
 | `apps/web/src/routes/_app/*.tsx`           | Routes with `headers()` returning cache tags |
+| `apps/web/src/features/pages/api/*.ts`     | Server functions for page data endpoints     |
 | `apps/server/src/lib/cache-keys.ts`        | `buildCacheTagsToPurge()` for invalidation   |
+| `apps/server/src/routes/pages/layout.ts`   | Aggregated layout data endpoint              |
+| `apps/server/src/routes/pages/home.ts`     | Aggregated homepage data endpoint            |
 | `apps/server/src/services/cloudflare.ts`   | `purgeCloudflareCDNByTags()` API call        |
 | `apps/server/src/routes/cache.ts`          | `/api/cache/invalidate` endpoint             |
 | `apps/cms/src/hooks/cache-invalidation.ts` | Payload CMS hooks                            |
+| `packages/utils/src/date.ts`               | Shared date formatting utility               |
 
 ## Adding Cache Tags to New Routes
 

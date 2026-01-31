@@ -7,8 +7,8 @@ import { requestId } from "hono/request-id";
 import {
   createCorsMiddleware,
   createSecureHeadersMiddleware,
-} from "./middleware";
-import routes from "./routes";
+} from "@/middleware";
+import routes from "@/routes";
 
 const app = new Hono();
 

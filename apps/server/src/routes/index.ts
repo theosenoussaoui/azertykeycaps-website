@@ -4,9 +4,12 @@ import { auth } from "@azertykeycaps-app/auth";
 import { trpcServer } from "@hono/trpc-server";
 import { Hono } from "hono";
 
-import cache from "./cache";
-import health from "./health";
-import media from "./media";
+import { pageDataCacheMiddleware } from "@/middleware";
+import cache from "@/routes/cache";
+import health from "@/routes/health";
+import media from "@/routes/media";
+import home from "@/routes/pages/home";
+import layout from "@/routes/pages/layout";
 
 const routes = new Hono()
   .route("/", health)
@@ -21,6 +24,10 @@ const routes = new Hono()
     }),
   )
   .route("/api/media", media)
-  .route("/api/cache", cache);
+  .route("/api/cache", cache)
+  // Page data routes with caching
+  .use("/api/pages/*", pageDataCacheMiddleware)
+  .route("/api/pages/layout", layout)
+  .route("/api/pages/home", home);
 
 export default routes;

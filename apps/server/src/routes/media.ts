@@ -4,7 +4,7 @@ import { HTTPException } from "hono/http-exception";
 import { proxy } from "hono/proxy";
 import { timeout } from "hono/timeout";
 
-import { mediaCacheMiddleware } from "../middleware";
+import { mediaCacheMiddleware } from "@/middleware";
 
 const MEDIA_TIMEOUT_MS = 30000;
 

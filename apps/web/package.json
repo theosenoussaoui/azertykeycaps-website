@@ -13,6 +13,7 @@
     "@azertykeycaps-app/auth": "workspace:*",
     "@azertykeycaps-app/env": "workspace:*",
     "@azertykeycaps-app/schemas": "workspace:*",
+    "@azertykeycaps-app/utils": "workspace:*",
     "@base-ui/react": "^1.1.0",
     "@fontsource-variable/geist": "^5.2.8",
     "@libsql/client": "catalog:",

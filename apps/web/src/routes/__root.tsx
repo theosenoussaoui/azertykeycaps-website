@@ -13,8 +13,7 @@ import {
 import { lazy, Suspense } from "react";
 
 import { NotFound } from "@/components/errors/not-found";
-import { getLayoutData } from "@/features/globals/api/get-layout-data";
-import { getNotFoundContent } from "@/features/globals/api/get-not-found-content";
+import { getLayoutData } from "@/features/pages/api/get-layout-data";
 import appCss from "@/index.css?url";
 import { siteConfig } from "@/lib/seo";
 
@@ -54,14 +53,11 @@ export interface RouterAppContext {
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   loader: async (): Promise<RootLoaderData> => {
-    const [layoutData, notFoundContent] = await Promise.all([
-      getLayoutData(),
-      getNotFoundContent(),
-    ]);
+    const data = await getLayoutData();
     return {
-      profiles: layoutData.profiles,
-      socialNetworks: layoutData.socialNetworks,
-      notFoundContent,
+      profiles: data.profiles,
+      socialNetworks: data.socialNetworks,
+      notFoundContent: data.notFoundPage,
     };
   },
   head: () => ({
