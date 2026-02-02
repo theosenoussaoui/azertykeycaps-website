@@ -12,6 +12,8 @@ import { Hono } from "hono";
  * fetching all CMS data in parallel.
  */
 const layout = new Hono().get("/", async (c) => {
+  const handlerStart = performance.now();
+
   const isDev = env.SERVER_URL?.includes("localhost") ?? true;
 
   const caller = appRouter.createCaller({
@@ -21,9 +23,30 @@ const layout = new Hono().get("/", async (c) => {
   });
 
   const [socialNetworks, profiles, notFoundPage] = await Promise.all([
-    caller.globals.socialNetworks(),
-    caller.articles.profiles({ limit: 100 }),
-    caller.globals.notFoundPage(),
+    (async () => {
+      const start = performance.now();
+      const data = await caller.globals.socialNetworks();
+      console.log(
+        `[server:/api/pages/layout] globals.socialNetworks: ${(performance.now() - start).toFixed(1)}ms`,
+      );
+      return data;
+    })(),
+    (async () => {
+      const start = performance.now();
+      const data = await caller.articles.profiles({ limit: 100 });
+      console.log(
+        `[server:/api/pages/layout] articles.profiles: ${(performance.now() - start).toFixed(1)}ms`,
+      );
+      return data;
+    })(),
+    (async () => {
+      const start = performance.now();
+      const data = await caller.globals.notFoundPage();
+      console.log(
+        `[server:/api/pages/layout] globals.notFoundPage: ${(performance.now() - start).toFixed(1)}ms`,
+      );
+      return data;
+    })(),
   ]);
 
   const response: LayoutDataResponse = {
@@ -31,6 +54,10 @@ const layout = new Hono().get("/", async (c) => {
     profiles,
     notFoundPage,
   };
+
+  console.log(
+    `[server:/api/pages/layout] total: ${(performance.now() - handlerStart).toFixed(1)}ms`,
+  );
 
   return c.json(response);
 });

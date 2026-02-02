@@ -53,7 +53,18 @@ export interface RouterAppContext {
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
   loader: async (): Promise<RootLoaderData> => {
+    const loaderStart = performance.now();
+
+    const layoutStart = performance.now();
     const data = await getLayoutData();
+    console.log(
+      `[route:/] getLayoutData: ${(performance.now() - layoutStart).toFixed(1)}ms`,
+    );
+
+    console.log(
+      `[route:/] loader total: ${(performance.now() - loaderStart).toFixed(1)}ms`,
+    );
+
     return {
       profiles: data.profiles,
       socialNetworks: data.socialNetworks,

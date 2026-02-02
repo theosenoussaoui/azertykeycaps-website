@@ -13,6 +13,8 @@ import { Hono } from "hono";
  * fetching all CMS data in parallel.
  */
 const home = new Hono().get("/", async (c) => {
+  const handlerStart = performance.now();
+
   const isDev = env.SERVER_URL?.includes("localhost") ?? true;
 
   const caller = appRouter.createCaller({
@@ -22,8 +24,22 @@ const home = new Hono().get("/", async (c) => {
   });
 
   const [articles, homepage] = await Promise.all([
-    caller.articles.list({ page: 1, limit: 4 }),
-    caller.globals.homepage(),
+    (async () => {
+      const start = performance.now();
+      const data = await caller.articles.list({ page: 1, limit: 4 });
+      console.log(
+        `[server:/api/pages/home] articles.list: ${(performance.now() - start).toFixed(1)}ms`,
+      );
+      return data;
+    })(),
+    (async () => {
+      const start = performance.now();
+      const data = await caller.globals.homepage();
+      console.log(
+        `[server:/api/pages/home] globals.homepage: ${(performance.now() - start).toFixed(1)}ms`,
+      );
+      return data;
+    })(),
   ]);
 
   // Format dates server-side to prevent hydration mismatch
@@ -40,6 +56,10 @@ const home = new Hono().get("/", async (c) => {
     articles: articlesWithFormattedDates,
     homepage,
   };
+
+  console.log(
+    `[server:/api/pages/home] total: ${(performance.now() - handlerStart).toFixed(1)}ms`,
+  );
 
   return c.json(response);
 });

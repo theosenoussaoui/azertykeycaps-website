@@ -8,249 +8,249 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from "./routes/__root";
-import { Route as AppRouteImport } from "./routes/_app";
-import { Route as AppAboutRouteImport } from "./routes/_app/about";
-import { Route as AppArticlesSlugRouteImport } from "./routes/_app/articles.$slug";
-import { Route as AppIndexRouteImport } from "./routes/_app/index";
-import { Route as AppProfileSlugRouteImport } from "./routes/_app/profile.$slug";
-import { Route as AppSuggestRouteImport } from "./routes/_app/suggest";
-import { Route as DashboardRouteImport } from "./routes/dashboard";
-import { Route as LlmsDottxtRouteImport } from "./routes/llms[.]txt";
-import { Route as LoginRouteImport } from "./routes/login";
-import { Route as RobotsDottxtRouteImport } from "./routes/robots[.]txt";
-import { Route as SitemapDotxmlRouteImport } from "./routes/sitemap[.]xml";
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppSuggestRouteImport } from './routes/_app/suggest'
+import { Route as AppAboutRouteImport } from './routes/_app/about'
+import { Route as AppProfileSlugRouteImport } from './routes/_app/profile.$slug'
+import { Route as AppArticlesSlugRouteImport } from './routes/_app/articles.$slug'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: "/sitemap.xml",
-  path: "/sitemap.xml",
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
-  id: "/robots.txt",
-  path: "/robots.txt",
+  id: '/robots.txt',
+  path: '/robots.txt',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const LoginRoute = LoginRouteImport.update({
-  id: "/login",
-  path: "/login",
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
-  id: "/llms.txt",
-  path: "/llms.txt",
+  id: '/llms.txt',
+  path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
-  id: "/dashboard",
-  path: "/dashboard",
+  id: '/dashboard',
+  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AppRoute = AppRouteImport.update({
-  id: "/_app",
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
-} as any);
+} as any)
 const AppIndexRoute = AppIndexRouteImport.update({
-  id: "/",
-  path: "/",
+  id: '/',
+  path: '/',
   getParentRoute: () => AppRoute,
-} as any);
+} as any)
 const AppSuggestRoute = AppSuggestRouteImport.update({
-  id: "/suggest",
-  path: "/suggest",
+  id: '/suggest',
+  path: '/suggest',
   getParentRoute: () => AppRoute,
-} as any);
+} as any)
 const AppAboutRoute = AppAboutRouteImport.update({
-  id: "/about",
-  path: "/about",
+  id: '/about',
+  path: '/about',
   getParentRoute: () => AppRoute,
-} as any);
+} as any)
 const AppProfileSlugRoute = AppProfileSlugRouteImport.update({
-  id: "/profile/$slug",
-  path: "/profile/$slug",
+  id: '/profile/$slug',
+  path: '/profile/$slug',
   getParentRoute: () => AppRoute,
-} as any);
+} as any)
 const AppArticlesSlugRoute = AppArticlesSlugRouteImport.update({
-  id: "/articles/$slug",
-  path: "/articles/$slug",
+  id: '/articles/$slug',
+  path: '/articles/$slug',
   getParentRoute: () => AppRoute,
-} as any);
+} as any)
 
 export interface FileRoutesByFullPath {
-  "/": typeof AppIndexRoute;
-  "/dashboard": typeof DashboardRoute;
-  "/llms.txt": typeof LlmsDottxtRoute;
-  "/login": typeof LoginRoute;
-  "/robots.txt": typeof RobotsDottxtRoute;
-  "/sitemap.xml": typeof SitemapDotxmlRoute;
-  "/about": typeof AppAboutRoute;
-  "/suggest": typeof AppSuggestRoute;
-  "/articles/$slug": typeof AppArticlesSlugRoute;
-  "/profile/$slug": typeof AppProfileSlugRoute;
+  '/': typeof AppIndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/login': typeof LoginRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/about': typeof AppAboutRoute
+  '/suggest': typeof AppSuggestRoute
+  '/articles/$slug': typeof AppArticlesSlugRoute
+  '/profile/$slug': typeof AppProfileSlugRoute
 }
 export interface FileRoutesByTo {
-  "/dashboard": typeof DashboardRoute;
-  "/llms.txt": typeof LlmsDottxtRoute;
-  "/login": typeof LoginRoute;
-  "/robots.txt": typeof RobotsDottxtRoute;
-  "/sitemap.xml": typeof SitemapDotxmlRoute;
-  "/about": typeof AppAboutRoute;
-  "/suggest": typeof AppSuggestRoute;
-  "/": typeof AppIndexRoute;
-  "/articles/$slug": typeof AppArticlesSlugRoute;
-  "/profile/$slug": typeof AppProfileSlugRoute;
+  '/dashboard': typeof DashboardRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/login': typeof LoginRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/about': typeof AppAboutRoute
+  '/suggest': typeof AppSuggestRoute
+  '/': typeof AppIndexRoute
+  '/articles/$slug': typeof AppArticlesSlugRoute
+  '/profile/$slug': typeof AppProfileSlugRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport;
-  "/_app": typeof AppRouteWithChildren;
-  "/dashboard": typeof DashboardRoute;
-  "/llms.txt": typeof LlmsDottxtRoute;
-  "/login": typeof LoginRoute;
-  "/robots.txt": typeof RobotsDottxtRoute;
-  "/sitemap.xml": typeof SitemapDotxmlRoute;
-  "/_app/about": typeof AppAboutRoute;
-  "/_app/suggest": typeof AppSuggestRoute;
-  "/_app/": typeof AppIndexRoute;
-  "/_app/articles/$slug": typeof AppArticlesSlugRoute;
-  "/_app/profile/$slug": typeof AppProfileSlugRoute;
+  __root__: typeof rootRouteImport
+  '/_app': typeof AppRouteWithChildren
+  '/dashboard': typeof DashboardRoute
+  '/llms.txt': typeof LlmsDottxtRoute
+  '/login': typeof LoginRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_app/about': typeof AppAboutRoute
+  '/_app/suggest': typeof AppSuggestRoute
+  '/_app/': typeof AppIndexRoute
+  '/_app/articles/$slug': typeof AppArticlesSlugRoute
+  '/_app/profile/$slug': typeof AppProfileSlugRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath;
+  fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | "/"
-    | "/dashboard"
-    | "/llms.txt"
-    | "/login"
-    | "/robots.txt"
-    | "/sitemap.xml"
-    | "/about"
-    | "/suggest"
-    | "/articles/$slug"
-    | "/profile/$slug";
-  fileRoutesByTo: FileRoutesByTo;
+    | '/'
+    | '/dashboard'
+    | '/llms.txt'
+    | '/login'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/about'
+    | '/suggest'
+    | '/articles/$slug'
+    | '/profile/$slug'
+  fileRoutesByTo: FileRoutesByTo
   to:
-    | "/dashboard"
-    | "/llms.txt"
-    | "/login"
-    | "/robots.txt"
-    | "/sitemap.xml"
-    | "/about"
-    | "/suggest"
-    | "/"
-    | "/articles/$slug"
-    | "/profile/$slug";
+    | '/dashboard'
+    | '/llms.txt'
+    | '/login'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/about'
+    | '/suggest'
+    | '/'
+    | '/articles/$slug'
+    | '/profile/$slug'
   id:
-    | "__root__"
-    | "/_app"
-    | "/dashboard"
-    | "/llms.txt"
-    | "/login"
-    | "/robots.txt"
-    | "/sitemap.xml"
-    | "/_app/about"
-    | "/_app/suggest"
-    | "/_app/"
-    | "/_app/articles/$slug"
-    | "/_app/profile/$slug";
-  fileRoutesById: FileRoutesById;
+    | '__root__'
+    | '/_app'
+    | '/dashboard'
+    | '/llms.txt'
+    | '/login'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/_app/about'
+    | '/_app/suggest'
+    | '/_app/'
+    | '/_app/articles/$slug'
+    | '/_app/profile/$slug'
+  fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  AppRoute: typeof AppRouteWithChildren;
-  DashboardRoute: typeof DashboardRoute;
-  LlmsDottxtRoute: typeof LlmsDottxtRoute;
-  LoginRoute: typeof LoginRoute;
-  RobotsDottxtRoute: typeof RobotsDottxtRoute;
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute;
+  AppRoute: typeof AppRouteWithChildren
+  DashboardRoute: typeof DashboardRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
+  LoginRoute: typeof LoginRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
 }
 
-declare module "@tanstack/react-router" {
+declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    "/sitemap.xml": {
-      id: "/sitemap.xml";
-      path: "/sitemap.xml";
-      fullPath: "/sitemap.xml";
-      preLoaderRoute: typeof SitemapDotxmlRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/robots.txt": {
-      id: "/robots.txt";
-      path: "/robots.txt";
-      fullPath: "/robots.txt";
-      preLoaderRoute: typeof RobotsDottxtRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/login": {
-      id: "/login";
-      path: "/login";
-      fullPath: "/login";
-      preLoaderRoute: typeof LoginRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/llms.txt": {
-      id: "/llms.txt";
-      path: "/llms.txt";
-      fullPath: "/llms.txt";
-      preLoaderRoute: typeof LlmsDottxtRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/dashboard": {
-      id: "/dashboard";
-      path: "/dashboard";
-      fullPath: "/dashboard";
-      preLoaderRoute: typeof DashboardRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/_app": {
-      id: "/_app";
-      path: "";
-      fullPath: "/";
-      preLoaderRoute: typeof AppRouteImport;
-      parentRoute: typeof rootRouteImport;
-    };
-    "/_app/": {
-      id: "/_app/";
-      path: "/";
-      fullPath: "/";
-      preLoaderRoute: typeof AppIndexRouteImport;
-      parentRoute: typeof AppRoute;
-    };
-    "/_app/suggest": {
-      id: "/_app/suggest";
-      path: "/suggest";
-      fullPath: "/suggest";
-      preLoaderRoute: typeof AppSuggestRouteImport;
-      parentRoute: typeof AppRoute;
-    };
-    "/_app/about": {
-      id: "/_app/about";
-      path: "/about";
-      fullPath: "/about";
-      preLoaderRoute: typeof AppAboutRouteImport;
-      parentRoute: typeof AppRoute;
-    };
-    "/_app/profile/$slug": {
-      id: "/_app/profile/$slug";
-      path: "/profile/$slug";
-      fullPath: "/profile/$slug";
-      preLoaderRoute: typeof AppProfileSlugRouteImport;
-      parentRoute: typeof AppRoute;
-    };
-    "/_app/articles/$slug": {
-      id: "/_app/articles/$slug";
-      path: "/articles/$slug";
-      fullPath: "/articles/$slug";
-      preLoaderRoute: typeof AppArticlesSlugRouteImport;
-      parentRoute: typeof AppRoute;
-    };
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/suggest': {
+      id: '/_app/suggest'
+      path: '/suggest'
+      fullPath: '/suggest'
+      preLoaderRoute: typeof AppSuggestRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/about': {
+      id: '/_app/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AppAboutRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/profile/$slug': {
+      id: '/_app/profile/$slug'
+      path: '/profile/$slug'
+      fullPath: '/profile/$slug'
+      preLoaderRoute: typeof AppProfileSlugRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/articles/$slug': {
+      id: '/_app/articles/$slug'
+      path: '/articles/$slug'
+      fullPath: '/articles/$slug'
+      preLoaderRoute: typeof AppArticlesSlugRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
-  AppAboutRoute: typeof AppAboutRoute;
-  AppSuggestRoute: typeof AppSuggestRoute;
-  AppIndexRoute: typeof AppIndexRoute;
-  AppArticlesSlugRoute: typeof AppArticlesSlugRoute;
-  AppProfileSlugRoute: typeof AppProfileSlugRoute;
+  AppAboutRoute: typeof AppAboutRoute
+  AppSuggestRoute: typeof AppSuggestRoute
+  AppIndexRoute: typeof AppIndexRoute
+  AppArticlesSlugRoute: typeof AppArticlesSlugRoute
+  AppProfileSlugRoute: typeof AppProfileSlugRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
@@ -259,9 +259,9 @@ const AppRouteChildren: AppRouteChildren = {
   AppIndexRoute: AppIndexRoute,
   AppArticlesSlugRoute: AppArticlesSlugRoute,
   AppProfileSlugRoute: AppProfileSlugRoute,
-};
+}
 
-const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren);
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
@@ -270,16 +270,16 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-};
+}
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>();
+  ._addFileTypes<FileRouteTypes>()
 
-import type { getRouter } from "./router.tsx";
-import type { createStart } from "@tanstack/react-start";
-declare module "@tanstack/react-start" {
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
   interface Register {
-    ssr: true;
-    router: Awaited<ReturnType<typeof getRouter>>;
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
   }
 }

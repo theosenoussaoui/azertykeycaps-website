@@ -87,6 +87,7 @@ export const web = await TanStackStart("web", {
     BETTER_AUTH_SECRET: getSecret("BETTER_AUTH_SECRET"),
     BETTER_AUTH_URL: serverUrl,
     SERVER_URL: serverUrl,
+    SERVER: server,
   },
 });
 

@@ -51,7 +51,31 @@ import {
 export const Route = createFileRoute("/_app/")({
   component: HomeComponent,
   loader: async () => {
-    const [pageData, i18n] = await Promise.all([getHomePageData(), t()]);
+    const loaderStart = performance.now();
+
+    const [pageData, i18n] = await Promise.all([
+      (async () => {
+        const start = performance.now();
+        const data = await getHomePageData();
+        console.log(
+          `[route:/_app/] getHomePageData: ${(performance.now() - start).toFixed(1)}ms`,
+        );
+        return data;
+      })(),
+      (async () => {
+        const start = performance.now();
+        const data = t();
+        console.log(
+          `[route:/_app/] t(): ${(performance.now() - start).toFixed(1)}ms`,
+        );
+        return data;
+      })(),
+    ]);
+
+    console.log(
+      `[route:/_app/] loader total: ${(performance.now() - loaderStart).toFixed(1)}ms`,
+    );
+
     return {
       articles: pageData.articles,
       homepage: pageData.homepage,
