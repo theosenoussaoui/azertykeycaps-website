@@ -26,21 +26,17 @@ const cache = new Hono()
       const payload = c.req.valid("json");
       const { type, slug, id } = payload;
 
-      // Log invalidation without exposing sensitive data
       console.log(`[cache] Invalidation: ${type}/${slug}`);
 
-      // Invalidate Workers Cache API (tRPC endpoints)
       const cacheKeys = buildCacheKeys(env.SERVER_URL, type, slug);
       const cmsResult = await invalidateCache(CACHE_NAMES.CMS_API, cacheKeys);
 
-      // Invalidate Page Data cache (static aggregated endpoints)
       const pageDataKeys = buildPageDataCacheKeys(env.SERVER_URL, type, slug);
       const pageDataResult = await invalidateCache(
         CACHE_NAMES.PAGE_DATA,
         pageDataKeys,
       );
 
-      // Invalidate dynamic Page Data cache (slug-based endpoints)
       const dynamicPageDataKeys = buildDynamicPageDataCacheKeys(
         env.SERVER_URL,
         payload,
@@ -50,14 +46,12 @@ const cache = new Hono()
         dynamicPageDataKeys,
       );
 
-      // Invalidate media cache if applicable
       let mediaResult = { success: true, message: "Skipped (not media)" };
       if (slug === "media" && id) {
         const mediaKeys = [`${env.SERVER_URL}/api/media/${id}`];
         mediaResult = await invalidateCache(CACHE_NAMES.MEDIA, mediaKeys);
       }
 
-      // Invalidate Cloudflare CDN cache by tags
       let cdnResult: {
         success: boolean;
         message: string;

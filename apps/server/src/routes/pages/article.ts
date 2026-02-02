@@ -22,23 +22,20 @@ const article = new Hono().get("/:slug", async (c) => {
     isDev,
   });
 
-  // Fetch article by slug
   const articleData = await caller.articles.bySlug({ slug });
 
   if (!articleData) {
     return c.json({ error: "Article not found" }, 404);
   }
 
-  // Fetch related articles if article has a profile
   let relatedArticles: ArticlePageDataResponse["relatedArticles"] = [];
 
   if (articleData.profile) {
     const related = await caller.articles.list({
       profile: articleData.profile.slug,
-      limit: 5, // Fetch one extra to filter out current
+      limit: 5,
     });
 
-    // Filter out current article, limit to 4, format dates
     relatedArticles = related.docs
       .filter((a) => a.slug !== slug)
       .slice(0, 4)

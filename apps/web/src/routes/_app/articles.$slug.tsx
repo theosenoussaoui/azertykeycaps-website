@@ -51,12 +51,10 @@ export const Route = createFileRoute("/_app/articles/$slug")({
   },
   head: ({ loaderData, params }) => {
     const article = loaderData?.article;
-    // Use enhanced preload with responsive hints for optimal LCP
     const preloadLink = getPreloadLinkAttributes(article?.img.url, "hero");
     const path = `/articles/${params.slug}`;
     const i18n = loaderData?.i18n ?? t();
 
-    // Use CMS SEO data with fallbacks to article content
     const title = article?.title ?? "Article";
     const description = article?.description ?? i18n.home.subtitle;
 
@@ -103,7 +101,6 @@ function ArticleDetailPage() {
 
   return (
     <PageContainer>
-      {/* Breadcrumb Navigation */}
       <nav className="py-4">
         <Breadcrumb>
           <BreadcrumbList>
@@ -141,7 +138,6 @@ function ArticleDetailPage() {
 
       <ArticleContent article={article} />
 
-      {/* Related Keysets Section */}
       {relatedArticles.length > 0 && (
         <PageSection>
           <PageSectionHeader>

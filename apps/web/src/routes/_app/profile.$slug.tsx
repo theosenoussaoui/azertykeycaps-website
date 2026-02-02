@@ -87,7 +87,6 @@ export const Route = createFileRoute("/_app/profile/$slug")({
     const articleCount = loaderData?.articles.totalDocs ?? 0;
     const path = `/profile/${params.slug}`;
 
-    // Use CMS description if available, otherwise generate dynamically
     const dynamicDescription = `${i18n.home.subtitle} ${articleCount} keyset${articleCount > 1 ? "s" : ""} ${profileTitle}.`;
     const description = profile?.description ?? dynamicDescription;
 
@@ -121,7 +120,6 @@ function ProfilePage() {
   const search = Route.useSearch();
   const { articles, profileSlug, profile, i18n } = Route.useLoaderData();
 
-  // Use full profile data if available, otherwise fall back to article's profile ref
   const profileInfo = profile ?? articles.docs[0]?.profile;
   const hasActiveFilters = !!(search.status || search.material);
 
@@ -159,7 +157,6 @@ function ProfilePage() {
     });
   };
 
-  // Empty state when no articles exist for this profile (not filtered)
   if (articles.docs.length === 0 && !hasActiveFilters) {
     return (
       <PageContainer>
@@ -186,7 +183,6 @@ function ProfilePage() {
 
   return (
     <PageContainer>
-      {/* Back Navigation */}
       <nav className="py-4">
         <Button variant="ghost" size="sm" render={<Link to="/" />}>
           <ArrowLeftIcon />
@@ -194,7 +190,6 @@ function ProfilePage() {
         </Button>
       </nav>
 
-      {/* Page Header */}
       <PageHeader className="py-4">
         <div className="flex flex-wrap items-center gap-3">
           <PageTitle>{profileInfo?.title ?? profileSlug}</PageTitle>
@@ -211,7 +206,6 @@ function ProfilePage() {
         )}
       </PageHeader>
 
-      {/* Filters */}
       <PageSection spacing="sm">
         <PageSectionContent>
           <ArticleFilters
@@ -226,7 +220,6 @@ function ProfilePage() {
         </PageSectionContent>
       </PageSection>
 
-      {/* Articles Grid */}
       <PageSection>
         <PageSectionContent>
           {articles.docs.length === 0 ? (
@@ -270,7 +263,6 @@ function ProfilePage() {
         </PageSectionContent>
       </PageSection>
 
-      {/* Pagination */}
       {articles.totalPages > 1 && (
         <PageSection spacing="sm">
           <PageSectionContent>

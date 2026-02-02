@@ -8,10 +8,6 @@ import {
 } from "./globals";
 import { keycapProfileRefSchema, keycapProfileSchema } from "./profiles";
 
-// ============================================
-// PAGINATED RESPONSE FACTORY
-// ============================================
-
 export const createPaginatedResponseSchema = <T extends z.ZodTypeAny>(
   itemSchema: T,
 ) =>
@@ -25,26 +21,13 @@ export const createPaginatedResponseSchema = <T extends z.ZodTypeAny>(
     error: z.string().nullable(),
   });
 
-// ============================================
-// SPECIFIC RESPONSE SCHEMAS
-// ============================================
-
-// Uses articleCardSchema for list responses (only fields selected in list query)
 export const articleListResponseSchema =
   createPaginatedResponseSchema(articleCardSchema);
 
 export const profileListResponseSchema = z.array(keycapProfileRefSchema);
 
-// ============================================
-// TYPES
-// ============================================
-
 export type ArticleListResponse = z.infer<typeof articleListResponseSchema>;
 export type ProfileListResponse = z.infer<typeof profileListResponseSchema>;
-
-// ============================================
-// PAGE DATA RESPONSE SCHEMAS
-// ============================================
 
 /**
  * Layout data response - data needed by root loader for all pages.
@@ -86,10 +69,6 @@ export const profilePageDataResponseSchema = z.object({
   articles: articleListResponseSchema,
   profileSlug: z.string(),
 });
-
-// ============================================
-// PAGE DATA TYPES
-// ============================================
 
 export type LayoutDataResponse = z.infer<typeof layoutDataResponseSchema>;
 export type HomePageDataResponse = z.infer<typeof homePageDataResponseSchema>;

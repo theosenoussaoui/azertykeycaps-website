@@ -12,7 +12,6 @@ export async function getServerSession(
 ): Promise<SessionResponse> {
   const url = `${serverEnv.SERVER_URL}/api/auth/get-session`;
 
-  // Add timeout to prevent hanging requests
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10000);
 
@@ -33,7 +32,6 @@ export async function getServerSession(
     return data as SessionResponse;
   } catch (error) {
     clearTimeout(timeoutId);
-    // Auth errors should fail silently - user is simply not authenticated
     if (error instanceof Error && error.name === "AbortError") {
       console.error("Auth session request timed out");
     }

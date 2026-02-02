@@ -16,7 +16,6 @@ export const getLayoutData = createServerFn({ method: "GET" }).handler(
   async (): Promise<LayoutDataResponse> => {
     const url = `${serverEnv.SERVER_URL}/api/pages/layout`;
 
-    // Add timeout to prevent hanging requests
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000);
 
@@ -28,7 +27,6 @@ export const getLayoutData = createServerFn({ method: "GET" }).handler(
         throw new Error(`Failed to fetch layout data: ${response.status}`);
       }
 
-      // Explicitly await json() to ensure body is fully consumed
       return await response.json();
     } catch (error) {
       clearTimeout(timeoutId);

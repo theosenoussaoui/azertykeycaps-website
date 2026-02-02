@@ -2,10 +2,6 @@ import { z } from "zod";
 
 import { articleMaterialSchema, articleStatusSchema } from "./articles";
 
-// ============================================
-// ROUTE SEARCH PARAMS (TanStack Router validateSearch)
-// ============================================
-
 export const articleFiltersSchema = z.object({
   page: z.number().min(1).catch(1),
   profile: z.string().optional(),
@@ -22,10 +18,6 @@ export const profilePageFiltersSchema = z.object({
   isNew: z.boolean().optional(),
   search: z.string().optional(),
 });
-
-// ============================================
-// tRPC INPUT SCHEMAS
-// ============================================
 
 export const articleListInputSchema = z.object({
   limit: z.number().min(1).max(100).default(12),
@@ -45,10 +37,6 @@ export const profileListInputSchema = z.object({
   limit: z.number().min(1).max(100).default(100),
 });
 
-// ============================================
-// HONO QUERY PARAM SCHEMAS (with string coercion)
-// ============================================
-
 /**
  * Profile page query params schema for Hono endpoints.
  * Handles string-to-type coercion from URL query params.
@@ -64,10 +52,6 @@ export const profilePageQueryParamsSchema = z.object({
     .optional(),
   search: z.string().optional(),
 });
-
-// ============================================
-// TYPES
-// ============================================
 
 export type ArticleFilters = z.infer<typeof articleFiltersSchema>;
 export type ProfilePageFilters = z.infer<typeof profilePageFiltersSchema>;

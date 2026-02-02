@@ -1,9 +1,5 @@
 import { z } from "zod";
 
-// ============================================
-// COMMON SCHEMA UTILITIES
-// ============================================
-
 /**
  * Payload ID schema that handles both string and numeric IDs.
  *
@@ -23,10 +19,6 @@ export const payloadIdOptionalSchema = z.coerce.string().optional();
  * Payload timestamp schema (ISO 8601 string).
  */
 export const payloadTimestampSchema = z.string();
-
-// ============================================
-// SEO SCHEMA
-// ============================================
 
 /**
  * SEO fields schema for CMS-managed meta data.
@@ -56,9 +48,4 @@ export const seoFieldsSchema = z.object({
 });
 
 export type SeoFields = z.infer<typeof seoFieldsSchema>;
-
-// ============================================
-// TYPES
-// ============================================
-
 export type PayloadId = z.infer<typeof payloadIdSchema>;

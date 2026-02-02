@@ -15,7 +15,6 @@ export const getArticlePageData = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<ArticlePageDataResponse | null> => {
     const url = `${serverEnv.SERVER_URL}/api/pages/article/${data.slug}`;
 
-    // Add timeout to prevent hanging requests
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000);
 
@@ -31,7 +30,6 @@ export const getArticlePageData = createServerFn({ method: "GET" })
         throw new Error(`Failed to fetch article data: ${response.status}`);
       }
 
-      // Explicitly await json() to ensure body is fully consumed
       return await response.json();
     } catch (error) {
       clearTimeout(timeoutId);

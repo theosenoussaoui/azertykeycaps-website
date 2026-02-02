@@ -66,7 +66,6 @@ async function getRelatedArticleSlugs(
 async function sendInvalidationToServer(
   payload: CacheInvalidationPayload,
 ): Promise<void> {
-  // Skip cache invalidation in development/migration mode
   if (process.env.NODE_ENV !== "production") {
     return;
   }
@@ -119,7 +118,6 @@ export const collectionAfterChangeHook: CollectionAfterChangeHook = ({
       payload.articleSlug = doc.slug;
       payload.profileSlug = await getProfileSlug(doc.profile, req);
 
-      // Detect profile change - invalidate both old and new profile pages
       if (previousDoc) {
         const previousProfileSlug = await getProfileSlug(
           previousDoc.profile,

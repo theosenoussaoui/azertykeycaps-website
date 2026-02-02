@@ -10,11 +10,9 @@ import type {
  * Uses Zod enum types for compile-time safety.
  */
 const SLUG_TO_TRPC_ENDPOINTS: Record<CacheSlug, TrpcEndpoint[]> = {
-  // Collections
   articles: ["articles.list", "articles.bySlug"],
   "keycap-profiles": ["articles.profiles", "articles.list"],
   media: [],
-  // Globals
   homepage: ["articles.list", "articles.profiles", "globals.homepage"],
   "social-networks": ["globals.socialNetworks"],
   "informations-page": ["globals.informationsPage"],
@@ -66,35 +64,27 @@ export function buildCacheTagsToPurge(
   if (type === "collection") {
     switch (slug) {
       case "articles":
-        // Homepage shows latest articles
         tags.push(tag("global", "homepage"));
-        // The specific article page
         if (articleSlug) {
           tags.push(tag("article", articleSlug));
         }
-        // Profile page that lists this article
         if (profileSlug) {
           tags.push(tag("profile", profileSlug));
         }
-        // Previous profile page (when article's profile changed)
         if (previousProfileSlug) {
           tags.push(tag("profile", previousProfileSlug));
         }
         break;
 
       case "keycap-profiles":
-        // Homepage shows profiles
         tags.push(tag("global", "homepage"));
         if (profileSlug) {
-          // The profile page itself
           tags.push(tag("profile", profileSlug));
-          // All articles belonging to this profile
           tags.push(tag("profile-articles", profileSlug));
         }
         break;
 
       case "media":
-        // Media changes don't affect HTML cache
         break;
     }
   } else if (type === "global") {
@@ -109,11 +99,9 @@ export function buildCacheTagsToPurge(
         tags.push(tag("global", "suggest"));
         break;
       case "social-networks":
-        // Social links are in the footer - purge ALL pages
         tags.push(tag("page", "all"));
         break;
       case "not-found-page":
-        // 404 page content - no specific tag needed
         break;
     }
   }
@@ -131,7 +119,6 @@ export function buildCacheTagsToPurge(
 const SLUG_TO_PAGE_DATA_ENDPOINTS: Partial<
   Record<CacheSlug, PageDataEndpoint[]>
 > = {
-  // Layout data (root loader)
   "social-networks": ["/api/pages/layout"],
   "keycap-profiles": [
     "/api/pages/layout",
@@ -139,7 +126,6 @@ const SLUG_TO_PAGE_DATA_ENDPOINTS: Partial<
     "/api/pages/profile",
   ],
   "not-found-page": ["/api/pages/layout"],
-  // Homepage and article data
   articles: ["/api/pages/home", "/api/pages/article"],
   homepage: ["/api/pages/home"],
 };
@@ -158,7 +144,6 @@ export function buildPageDataCacheKeys(
 ): string[] {
   const endpoints = SLUG_TO_PAGE_DATA_ENDPOINTS[slug] ?? [];
 
-  // Filter out pattern endpoints that require dynamic handling
   return endpoints
     .filter((e) => e !== "/api/pages/article" && e !== "/api/pages/profile")
     .map((endpoint) => `${serverUrl}${endpoint}`);
@@ -179,22 +164,18 @@ export function buildDynamicPageDataCacheKeys(
 ): string[] {
   const keys: string[] = [];
 
-  // Article detail page - uses articleSlug
   if (payload.articleSlug) {
     keys.push(`${serverUrl}/api/pages/article/${payload.articleSlug}`);
   }
 
-  // Profile page - uses profileSlug (base URL only, no query params)
   if (payload.profileSlug) {
     keys.push(`${serverUrl}/api/pages/profile/${payload.profileSlug}`);
   }
 
-  // Previous profile page - when article's profile changed
   if (payload.previousProfileSlug) {
     keys.push(`${serverUrl}/api/pages/profile/${payload.previousProfileSlug}`);
   }
 
-  // Related articles (when profile changes, invalidate their article pages)
   if (payload.relatedArticleSlugs) {
     for (const slug of payload.relatedArticleSlugs) {
       keys.push(`${serverUrl}/api/pages/article/${slug}`);

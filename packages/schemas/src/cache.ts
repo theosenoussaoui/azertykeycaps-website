@@ -1,9 +1,5 @@
 import { z } from "zod";
 
-// ============================================================================
-// Cache Invalidation Enums
-// ============================================================================
-
 /**
  * Collection slugs that can be invalidated.
  * These correspond to Payload CMS collection slugs.
@@ -81,10 +77,6 @@ export const cacheTagPrefixSchema = z.enum([
 ]);
 export type CacheTagPrefix = z.infer<typeof cacheTagPrefixSchema>;
 export const CACHE_TAG_PREFIXES = cacheTagPrefixSchema.options;
-
-// ============================================================================
-// Cache Invalidation Payload
-// ============================================================================
 
 export const cacheInvalidationPayloadSchema = z.object({
   type: z.enum(["collection", "global"]),

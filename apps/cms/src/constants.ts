@@ -7,18 +7,10 @@
  * IMPORTANT: Keep these in sync with packages/schemas/src/profiles.ts and packages/schemas/src/articles.ts
  */
 
-// ============================================
-// PROFILE CONSTANTS
-// ============================================
-
 export const PROFILE_SHAPES = {
   SCULPTED: "sculpted",
   UNIFORM: "uniform",
 } as const;
-
-// ============================================
-// ARTICLE CONSTANTS
-// ============================================
 
 export const ARTICLE_STATUS = {
   IN_STOCK: "in_stock",

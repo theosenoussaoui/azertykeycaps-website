@@ -3,10 +3,6 @@ import { z } from "zod";
 import { seoFieldsSchema } from "./common";
 import { keycapProfileRefSchema } from "./profiles";
 
-// ============================================
-// SOCIAL NETWORKS GLOBAL
-// ============================================
-
 export const socialNetworkItemSchema = z.object({
   title: z.string(),
   url: z.string(),
@@ -17,10 +13,6 @@ export const socialNetworksSchema = z.object({
   networks: z.array(socialNetworkItemSchema),
 });
 
-// ============================================
-// HOMEPAGE GLOBAL
-// ============================================
-
 export const homepageSchema = z
   .object({
     title: z.string().nullish(),
@@ -29,11 +21,6 @@ export const homepageSchema = z
   })
   .merge(seoFieldsSchema);
 
-// ============================================
-// INFORMATIONS PAGE GLOBAL
-// ============================================
-
-// Lexical rich text content - using any to avoid serialization issues with TanStack Start
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const lexicalContentSchema = z.any().nullable();
 
@@ -44,10 +31,6 @@ export const informationsPageSchema = z
   })
   .merge(seoFieldsSchema);
 
-// ============================================
-// SUGGESTION PAGE GLOBAL
-// ============================================
-
 export const suggestionPageSchema = z
   .object({
     title: z.string(),
@@ -56,10 +39,6 @@ export const suggestionPageSchema = z
   })
   .merge(seoFieldsSchema);
 
-// ============================================
-// NOT FOUND PAGE GLOBAL
-// ============================================
-
 export const notFoundPageSchema = z
   .object({
     title: z.string(),
@@ -67,10 +46,6 @@ export const notFoundPageSchema = z
     ctaText: z.string(),
   })
   .merge(seoFieldsSchema);
-
-// ============================================
-// TYPES
-// ============================================
 
 export type SocialNetworkItem = z.infer<typeof socialNetworkItemSchema>;
 export type SocialNetworks = z.infer<typeof socialNetworksSchema>;

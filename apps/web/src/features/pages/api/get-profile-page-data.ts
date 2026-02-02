@@ -20,7 +20,6 @@ export const getProfilePageData = createServerFn({ method: "GET" })
   .handler(async ({ data }): Promise<ProfilePageDataResponse | null> => {
     const { slug, ...filters } = data;
 
-    // Build query string from filters
     const params = new URLSearchParams();
     if (filters.page && filters.page !== 1) {
       params.set("page", String(filters.page));
@@ -33,7 +32,6 @@ export const getProfilePageData = createServerFn({ method: "GET" })
     const queryString = params.toString();
     const url = `${serverEnv.SERVER_URL}/api/pages/profile/${slug}${queryString ? `?${queryString}` : ""}`;
 
-    // Add timeout to prevent hanging requests
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000);
 
@@ -49,7 +47,6 @@ export const getProfilePageData = createServerFn({ method: "GET" })
         throw new Error(`Failed to fetch profile data: ${response.status}`);
       }
 
-      // Explicitly await json() to ensure body is fully consumed
       return await response.json();
     } catch (error) {
       clearTimeout(timeoutId);

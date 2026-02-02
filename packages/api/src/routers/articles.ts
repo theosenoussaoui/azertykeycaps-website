@@ -16,10 +16,8 @@ import { stringify } from "qs-esm";
 
 import { publicProcedure, router } from "../index";
 
-// Transform CMS media URLs to use the server proxy
 function transformMediaUrls<T>(data: T, serverUrl: string): T {
   const json = JSON.stringify(data);
-  // Replace relative /api/media/ URLs with absolute server URLs
   const transformed = json.replace(
     /"\/api\/media\//g,
     `"${serverUrl}/api/media/`,
@@ -47,8 +45,6 @@ class CMSError extends Error {
   }
 }
 
-// Disabled: cf.cacheTtl subrequest cache can't be purged via Cloudflare API
-// Relying on CDN cache for HTML pages instead (purged on content change)
 const CMS_CACHE_TTL = 0;
 
 /**
@@ -123,7 +119,6 @@ async function fetchCMS(
   } catch (error) {
     if (error instanceof CMSError) throw error;
 
-    // Network-level errors (connection refused, DNS failure, etc.)
     const message =
       error instanceof Error ? error.message : "Unknown network error";
     console.error("[CMS] Network error:", message);
@@ -147,7 +142,6 @@ export const articlesRouter = router({
     .input(articleListInputSchema.optional())
     .output(articleListResponseSchema)
     .query(async ({ ctx, input }): Promise<ArticleListResponse> => {
-      // Safely parse and apply defaults from schema (limit: 12, page: 1)
       const parsed = articleListInputSchema.safeParse(input ?? {});
       if (!parsed.success) {
         console.error(
@@ -168,11 +162,9 @@ export const articlesRouter = router({
         parsed.data;
 
       try {
-        // Build where clause using Payload query format
         const where: Record<string, unknown> = {};
 
         if (profile) {
-          // Query nested relationship field
           where["profile.slug"] = { equals: profile };
         }
         if (status) {
@@ -188,8 +180,6 @@ export const articlesRouter = router({
           where.title = { contains: search };
         }
 
-        // Use qs-esm to properly format query string for Payload REST API
-        // Using select to only fetch fields needed for article cards (performance optimization)
         const queryString = stringify(
           {
             limit,
@@ -197,7 +187,6 @@ export const articlesRouter = router({
             depth: 1,
             sort: "-createdAt",
             ...(Object.keys(where).length > 0 && { where }),
-            // Select fields needed for rich article cards
             select: {
               id: true,
               title: true,
@@ -225,7 +214,6 @@ export const articlesRouter = router({
 
         const data = (await response.json()) as ArticleListResponse;
 
-        // Transform media URLs to use server proxy
         const transformedData = transformMediaUrls(data, ctx.env.SERVER_URL);
 
         const output = {
@@ -233,7 +221,6 @@ export const articlesRouter = router({
           error: null,
         };
 
-        // Validate before returning to catch schema mismatches
         const validation = articleListResponseSchema.safeParse(output);
         if (!validation.success) {
           console.error(
@@ -275,8 +262,6 @@ export const articlesRouter = router({
       const { slug } = input;
 
       try {
-        // Use qs-esm to properly format query string for Payload REST API
-        // Using limit: 1 + pagination: false for optimized unique field query
         const queryString = stringify(
           {
             where: {
@@ -307,7 +292,6 @@ export const articlesRouter = router({
 
         if (!article) return null;
 
-        // Transform media URLs to use server proxy
         return transformMediaUrls(article, ctx.env.SERVER_URL);
       } catch (error) {
         if (error instanceof TRPCError) throw error;
@@ -327,7 +311,6 @@ export const articlesRouter = router({
     .input(profileListInputSchema.optional())
     .output(profileListResponseSchema)
     .query(async ({ ctx, input }) => {
-      // Safely parse and apply defaults from schema (limit: 100)
       const parsed = profileListInputSchema.safeParse(input ?? {});
       if (!parsed.success) {
         console.error(
@@ -360,7 +343,6 @@ export const articlesRouter = router({
 
         const data = (await response.json()) as { docs: KeycapProfileRef[] };
 
-        // Validate before returning to catch schema mismatches
         const validation = profileListResponseSchema.safeParse(data.docs);
         if (!validation.success) {
           console.error(
@@ -386,7 +368,6 @@ export const articlesRouter = router({
       const { slug } = input;
 
       try {
-        // Use qs-esm to properly format query string for Payload REST API
         const queryString = stringify(
           {
             where: {
@@ -414,7 +395,6 @@ export const articlesRouter = router({
 
         if (!profile) return null;
 
-        // Validate before returning
         const validation = keycapProfileSchema.safeParse(profile);
         if (!validation.success) {
           console.error(

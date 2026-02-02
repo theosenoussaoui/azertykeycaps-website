@@ -11,21 +11,17 @@ export const Media: CollectionConfig = {
   slug: "media",
   access: {
     create: isAdminOrEditorOrApi,
-    // Media files remain public - they're served via proxy and need to be accessible
-    // The actual file URLs are hidden behind the server's /api/media/* proxy
     read: () => true,
     update: isAdminOrEditorOrApi,
     delete: isAdminOrApi,
   },
-  // When media is populated from relationships, include filename for URL generation
   defaultPopulate: {
     id: true,
     alt: true,
     url: true,
-    filename: true, // Required for Payload to construct correct URLs
+    filename: true,
     width: true,
     height: true,
-    // Note: sizes removed - image processing disabled on Cloudflare Workers
   },
   hooks: {
     afterChange: [collectionAfterChangeHook],
@@ -39,9 +35,6 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
-    // Image resizing disabled - sharp is not available on Cloudflare Workers
-    // Original images are served directly from R2
-    // Consider using Cloudflare Images for on-the-fly transforms in the future
     crop: false,
     focalPoint: false,
     mimeTypes: ["image/*"],

@@ -26,7 +26,6 @@ import { Hono } from "hono";
 const profile = new Hono().get("/:slug", async (c) => {
   const slug = c.req.param("slug");
 
-  // Parse and validate query params with safeParse
   const queryResult = profilePageQueryParamsSchema.safeParse(c.req.query());
 
   if (!queryResult.success) {
@@ -48,7 +47,6 @@ const profile = new Hono().get("/:slug", async (c) => {
     isDev,
   });
 
-  // Fetch profile and articles in parallel
   const [profileData, articlesResponse] = await Promise.all([
     caller.articles.profileBySlug({ slug }),
     caller.articles.list({
@@ -62,12 +60,10 @@ const profile = new Hono().get("/:slug", async (c) => {
     }),
   ]);
 
-  // Return 404 if profile doesn't exist
   if (!profileData) {
     return c.json({ error: "Profile not found" }, 404);
   }
 
-  // Format dates server-side to prevent hydration mismatch
   const articlesWithFormattedDates = {
     ...articlesResponse,
     docs: articlesResponse.docs.map((article) => ({

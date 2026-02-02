@@ -10,36 +10,24 @@ config({ path: "../../apps/server/.env", override: true });
 
 const stage = process.env.STAGE ?? "dev";
 const isProd = stage === "prod";
-// Local development: not in CI and not deploying to prod
 const isLocalDev = !process.env.CI && stage === "dev";
 
-// For PR previews, we'll use the Workers URLs directly
-// For prod, we use custom domains from env
-const CLOUDFLARE_SUBDOMAIN = "theosen95"; // Your Cloudflare account subdomain
-
-// Custom domains from env (only used in prod)
-// Use process.env directly to avoid throwing in dev when not set
-const WEB_DOMAIN = process.env.WEB_DOMAIN; // e.g., "www.azertykeycaps.fr"
-const API_DOMAIN = process.env.API_DOMAIN; // e.g., "api.azertykeycaps.fr"
-const CMS_DOMAIN = process.env.CMS_DOMAIN; // e.g., "cms.azertykeycaps.fr"
+const CLOUDFLARE_SUBDOMAIN = "theosen95";
+const WEB_DOMAIN = process.env.WEB_DOMAIN;
+const API_DOMAIN = process.env.API_DOMAIN;
+const CMS_DOMAIN = process.env.CMS_DOMAIN;
 
 const app = await alchemy("azertykeycaps-app", {
   stage,
-  // Use CloudflareStateStore in CI for shared state, local file store in dev
   stateStore: process.env.CI
     ? (scope) => new CloudflareStateStore(scope)
     : undefined,
 });
 
-// API database (for Better-Auth used by web/server)
 const db = await D1Database("api-db", {
   migrationsDir: "../../packages/db/src/migrations",
 });
 
-// Compute URLs based on environment
-// Local dev: use localhost
-// Prod with custom domains: use custom domains
-// PR previews / staging: use Workers URLs
 const serverUrl = isLocalDev
   ? "http://localhost:1337"
   : isProd && API_DOMAIN
@@ -52,14 +40,12 @@ const webUrl = isLocalDev
     ? `https://${WEB_DOMAIN}`
     : `https://azertykeycaps-app-web-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
 
-// CMS URL - deployed separately via opennextjs-cloudflare (not managed by Alchemy)
 const cmsUrl = isLocalDev
   ? "http://localhost:3002"
   : isProd && CMS_DOMAIN
     ? `https://${CMS_DOMAIN}`
     : `https://azertykeycaps-cms-${stage}.${CLOUDFLARE_SUBDOMAIN}.workers.dev`;
 
-// Secrets - use process.env with defaults for dev, alchemy.env for prod (throws if missing)
 const getSecret = (
   name: string,
   devDefault: string = "dev-secret-placeholder",
@@ -75,7 +61,6 @@ export const server = await Worker("server", {
   entrypoint: "src/index.ts",
   compatibility: "node",
   domains: isProd && API_DOMAIN ? [API_DOMAIN] : undefined,
-  // Smart placement optimizes worker location based on traffic patterns to backend
   placement: { mode: "smart" },
   bindings: {
     DB: db,
@@ -105,14 +90,10 @@ export const web = await TanStackStart("web", {
   },
 });
 
-// Note: CMS is deployed separately - see apps/cms/wrangler.toml
-// CMS manages its own D1 database and R2 bucket via wrangler
-
 console.log(`Stage  -> ${stage}`);
 console.log(`Web    -> ${webUrl}`);
 console.log(`Server -> ${serverUrl}`);
 
-// GitHub PR comment for preview deployments
 if (process.env.PULL_REQUEST) {
   await GitHubComment("preview-comment", {
     owner: process.env.GITHUB_REPOSITORY_OWNER || "your-github-username",

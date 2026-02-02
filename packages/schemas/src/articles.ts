@@ -4,10 +4,6 @@ import { payloadIdSchema, seoFieldsSchema } from "./common";
 import { mediaSchema } from "./media";
 import { keycapProfileRefSchema } from "./profiles";
 
-// ============================================
-// CONSTANTS (i18n keys stored in CMS)
-// ============================================
-
 export const ARTICLE_STATUS = {
   IN_STOCK: "in_stock",
   EXTRAS_GB: "extras_gb",
@@ -36,10 +32,6 @@ export const ARTICLE_MATERIAL_VALUES = Object.values(ARTICLE_MATERIALS);
 export type ArticleMaterial =
   (typeof ARTICLE_MATERIALS)[keyof typeof ARTICLE_MATERIALS];
 
-// ============================================
-// SCHEMAS
-// ============================================
-
 export const articleStatusSchema = z.enum([
   ARTICLE_STATUS.IN_STOCK,
   ARTICLE_STATUS.EXTRAS_GB,
@@ -60,7 +52,6 @@ export const articleMaterialSchema = z.enum([
   ARTICLE_MATERIALS.PBT_LASER_PRINTED,
 ]);
 
-// Schema for article list items (cards) - only fields selected in list query
 export const articleListItemSchema = z.object({
   id: payloadIdSchema,
   title: z.string(),
@@ -71,8 +62,6 @@ export const articleListItemSchema = z.object({
   isNew: z.boolean(),
 });
 
-// Schema for full article (detail page) - all fields
-// Full article schema - all fields from CMS
 export const articleSchema = z
   .object({
     id: payloadIdSchema,
@@ -95,11 +84,6 @@ export const articleSchema = z
   })
   .merge(seoFieldsSchema);
 
-// ============================================
-// UI SCHEMAS (derived from base schema)
-// ============================================
-
-// Article card schema - fields needed for rich list/grid display
 export const articleCardSchema = articleSchema.pick({
   id: true,
   title: true,
@@ -115,10 +99,6 @@ export const articleCardSchema = articleSchema.pick({
   warningText: true,
   isNew: true,
 });
-
-// ============================================
-// TYPES
-// ============================================
 
 export type Article = z.infer<typeof articleSchema>;
 export type ArticleCard = z.infer<typeof articleCardSchema>;

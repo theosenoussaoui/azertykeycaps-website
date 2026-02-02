@@ -31,7 +31,6 @@ const routes = new Hono()
   )
   .route("/api/media", media)
   .route("/api/cache", cache)
-  // Page data routes with route-specific caching strategies
   .use("/api/pages/layout", pageDataCacheMiddleware)
   .route("/api/pages/layout", layout)
   .use("/api/pages/home", pageDataCacheMiddleware)

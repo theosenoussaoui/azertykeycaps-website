@@ -23,7 +23,6 @@ export const searchRouter = router({
       const { q, limit } = input;
 
       try {
-        // Query Payload's auto-generated 'search' collection
         const queryString = stringify(
           {
             where: {
@@ -55,7 +54,6 @@ export const searchRouter = router({
 
         const data = await response.json();
 
-        // Validate and return
         const parsed = searchResponseSchema.safeParse(data);
         if (!parsed.success) {
           console.error(

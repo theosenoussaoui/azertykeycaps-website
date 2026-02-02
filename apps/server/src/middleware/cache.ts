@@ -26,7 +26,6 @@ function createDevCacheLogger(
     await next();
     const duration = Date.now() - startTime;
 
-    // Dev-only logging - URLs are local, safe to log
     console.log(
       `[cache:dev] ${c.req.method} ${new URL(c.req.url).pathname} - ${c.res.status} (${duration}ms)`,
     );
@@ -59,10 +58,6 @@ export const pageDataCacheMiddleware: MiddlewareHandler = isDevMode()
       keyGenerator: (c) => c.req.url,
     });
 
-// ============================================
-// CONFIGURABLE CACHE MIDDLEWARE FACTORY
-// ============================================
-
 interface CacheStrategyOptions {
   cacheName: string;
   cacheControl: string;
@@ -90,17 +85,14 @@ export function createCacheMiddleware(
     return createDevCacheLogger(cacheName, cacheControl);
   }
 
-  // Create base cache middleware
   const cacheMiddleware = cache({
     cacheName,
     cacheControl,
     keyGenerator,
   });
 
-  // Wrap with conditional caching
   return async (c, next) => {
     if (!shouldCache(c)) {
-      // Skip cache, go directly to origin
       await next();
       return;
     }
@@ -118,14 +110,12 @@ export const profilePageCacheMiddleware = createCacheMiddleware({
   cacheName: CACHE_NAMES.PAGE_DATA,
   cacheControl: PAGE_DATA_CACHE_CONTROL,
   keyGenerator: (c) => {
-    // Strip query params - cache key is base URL only
     const url = new URL(c.req.url);
     return `${url.origin}${url.pathname}`;
   },
   shouldCache: (c) => {
     const url = new URL(c.req.url);
     const page = url.searchParams.get("page");
-    // Only cache: no filters AND (no page OR page=1)
     return (
       !url.searchParams.has("status") &&
       !url.searchParams.has("material") &&
@@ -150,7 +140,6 @@ export async function invalidateCache(
   patterns?: string[],
 ): Promise<{ success: boolean; message: string }> {
   if (isDevMode()) {
-    // Dev-only: log pattern count, not actual URLs
     console.log(
       `[cache:dev] Invalidation for ${cacheName}: ${patterns?.length ?? 0} patterns`,
     );

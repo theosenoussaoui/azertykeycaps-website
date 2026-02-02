@@ -19,7 +19,6 @@ export const serverTRPCClient = createTRPCClient<AppRouter>({
   links: [
     httpLink({
       url: `${serverEnv.SERVER_URL}/trpc`,
-      // Add timeout to prevent hanging requests
       fetch: async (url, options) => {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 25000);

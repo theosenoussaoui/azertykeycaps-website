@@ -3,10 +3,6 @@ import { z } from "zod";
 import { payloadIdSchema, seoFieldsSchema } from "./common";
 import { mediaSchema } from "./media";
 
-// ============================================
-// CONSTANTS (i18n keys)
-// ============================================
-
 export const PROFILE_SHAPES = {
   SCULPTED: "sculpted",
   UNIFORM: "uniform",
@@ -15,16 +11,11 @@ export const PROFILE_SHAPES = {
 export const PROFILE_SHAPE_VALUES = Object.values(PROFILE_SHAPES);
 export type ProfileShape = (typeof PROFILE_SHAPES)[keyof typeof PROFILE_SHAPES];
 
-// ============================================
-// SCHEMAS
-// ============================================
-
 export const profileShapeSchema = z.enum([
   PROFILE_SHAPES.SCULPTED,
   PROFILE_SHAPES.UNIFORM,
 ]);
 
-// Reference schema (when populated in relationships)
 export const keycapProfileRefSchema = z.object({
   id: payloadIdSchema,
   title: z.string(),
@@ -34,7 +25,6 @@ export const keycapProfileRefSchema = z.object({
   shape: profileShapeSchema,
 });
 
-// Full profile schema
 export const keycapProfileSchema = z
   .object({
     id: payloadIdSchema,
@@ -50,10 +40,6 @@ export const keycapProfileSchema = z
     updatedAt: z.string(),
   })
   .merge(seoFieldsSchema);
-
-// ============================================
-// TYPES
-// ============================================
 
 export type KeycapProfileRef = z.infer<typeof keycapProfileRefSchema>;
 export type KeycapProfile = z.infer<typeof keycapProfileSchema>;

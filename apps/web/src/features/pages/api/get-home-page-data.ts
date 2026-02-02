@@ -16,7 +16,6 @@ export const getHomePageData = createServerFn({ method: "GET" }).handler(
   async (): Promise<HomePageDataResponse> => {
     const url = `${serverEnv.SERVER_URL}/api/pages/home`;
 
-    // Add timeout to prevent hanging requests
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 25000);
 
@@ -28,7 +27,6 @@ export const getHomePageData = createServerFn({ method: "GET" }).handler(
         throw new Error(`Failed to fetch homepage data: ${response.status}`);
       }
 
-      // Explicitly await json() to ensure body is fully consumed
       return await response.json();
     } catch (error) {
       clearTimeout(timeoutId);
