@@ -58,6 +58,25 @@
 </Button>
 ```
 
+### Action Button Styling (Brutalist Pattern)
+
+**MANDATORY:** All primary action buttons (form submits, CTAs, card actions) must use:
+
+```tsx
+<Button size="lg" className="font-mono font-semibold tracking-tight uppercase">
+  Submit
+</Button>
+```
+
+| Class            | Purpose              |
+| ---------------- | -------------------- |
+| `font-mono`      | Geist Mono font      |
+| `font-semibold`  | Bold weight          |
+| `tracking-tight` | Tight letter spacing |
+| `uppercase`      | All caps text        |
+
+**Reference:** See `article-card.tsx` for canonical implementation.
+
 ---
 
 ## Badge
@@ -782,4 +801,49 @@ Wrap card grids with section dividers to create visual separation:
   ))}
 </CardGrid>
 <SectionDivider />
+```
+
+---
+
+## Toast (Sonner)
+
+### Font Styling
+
+**MANDATORY:** Toast notifications must use proper font styling for consistency with the brutalist design:
+
+```tsx
+toast.success("Title text", {
+  description: "Description text",
+  classNames: {
+    title: "font-mono", // Geist Mono for titles
+    description: "font-sans", // Geist Sans for descriptions
+  },
+});
+```
+
+| Element       | Font Class  | Font Family |
+| ------------- | ----------- | ----------- |
+| Toast title   | `font-mono` | Geist Mono  |
+| Toast message | `font-sans` | Geist Sans  |
+
+### Usage Pattern
+
+```tsx
+// Success toast
+toast.success(i18n.form.successTitle, {
+  description: i18n.form.successDescription,
+  classNames: {
+    title: "font-mono",
+    description: "font-sans",
+  },
+});
+
+// Error toast
+toast.error(i18n.form.errorTitle, {
+  description: i18n.form.errorDescription,
+  classNames: {
+    title: "font-mono",
+    description: "font-sans",
+  },
+});
 ```

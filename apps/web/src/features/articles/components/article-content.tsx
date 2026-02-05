@@ -1,6 +1,6 @@
 import type { Article } from "@azertykeycaps-app/schemas";
 import { ClientOnly, Link } from "@tanstack/react-router";
-import { AlertTriangleIcon, ExternalLinkIcon } from "lucide-react";
+import { AlertTriangleIcon, ExternalLinkIcon, PencilIcon } from "lucide-react";
 
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -138,6 +138,13 @@ export function ArticleContent({ article }: ArticleContentProps) {
                 <ExternalLinkIcon />
               </Button>
             )}
+            <Button
+              variant="ghost"
+              render={<Link to="/suggest" search={{ slug: article.slug }} />}
+            >
+              <PencilIcon />
+              {i18n.articles.suggestChange}
+            </Button>
           </div>
         </PageSectionContent>
       </PageSection>

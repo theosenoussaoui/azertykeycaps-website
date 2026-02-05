@@ -1,0 +1,627 @@
+[
+  {
+    "source": {
+      "message": "[route:/_app/] loader total: 1506.0ms"
+    },
+    "dataset": "cloudflare-workers",
+    "timestamp": "2026-02-05T23:09:50.623Z",
+    "$workers": {
+      "truncated": false,
+      "event": {
+        "request": {
+          "url": "https://staging.azertykeycaps.fr/",
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "outcome": "ok",
+      "scriptName": "azertykeycaps-app-web-prod",
+      "eventType": "fetch",
+      "executionModel": "stateless",
+      "scriptVersion": {
+        "id": "9761f598-8323-4ddf-85d1-b0ecdbe8937a"
+      },
+      "requestId": "9c9613db4e556f0f"
+    },
+    "$metadata": {
+      "id": "01KGR13B7M6P8KCNFKVAA14R69",
+      "requestId": "9c9613db4e556f0f",
+      "trigger": "GET /",
+      "service": "azertykeycaps-app-web-prod",
+      "message": "[route:/_app/] loader total: 1506.0ms",
+      "account": "dd56b56a4f023cb0e3bd02e858e27049",
+      "type": "cf-worker",
+      "fingerprint": "4e5edd9333ce5d16b6f0524bfc41d67b",
+      "origin": "fetch",
+      "messageTemplate": "[route:/_app/] loader total: 1506.0ms"
+    },
+    "links": []
+  },
+  {
+    "source": {
+      "message": "[route:/_app/] getHomePageData: 1506.0ms"
+    },
+    "dataset": "cloudflare-workers",
+    "timestamp": "2026-02-05T23:09:50.623Z",
+    "$workers": {
+      "truncated": false,
+      "event": {
+        "request": {
+          "url": "https://staging.azertykeycaps.fr/",
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "outcome": "ok",
+      "scriptName": "azertykeycaps-app-web-prod",
+      "eventType": "fetch",
+      "executionModel": "stateless",
+      "scriptVersion": {
+        "id": "9761f598-8323-4ddf-85d1-b0ecdbe8937a"
+      },
+      "requestId": "9c9613db4e556f0f"
+    },
+    "$metadata": {
+      "id": "01KGR13B7M6P8KCNFKVAA14R68",
+      "requestId": "9c9613db4e556f0f",
+      "trigger": "GET /",
+      "service": "azertykeycaps-app-web-prod",
+      "message": "[route:/_app/] getHomePageData: 1506.0ms",
+      "account": "dd56b56a4f023cb0e3bd02e858e27049",
+      "type": "cf-worker",
+      "fingerprint": "4e5edd9333ce5d16b6f0524bfc41d67b",
+      "origin": "fetch",
+      "messageTemplate": "[route:/<*>/] <*>: <*>.0ms"
+    },
+    "links": []
+  },
+  {
+    "source": {
+      "message": "[route:/] loader total: 1492.0ms"
+    },
+    "dataset": "cloudflare-workers",
+    "timestamp": "2026-02-05T23:09:50.609Z",
+    "$workers": {
+      "truncated": false,
+      "event": {
+        "request": {
+          "url": "https://staging.azertykeycaps.fr/",
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "outcome": "ok",
+      "scriptName": "azertykeycaps-app-web-prod",
+      "eventType": "fetch",
+      "executionModel": "stateless",
+      "scriptVersion": {
+        "id": "9761f598-8323-4ddf-85d1-b0ecdbe8937a"
+      },
+      "requestId": "9c9613db4e556f0f"
+    },
+    "$metadata": {
+      "id": "01KGR13B7M6P8KCNFKVAA14R67",
+      "requestId": "9c9613db4e556f0f",
+      "trigger": "GET /",
+      "service": "azertykeycaps-app-web-prod",
+      "message": "[route:/] loader total: 1492.0ms",
+      "account": "dd56b56a4f023cb0e3bd02e858e27049",
+      "type": "cf-worker",
+      "fingerprint": "4e5edd9333ce5d16b6f0524bfc41d67b",
+      "origin": "fetch",
+      "messageTemplate": "[route:/] <*> <*>: <*>.0ms"
+    },
+    "links": []
+  },
+  {
+    "source": {
+      "message": "[route:/] getLayoutData: 1492.0ms"
+    },
+    "dataset": "cloudflare-workers",
+    "timestamp": "2026-02-05T23:09:50.609Z",
+    "$workers": {
+      "truncated": false,
+      "event": {
+        "request": {
+          "url": "https://staging.azertykeycaps.fr/",
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "outcome": "ok",
+      "scriptName": "azertykeycaps-app-web-prod",
+      "eventType": "fetch",
+      "executionModel": "stateless",
+      "scriptVersion": {
+        "id": "9761f598-8323-4ddf-85d1-b0ecdbe8937a"
+      },
+      "requestId": "9c9613db4e556f0f"
+    },
+    "$metadata": {
+      "id": "01KGR13B7M6P8KCNFKVAA14R66",
+      "requestId": "9c9613db4e556f0f",
+      "trigger": "GET /",
+      "service": "azertykeycaps-app-web-prod",
+      "message": "[route:/] getLayoutData: 1492.0ms",
+      "account": "dd56b56a4f023cb0e3bd02e858e27049",
+      "type": "cf-worker",
+      "fingerprint": "4e5edd9333ce5d16b6f0524bfc41d67b",
+      "origin": "fetch",
+      "messageTemplate": "[route:/] getLayoutData: 1492.0ms"
+    },
+    "links": []
+  },
+  {
+    "source": {
+      "message": "[route:/_app/] t(): 0.0ms"
+    },
+    "dataset": "cloudflare-workers",
+    "timestamp": "2026-02-05T23:09:49.117Z",
+    "$workers": {
+      "truncated": false,
+      "event": {
+        "request": {
+          "url": "https://staging.azertykeycaps.fr/",
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "outcome": "ok",
+      "scriptName": "azertykeycaps-app-web-prod",
+      "eventType": "fetch",
+      "executionModel": "stateless",
+      "scriptVersion": {
+        "id": "9761f598-8323-4ddf-85d1-b0ecdbe8937a"
+      },
+      "requestId": "9c9613db4e556f0f"
+    },
+    "$metadata": {
+      "id": "01KGR13B7M6P8KCNFKVAA14R65",
+      "requestId": "9c9613db4e556f0f",
+      "trigger": "GET /",
+      "service": "azertykeycaps-app-web-prod",
+      "message": "[route:/_app/] t(): 0.0ms",
+      "account": "dd56b56a4f023cb0e3bd02e858e27049",
+      "type": "cf-worker",
+      "fingerprint": "4e5edd9333ce5d16b6f0524bfc41d67b",
+      "origin": "fetch",
+      "messageTemplate": "[route:/<*>/] <*>(): <*>.0ms"
+    },
+    "links": []
+  },
+  {
+    "source": {
+      "level": "info",
+      "message": "GET https://staging.azertykeycaps.fr/"
+    },
+    "dataset": "cloudflare-workers",
+    "timestamp": "2026-02-05T23:09:48.913Z",
+    "$workers": {
+      "event": {
+        "request": {
+          "cf": {
+            "requestHeaderNames": {},
+            "botManagement": {
+              "detectionIds": {},
+              "corporateProxy": false,
+              "verifiedBot": false,
+              "jsDetection": {
+                "passed": false
+              },
+              "staticResource": false,
+              "score": 99
+            },
+            "httpProtocol": "HTTP/3",
+            "clientAcceptEncoding": "gzip, deflate, br",
+            "requestPriority": "",
+            "colo": "CDG",
+            "asOrganization": "Orange S.A.",
+            "country": "FR",
+            "isEUCountry": "1",
+            "city": "Tourcoing",
+            "continent": "EU",
+            "region": "Hauts-de-France",
+            "regionCode": "HDF",
+            "timezone": "Europe/Paris",
+            "longitude": "3.16117",
+            "latitude": "50.72391",
+            "postalCode": "59200",
+            "tlsVersion": "TLSv1.3",
+            "tlsCipher": "AEAD-AES128-GCM-SHA256",
+            "tlsClientRandom": "yY+posD6ih3Nxn+l2W+zHnxD97YAgruh7RHTP4cExHA=",
+            "tlsClientCiphersSha1": "majgAKUWrKK75XCpDQDr/Sf7Eyw=",
+            "tlsClientExtensionsSha1": "33/GTUcx46fsroQ9wc0J5aIerIs=",
+            "tlsClientExtensionsSha1Le": "7UDFPCpfb/3bnjh9ZGGBS7yc31M=",
+            "tlsExportedAuthenticator": {
+              "clientHandshake": "34d7f0c8a5c2ce33d8385fd1b6d07aa4309f8e1f83037a4a0f31016d5aca95a0",
+              "serverHandshake": "fd4301db2c08b073601efcdf6b01072e61f871de01fa62c1fba8e720deb39631",
+              "clientFinished": "f1cb3db3125959aa9957d21b9cca01a3cd2e7c115355bd597e73deb9ef964f55",
+              "serverFinished": "c43d7ba442151bd300704df305f23901662b18b56b09eca73ab98fc2bf418652"
+            },
+            "tlsClientHelloLength": "1602",
+            "tlsClientAuth": {
+              "certPresented": "0",
+              "certVerified": "NONE",
+              "certRevoked": "0",
+              "certIssuerDN": "",
+              "certSubjectDN": "",
+              "certIssuerDNRFC2253": "",
+              "certSubjectDNRFC2253": "",
+              "certIssuerDNLegacy": "",
+              "certSubjectDNLegacy": "",
+              "certSerial": "",
+              "certIssuerSerial": "",
+              "certSKI": "",
+              "certIssuerSKI": "",
+              "certFingerprintSHA1": "",
+              "certFingerprintSHA256": "",
+              "certNotBefore": "",
+              "certNotAfter": ""
+            },
+            "verifiedBotCategory": "",
+            "edgeRequestKeepAliveStatus": 1,
+            "clientTcpRtt": 0,
+            "asn": 3215
+          },
+          "url": "https://staging.azertykeycaps.fr/",
+          "method": "GET",
+          "headers": {
+            "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "accept-encoding": "gzip, br",
+            "accept-language": "fr-FR,en-US;q=0.7,en;q=0.3",
+            "cf-connecting-ip": "2a01:cb0c:15a5:5200:c298:631a:6841:9318",
+            "cf-ipcountry": "FR",
+            "cf-ray": "9c9613db4e556f0f",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "connection": "Keep-Alive",
+            "host": "staging.azertykeycaps.fr",
+            "priority": "u=0, i",
+            "sec-fetch-dest": "document",
+            "sec-fetch-mode": "navigate",
+            "sec-fetch-site": "none",
+            "upgrade-insecure-requests": "1",
+            "user-agent": "Mozilla/5.0 (X11; Linux x86_64; rv:146.0) Gecko/20100101 Firefox/146.0",
+            "x-forwarded-proto": "https",
+            "x-real-ip": "2a01:cb0c:15a5:5200:c298:631a:6841:9318"
+          },
+          "path": "/"
+        },
+        "rayId": "9c9613db4e556f0f",
+        "response": {
+          "status": 200
+        }
+      },
+      "diagnosticsChannelEvents": [],
+      "truncated": false,
+      "scriptName": "azertykeycaps-app-web-prod",
+      "outcome": "ok",
+      "eventType": "fetch",
+      "executionModel": "stateless",
+      "scriptVersion": {
+        "id": "9761f598-8323-4ddf-85d1-b0ecdbe8937a"
+      },
+      "requestId": "9c9613db4e556f0f",
+      "cpuTimeMs": 104,
+      "wallTimeMs": 1607
+    },
+    "$metadata": {
+      "id": "01KGR13B7M6P8KCNFKVAA14R64",
+      "requestId": "9c9613db4e556f0f",
+      "trigger": "GET /",
+      "service": "azertykeycaps-app-web-prod",
+      "level": "info",
+      "message": "GET https://staging.azertykeycaps.fr/",
+      "account": "dd56b56a4f023cb0e3bd02e858e27049",
+      "type": "cf-worker-event",
+      "fingerprint": "4e5edd9333ce5d16b6f0524bfc41d67b",
+      "origin": "fetch",
+      "messageTemplate": "GET https://staging.azertykeycaps.fr/"
+    },
+    "links": []
+  },
+  {
+    "source": {
+      "message": "[route:/_app/] loader total: 4247.0ms"
+    },
+    "dataset": "cloudflare-workers",
+    "timestamp": "2026-02-05T22:43:04.260Z",
+    "$workers": {
+      "truncated": false,
+      "event": {
+        "request": {
+          "url": "http://staging.azertykeycaps.fr/",
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "outcome": "ok",
+      "scriptName": "azertykeycaps-app-web-prod",
+      "eventType": "fetch",
+      "executionModel": "stateless",
+      "scriptVersion": {
+        "id": "9761f598-8323-4ddf-85d1-b0ecdbe8937a"
+      },
+      "requestId": "9c95ec8e9b366b86"
+    },
+    "$metadata": {
+      "id": "01KGQZJAE4XNVKMCJ9NREHACP5",
+      "requestId": "9c95ec8e9b366b86",
+      "trigger": "GET /",
+      "service": "azertykeycaps-app-web-prod",
+      "message": "[route:/_app/] loader total: 4247.0ms",
+      "account": "dd56b56a4f023cb0e3bd02e858e27049",
+      "type": "cf-worker",
+      "fingerprint": "4e5edd9333ce5d16b6f0524bfc41d67b",
+      "origin": "fetch",
+      "messageTemplate": "[route:/_app/] loader total: 4247.0ms"
+    },
+    "links": []
+  },
+  {
+    "source": {
+      "message": "[route:/_app/] getHomePageData: 4247.0ms"
+    },
+    "dataset": "cloudflare-workers",
+    "timestamp": "2026-02-05T22:43:04.260Z",
+    "$workers": {
+      "truncated": false,
+      "event": {
+        "request": {
+          "url": "http://staging.azertykeycaps.fr/",
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "outcome": "ok",
+      "scriptName": "azertykeycaps-app-web-prod",
+      "eventType": "fetch",
+      "executionModel": "stateless",
+      "scriptVersion": {
+        "id": "9761f598-8323-4ddf-85d1-b0ecdbe8937a"
+      },
+      "requestId": "9c95ec8e9b366b86"
+    },
+    "$metadata": {
+      "id": "01KGQZJAE4XNVKMCJ9NREHACP4",
+      "requestId": "9c95ec8e9b366b86",
+      "trigger": "GET /",
+      "service": "azertykeycaps-app-web-prod",
+      "message": "[route:/_app/] getHomePageData: 4247.0ms",
+      "account": "dd56b56a4f023cb0e3bd02e858e27049",
+      "type": "cf-worker",
+      "fingerprint": "4e5edd9333ce5d16b6f0524bfc41d67b",
+      "origin": "fetch",
+      "messageTemplate": "[route:/<*>/] <*>: <*>.0ms"
+    },
+    "links": []
+  },
+  {
+    "source": {
+      "message": "[route:/] loader total: 4009.0ms"
+    },
+    "dataset": "cloudflare-workers",
+    "timestamp": "2026-02-05T22:43:04.022Z",
+    "$workers": {
+      "truncated": false,
+      "event": {
+        "request": {
+          "url": "http://staging.azertykeycaps.fr/",
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "outcome": "ok",
+      "scriptName": "azertykeycaps-app-web-prod",
+      "eventType": "fetch",
+      "executionModel": "stateless",
+      "scriptVersion": {
+        "id": "9761f598-8323-4ddf-85d1-b0ecdbe8937a"
+      },
+      "requestId": "9c95ec8e9b366b86"
+    },
+    "$metadata": {
+      "id": "01KGQZJA8MJ3QP190P3JPSS3MR",
+      "requestId": "9c95ec8e9b366b86",
+      "trigger": "GET /",
+      "service": "azertykeycaps-app-web-prod",
+      "message": "[route:/] loader total: 4009.0ms",
+      "account": "dd56b56a4f023cb0e3bd02e858e27049",
+      "type": "cf-worker",
+      "fingerprint": "4e5edd9333ce5d16b6f0524bfc41d67b",
+      "origin": "fetch",
+      "messageTemplate": "[route:/] <*> <*>: <*>.0ms"
+    },
+    "links": []
+  },
+  {
+    "source": {
+      "message": "[route:/] getLayoutData: 4009.0ms"
+    },
+    "dataset": "cloudflare-workers",
+    "timestamp": "2026-02-05T22:43:04.022Z",
+    "$workers": {
+      "truncated": false,
+      "event": {
+        "request": {
+          "url": "http://staging.azertykeycaps.fr/",
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "outcome": "ok",
+      "scriptName": "azertykeycaps-app-web-prod",
+      "eventType": "fetch",
+      "executionModel": "stateless",
+      "scriptVersion": {
+        "id": "9761f598-8323-4ddf-85d1-b0ecdbe8937a"
+      },
+      "requestId": "9c95ec8e9b366b86"
+    },
+    "$metadata": {
+      "id": "01KGQZJA8MJ3QP190P3JPSS3MQ",
+      "requestId": "9c95ec8e9b366b86",
+      "trigger": "GET /",
+      "service": "azertykeycaps-app-web-prod",
+      "message": "[route:/] getLayoutData: 4009.0ms",
+      "account": "dd56b56a4f023cb0e3bd02e858e27049",
+      "type": "cf-worker",
+      "fingerprint": "4e5edd9333ce5d16b6f0524bfc41d67b",
+      "origin": "fetch",
+      "messageTemplate": "[route:/] getLayoutData: 4009.0ms"
+    },
+    "links": []
+  },
+  {
+    "source": {
+      "message": "[route:/_app/] t(): 0.0ms"
+    },
+    "dataset": "cloudflare-workers",
+    "timestamp": "2026-02-05T22:43:00.013Z",
+    "$workers": {
+      "truncated": false,
+      "event": {
+        "request": {
+          "url": "http://staging.azertykeycaps.fr/",
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "outcome": "ok",
+      "scriptName": "azertykeycaps-app-web-prod",
+      "eventType": "fetch",
+      "executionModel": "stateless",
+      "scriptVersion": {
+        "id": "9761f598-8323-4ddf-85d1-b0ecdbe8937a"
+      },
+      "requestId": "9c95ec8e9b366b86"
+    },
+    "$metadata": {
+      "id": "01KGQZJA8MJ3QP190P3JPSS3MP",
+      "requestId": "9c95ec8e9b366b86",
+      "trigger": "GET /",
+      "service": "azertykeycaps-app-web-prod",
+      "message": "[route:/_app/] t(): 0.0ms",
+      "account": "dd56b56a4f023cb0e3bd02e858e27049",
+      "type": "cf-worker",
+      "fingerprint": "4e5edd9333ce5d16b6f0524bfc41d67b",
+      "origin": "fetch",
+      "messageTemplate": "[route:/<*>/] <*>(): <*>.0ms"
+    },
+    "links": []
+  },
+  {
+    "source": {
+      "level": "info",
+      "message": "GET http://staging.azertykeycaps.fr/"
+    },
+    "dataset": "cloudflare-workers",
+    "timestamp": "2026-02-05T22:42:59.692Z",
+    "$workers": {
+      "event": {
+        "request": {
+          "cf": {
+            "requestHeaderNames": {},
+            "botManagement": {
+              "detectionIds": {},
+              "corporateProxy": false,
+              "verifiedBot": false,
+              "jsDetection": {
+                "passed": false
+              },
+              "staticResource": false,
+              "score": 99
+            },
+            "isEUCountry": false,
+            "httpProtocol": "HTTP/1.1",
+            "requestPriority": "",
+            "colo": "TPE",
+            "asOrganization": "Palo Alto Networks, Inc",
+            "country": "TW",
+            "city": "Chang-hua",
+            "continent": "AS",
+            "region": "Taiwan",
+            "regionCode": "04",
+            "timezone": "Asia/Taipei",
+            "longitude": "120.56276",
+            "latitude": "24.07327",
+            "tlsVersion": "",
+            "tlsCipher": "",
+            "tlsClientRandom": "",
+            "tlsClientCiphersSha1": "",
+            "tlsClientExtensionsSha1": "",
+            "tlsClientExtensionsSha1Le": "",
+            "tlsClientHelloLength": "0",
+            "tlsClientAuth": {
+              "certPresented": "0",
+              "certVerified": "NONE",
+              "certRevoked": "0",
+              "certIssuerDN": "",
+              "certSubjectDN": "",
+              "certIssuerDNRFC2253": "",
+              "certSubjectDNRFC2253": "",
+              "certIssuerDNLegacy": "",
+              "certSubjectDNLegacy": "",
+              "certSerial": "",
+              "certIssuerSerial": "",
+              "certSKI": "",
+              "certIssuerSKI": "",
+              "certFingerprintSHA1": "",
+              "certFingerprintSHA256": "",
+              "certNotBefore": "",
+              "certNotAfter": ""
+            },
+            "verifiedBotCategory": "",
+            "edgeRequestKeepAliveStatus": 1,
+            "clientTcpRtt": 3,
+            "asn": 396982
+          },
+          "url": "http://staging.azertykeycaps.fr/",
+          "method": "GET",
+          "headers": {
+            "accept-encoding": "gzip",
+            "cf-connecting-ip": "198.235.24.115",
+            "cf-ipcountry": "TW",
+            "cf-ray": "9c95ec8e9b366b86",
+            "cf-visitor": "{\"scheme\":\"http\"}",
+            "connection": "Keep-Alive",
+            "host": "staging.azertykeycaps.fr",
+            "user-agent": "Hello from Palo Alto Networks, find out more about our scans in https://docs-cortex.paloaltonetworks.com/r/1/Cortex-Xpanse/Scanning-activity",
+            "x-forwarded-proto": "http",
+            "x-real-ip": "198.235.24.115"
+          },
+          "path": "/"
+        },
+        "rayId": "9c95ec8e9b366b86",
+        "response": {
+          "status": 200
+        }
+      },
+      "diagnosticsChannelEvents": [],
+      "truncated": false,
+      "scriptName": "azertykeycaps-app-web-prod",
+      "outcome": "ok",
+      "eventType": "fetch",
+      "executionModel": "stateless",
+      "scriptVersion": {
+        "id": "9761f598-8323-4ddf-85d1-b0ecdbe8937a"
+      },
+      "requestId": "9c95ec8e9b366b86",
+      "cpuTimeMs": 109,
+      "wallTimeMs": 4349
+    },
+    "$metadata": {
+      "id": "01KGQZJA8MJ3QP190P3JPSS3MN",
+      "requestId": "9c95ec8e9b366b86",
+      "trigger": "GET /",
+      "service": "azertykeycaps-app-web-prod",
+      "level": "info",
+      "message": "GET http://staging.azertykeycaps.fr/",
+      "account": "dd56b56a4f023cb0e3bd02e858e27049",
+      "type": "cf-worker-event",
+      "fingerprint": "4e5edd9333ce5d16b6f0524bfc41d67b",
+      "origin": "fetch",
+      "messageTemplate": "GET http://staging.azertykeycaps.fr/"
+    },
+    "links": []
+  }
+]

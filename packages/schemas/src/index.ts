@@ -7,3 +7,4 @@ export * from "./filters";
 export * from "./responses";
 export * from "./cache";
 export * from "./search";
+export * from "./suggestions";

@@ -16,7 +16,8 @@
       "alchemy": "^0.82.1",
       "@libsql/client": "0.15.15",
       "libsql": "0.5.22",
-      "@hono/zod-validator": "^0.6.3"
+      "@hono/zod-validator": "^0.6.3",
+      "date-fns": "^4.1.0"
     }
   },
   "type": "module",

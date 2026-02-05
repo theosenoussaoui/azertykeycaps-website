@@ -14,6 +14,9 @@
   "scripts": {
     "check-types": "tsc --noEmit"
   },
+  "dependencies": {
+    "date-fns": "catalog:"
+  },
   "devDependencies": {
     "@azertykeycaps-app/config": "workspace:*",
     "typescript": "catalog:"

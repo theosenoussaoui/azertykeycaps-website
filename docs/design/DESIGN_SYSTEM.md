@@ -1012,6 +1012,25 @@ pages: {
 - Warn users before navigation when form has unsaved changes
 - Use `beforeunload` event or router guards
 
+### Form & Action Button Styling
+
+**MANDATORY:** All primary action buttons (form submit, CTA buttons, card action buttons) must use the brutalist button style:
+
+```tsx
+<Button size="lg" className="font-mono font-semibold tracking-tight uppercase">
+  Submit
+</Button>
+```
+
+**Required classes:**
+
+- `font-mono` - Geist Mono font
+- `font-semibold` - Bold weight
+- `tracking-tight` - Tight letter spacing
+- `uppercase` - All caps text
+
+**Reference:** See `article-card.tsx` for canonical implementation of action buttons.
+
 ---
 
 ## URL State Management
@@ -1325,6 +1344,7 @@ The divider spans 100vw using the `left-1/2 -ml-[50vw]` technique and uses `opac
 
 | Version | Date       | Changes                                                                                                                                                                            |
 | ------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.7     | 2026-02-03 | Added form action button styling rule (font-mono font-semibold tracking-tight uppercase), toast font styling rule (mono title, sans description)                                   |
 | 1.6     | 2026-01-25 | PayloadCMS-style grid: integrated borders on CardGrid/GridCard, bg-accent hover, grayscale image hover. Removed DitherShader for performance.                                      |
 | 1.5     | 2026-01-25 | Added breadcrumb navigation pattern, related content sections, filter accessibility (aria-labels), empty state action requirement, profile shape badges, Badge render prop pattern |
 | 1.4     | 2026-01-19 | Changed grid system from 6 to 8 columns on desktop                                                                                                                                 |

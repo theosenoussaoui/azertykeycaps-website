@@ -3,6 +3,7 @@ import { protectedProcedure, publicProcedure, router } from "../index";
 import { articlesRouter } from "./articles";
 import { globalsRouter } from "./globals";
 import { searchRouter } from "./search";
+import { suggestionsRouter } from "./suggestions";
 
 export const appRouter = router({
   healthCheck: publicProcedure.query(() => {
@@ -17,5 +18,6 @@ export const appRouter = router({
   articles: articlesRouter,
   globals: globalsRouter,
   search: searchRouter,
+  suggestions: suggestionsRouter,
 });
 export type AppRouter = typeof appRouter;

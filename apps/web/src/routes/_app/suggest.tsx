@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { LightbulbIcon, ArrowRightIcon } from "lucide-react";
+import { ArrowRightIcon, LightbulbIcon } from "lucide-react";
+import { z } from "zod";
 
 import { PageError } from "@/components/errors/page-error";
 import { Button } from "@/components/ui/button";
+import { CardGrid, GridCard } from "@/components/ui/card-grid";
 import {
   Empty,
   EmptyContent,
@@ -19,8 +21,11 @@ import {
   PageSectionContent,
   PageTitle,
 } from "@/components/ui/page-container";
+import { getArticleBySlug } from "@/features/articles/api/get-article-by-slug";
 import { getSuggestContent } from "@/features/globals/api/get-suggest-content";
-import { t } from "@/i18n";
+import { getProfilesForForm } from "@/features/suggestions/api/get-profiles-for-form";
+import { SuggestionForm } from "@/features/suggestions/components/suggestion-form";
+import { defaultLocale, t } from "@/i18n";
 import { buildCacheHeaders } from "@/lib/cache-tags";
 import {
   generateCanonical,
@@ -29,11 +34,22 @@ import {
   generateWebPageSchema,
 } from "@/lib/seo";
 
+const searchSchema = z.object({
+  slug: z.string().optional(),
+});
+
 export const Route = createFileRoute("/_app/suggest")({
   component: SuggestPage,
-  loader: async () => {
-    const [content, i18n] = await Promise.all([getSuggestContent(), t()]);
-    return { content, i18n };
+  validateSearch: searchSchema,
+  loaderDeps: ({ search }) => ({ slug: search.slug }),
+  loader: async ({ deps }) => {
+    const [content, profiles, articleToEdit, i18n] = await Promise.all([
+      getSuggestContent(),
+      getProfilesForForm(),
+      deps.slug ? getArticleBySlug({ data: { slug: deps.slug } }) : null,
+      t(),
+    ]);
+    return { content, profiles, articleToEdit, i18n, locale: defaultLocale };
   },
   headers: () => buildCacheHeaders({ global: ["suggest"] }),
   staleTime: 60 * 60_000,
@@ -72,20 +88,32 @@ export const Route = createFileRoute("/_app/suggest")({
 });
 
 function SuggestPage() {
-  const { content, i18n } = Route.useLoaderData();
+  const { content, profiles, articleToEdit, i18n, locale } =
+    Route.useLoaderData();
 
   return (
     <PageContainer>
-      <PageHeader>
+      <PageHeader className="min-h-0 py-8 @sm:py-10 @md:py-12">
         <PageTitle>{content?.title ?? i18n.pages.suggest.title}</PageTitle>
         <PageDescription>
           {content?.description ?? i18n.pages.suggest.description}
         </PageDescription>
       </PageHeader>
 
-      <PageSection>
+      <PageSection spacing="none">
         <PageSectionContent>
-          {!content?.formEnabled && (
+          {content?.formEnabled ? (
+            <CardGrid>
+              <GridCard className="col-span-2 border-y border-border/60 md:col-span-6">
+                <SuggestionForm
+                  profiles={profiles}
+                  editingArticle={articleToEdit}
+                  i18n={i18n}
+                  locale={locale}
+                />
+              </GridCard>
+            </CardGrid>
+          ) : (
             <Empty>
               <EmptyHeader>
                 <EmptyMedia variant="icon">
