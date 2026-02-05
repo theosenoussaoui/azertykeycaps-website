@@ -1,8 +1,3 @@
-import type {
-  KeycapProfileRef,
-  NotFoundPage,
-  SocialNetworks,
-} from "@azertykeycaps-app/schemas";
 import type { QueryClient } from "@tanstack/react-query";
 import {
   HeadContent,
@@ -13,24 +8,15 @@ import {
 import { lazy, Suspense } from "react";
 
 import { NotFound } from "@/components/errors/not-found";
-import { getLayoutData } from "@/features/pages/api/get-layout-data";
 import appCss from "@/index.css?url";
 import { siteConfig } from "@/lib/seo";
 
-export interface RootLoaderData {
-  profiles: KeycapProfileRef[];
-  socialNetworks: SocialNetworks | null;
-  notFoundContent: NotFoundPage | null;
-}
-
-// Lazy load Toaster - toasts are rare, no need to block initial render
 const Toaster = lazy(() =>
   import("@/components/ui/sonner").then((m) => ({
     default: m.Toaster,
   })),
 );
 
-// Lazy load devtools only in development - removes ~100KB from production bundle
 const TanStackRouterDevtools = import.meta.env.DEV
   ? lazy(() =>
       import("@tanstack/react-router-devtools").then((m) => ({
@@ -52,55 +38,17 @@ export interface RouterAppContext {
 }
 
 export const Route = createRootRouteWithContext<RouterAppContext>()({
-  loader: async (): Promise<RootLoaderData> => {
-    const loaderStart = performance.now();
-
-    const layoutStart = performance.now();
-    const data = await getLayoutData();
-    console.log(
-      `[route:/] getLayoutData: ${(performance.now() - layoutStart).toFixed(1)}ms`,
-    );
-
-    console.log(
-      `[route:/] loader total: ${(performance.now() - loaderStart).toFixed(1)}ms`,
-    );
-
-    return {
-      profiles: data.profiles,
-      socialNetworks: data.socialNetworks,
-      notFoundContent: data.notFoundPage,
-    };
-  },
   head: () => ({
     meta: [
-      {
-        charSet: "utf-8",
-      },
-      {
-        name: "viewport",
-        content: "width=device-width, initial-scale=1",
-      },
-      {
-        name: "theme-color",
-        content: siteConfig.themeColor,
-      },
-      {
-        title: `${siteConfig.name} - ${siteConfig.description}`,
-      },
-      // Default Open Graph for pages that don't override
+      { charSet: "utf-8" },
+      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "theme-color", content: siteConfig.themeColor },
+      { title: `${siteConfig.name} - ${siteConfig.description}` },
       { property: "og:site_name", content: siteConfig.name },
       { property: "og:locale", content: siteConfig.locale },
       { property: "og:type", content: "website" },
     ],
-    links: [
-      // App styles (includes self-hosted Geist font via Fontsource)
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
-    ],
-    // Note: JSON-LD is added per-page for better specificity
-    // WebSite schema is not critical - page-specific schemas are more important
+    links: [{ rel: "stylesheet", href: appCss }],
   }),
 
   component: RootDocument,

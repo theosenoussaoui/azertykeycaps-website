@@ -1,5 +1,5 @@
-import type { RootLoaderData } from "@/routes/__root";
-import { Link, rootRouteId, useMatch } from "@tanstack/react-router";
+import type { AppLoaderData } from "@/routes/_app";
+import { Link, useMatch } from "@tanstack/react-router";
 
 import Footer from "@/components/layout/footer";
 import Header from "@/components/layout/header";
@@ -8,8 +8,8 @@ import { CurvedRoot, CurvedText } from "@/components/ui/curved-loop";
 import { GridLines } from "@/components/ui/grid-lines";
 
 export function NotFound() {
-  const rootMatch = useMatch({ from: rootRouteId, shouldThrow: false });
-  const loaderData = rootMatch?.loaderData as RootLoaderData | undefined;
+  const appMatch = useMatch({ from: "/_app", shouldThrow: false });
+  const loaderData = appMatch?.loaderData as AppLoaderData | undefined;
 
   const profiles = loaderData?.profiles ?? [];
   const socialNetworks = loaderData?.socialNetworks ?? null;
@@ -41,7 +41,7 @@ export function NotFound() {
           </Button>
         </div>
       </main>
-      <Footer socialNetworks={socialNetworks ?? null} />
+      <Footer socialNetworks={socialNetworks} />
     </div>
   );
 }

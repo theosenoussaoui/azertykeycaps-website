@@ -181,7 +181,7 @@ export function SuggestionForm({
                 <div>
                   <Label
                     htmlFor={field.name}
-                    className="font-mono text-xs font-semibold uppercase tracking-tighter text-white/90"
+                    className="font-mono text-xs font-semibold tracking-tighter text-white/90 uppercase"
                   >
                     {i18n.pages.suggest.form.title} *
                   </Label>
@@ -219,7 +219,7 @@ export function SuggestionForm({
                 <div>
                   <Label
                     htmlFor={field.name}
-                    className="font-mono text-xs font-semibold uppercase tracking-tighter text-white/90"
+                    className="font-mono text-xs font-semibold tracking-tighter text-white/90 uppercase"
                   >
                     {i18n.pages.suggest.form.profile} *
                   </Label>
@@ -269,7 +269,7 @@ export function SuggestionForm({
                 <div>
                   <Label
                     htmlFor={field.name}
-                    className="font-mono text-xs font-semibold uppercase tracking-tighter text-white/90"
+                    className="font-mono text-xs font-semibold tracking-tighter text-white/90 uppercase"
                   >
                     {i18n.pages.suggest.form.url} *
                   </Label>
@@ -308,7 +308,7 @@ export function SuggestionForm({
                 <div>
                   <Label
                     htmlFor={field.name}
-                    className="font-mono text-xs font-semibold uppercase tracking-tighter text-white/90"
+                    className="font-mono text-xs font-semibold tracking-tighter text-white/90 uppercase"
                   >
                     {i18n.pages.suggest.form.additionalUrl}
                   </Label>
@@ -349,7 +349,7 @@ export function SuggestionForm({
                 <div className="@md:col-span-2">
                   <Label
                     htmlFor={field.name}
-                    className="font-mono text-xs font-semibold uppercase tracking-tighter text-white/90"
+                    className="font-mono text-xs font-semibold tracking-tighter text-white/90 uppercase"
                   >
                     {i18n.pages.suggest.form.email} *
                   </Label>
@@ -393,7 +393,7 @@ export function SuggestionForm({
                 <div>
                   <Label
                     htmlFor={field.name}
-                    className="font-mono text-xs font-semibold uppercase tracking-tighter text-white/90"
+                    className="font-mono text-xs font-semibold tracking-tighter text-white/90 uppercase"
                   >
                     {i18n.pages.suggest.form.material}
                   </Label>
@@ -450,7 +450,7 @@ export function SuggestionForm({
                 <div>
                   <Label
                     htmlFor={field.name}
-                    className="font-mono text-xs font-semibold uppercase tracking-tighter text-white/90"
+                    className="font-mono text-xs font-semibold tracking-tighter text-white/90 uppercase"
                   >
                     {i18n.pages.suggest.form.status}
                   </Label>
@@ -504,7 +504,7 @@ export function SuggestionForm({
                 <div>
                   <Label
                     htmlFor={field.name}
-                    className="font-mono text-xs font-semibold uppercase tracking-tighter text-white/90"
+                    className="font-mono text-xs font-semibold tracking-tighter text-white/90 uppercase"
                   >
                     {i18n.pages.suggest.form.startDate}
                   </Label>
@@ -550,7 +550,7 @@ export function SuggestionForm({
                 <div>
                   <Label
                     htmlFor={field.name}
-                    className="font-mono text-xs font-semibold uppercase tracking-tighter text-white/90"
+                    className="font-mono text-xs font-semibold tracking-tighter text-white/90 uppercase"
                   >
                     {i18n.pages.suggest.form.endDate}
                   </Label>
@@ -596,7 +596,7 @@ export function SuggestionForm({
                 <div className="@md:col-span-2">
                   <Label
                     htmlFor={field.name}
-                    className="font-mono text-xs font-semibold uppercase tracking-tighter text-white/90"
+                    className="font-mono text-xs font-semibold tracking-tighter text-white/90 uppercase"
                   >
                     {i18n.pages.suggest.form.description}
                   </Label>
@@ -633,7 +633,7 @@ export function SuggestionForm({
                 <div className="@md:col-span-2">
                   <Label
                     htmlFor={field.name}
-                    className="font-mono text-xs font-semibold uppercase tracking-tighter text-white/9090"
+                    className="font-mono text-xs font-semibold tracking-tighter text-white/9090 uppercase"
                   >
                     {i18n.pages.suggest.form.warningText}
                   </Label>

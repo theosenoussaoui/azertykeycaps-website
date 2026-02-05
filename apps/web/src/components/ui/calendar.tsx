@@ -40,7 +40,7 @@ function Calendar({
         day_button: cn(
           "flex size-8 items-center justify-center font-mono text-sm font-semibold tabular-nums transition-colors",
           "hover:bg-accent hover:text-accent-foreground",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+          "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
         ),
         selected:
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground",

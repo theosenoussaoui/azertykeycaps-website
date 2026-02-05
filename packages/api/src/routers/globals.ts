@@ -13,7 +13,7 @@ import {
 
 import { publicProcedure, router } from "../index";
 
-const CMS_CACHE_TTL = 0;
+const CMS_CACHE_TTL = 300;
 
 /**
  * Fetch from CMS with API key authentication and optional edge caching

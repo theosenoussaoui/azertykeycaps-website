@@ -490,15 +490,15 @@ Admin interface in CMS to:
 
 ## Related Files
 
-| File                                      | Purpose                           |
-| ----------------------------------------- | --------------------------------- |
-| `apps/cms/src/globals/Suggest.ts`         | CMS global configuration          |
-| `packages/schemas/src/suggestions.ts`     | Zod schemas, types, factory       |
-| `packages/api/src/routers/suggestions.ts` | tRPC router                       |
-| `apps/web/src/routes/_app/suggest.tsx`    | Route configuration               |
-| `apps/web/src/features/suggestions/`      | Feature components and API        |
+| File                                         | Purpose                        |
+| -------------------------------------------- | ------------------------------ |
+| `apps/cms/src/globals/Suggest.ts`            | CMS global configuration       |
+| `packages/schemas/src/suggestions.ts`        | Zod schemas, types, factory    |
+| `packages/api/src/routers/suggestions.ts`    | tRPC router                    |
+| `apps/web/src/routes/_app/suggest.tsx`       | Route configuration            |
+| `apps/web/src/features/suggestions/`         | Feature components and API     |
 | `apps/web/src/components/ui/date-picker.tsx` | DatePicker with locale support |
-| `apps/web/src/components/ui/calendar.tsx` | Calendar component                |
-| `apps/web/src/components/ui/sonner.tsx`   | Toast configuration (no icons)    |
-| `apps/web/src/i18n/fr.ts`                 | French translations               |
-| `apps/web/src/i18n/en.ts`                 | English translations              |
+| `apps/web/src/components/ui/calendar.tsx`    | Calendar component             |
+| `apps/web/src/components/ui/sonner.tsx`      | Toast configuration (no icons) |
+| `apps/web/src/i18n/fr.ts`                    | French translations            |
+| `apps/web/src/i18n/en.ts`                    | English translations           |
