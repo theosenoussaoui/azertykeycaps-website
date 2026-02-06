@@ -14,6 +14,7 @@ import health from "@/routes/health";
 import media from "@/routes/media";
 import article from "@/routes/pages/article";
 import home from "@/routes/pages/home";
+import homeWithLayout from "@/routes/pages/home-with-layout";
 import layout from "@/routes/pages/layout";
 import profile from "@/routes/pages/profile";
 
@@ -35,6 +36,8 @@ const routes = new Hono()
   .route("/api/pages/layout", layout)
   .use("/api/pages/home", pageDataCacheMiddleware)
   .route("/api/pages/home", home)
+  .use("/api/pages/home-with-layout", pageDataCacheMiddleware)
+  .route("/api/pages/home-with-layout", homeWithLayout)
   .use("/api/pages/article/*", articlePageCacheMiddleware)
   .route("/api/pages/article", article)
   .use("/api/pages/profile/*", profilePageCacheMiddleware)

@@ -22,7 +22,7 @@ const layout = new Hono().get("/", async (c) => {
     isDev,
   });
 
-  const [socialNetworks, profiles, notFoundPage] = await Promise.all([
+  const [socialNetworks, profiles] = await Promise.all([
     (async () => {
       const start = performance.now();
       const data = await caller.globals.socialNetworks();
@@ -39,20 +39,12 @@ const layout = new Hono().get("/", async (c) => {
       );
       return data;
     })(),
-    (async () => {
-      const start = performance.now();
-      const data = await caller.globals.notFoundPage();
-      console.log(
-        `[server:/api/pages/layout] globals.notFoundPage: ${(performance.now() - start).toFixed(1)}ms`,
-      );
-      return data;
-    })(),
   ]);
 
   const response: LayoutDataResponse = {
     socialNetworks,
     profiles,
-    notFoundPage,
+    notFoundPage: null,
   };
 
   console.log(

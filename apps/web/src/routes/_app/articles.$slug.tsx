@@ -1,3 +1,4 @@
+import type { LayoutData } from "@/routes/_app";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 
 import { PageErrorWithBack } from "@/components/errors/page-error";
@@ -21,6 +22,7 @@ import { SectionDivider } from "@/components/ui/section-divider";
 import { ArticleCard } from "@/features/articles/components/article-card";
 import { ArticleContent } from "@/features/articles/components/article-content";
 import { getArticlePageData } from "@/features/pages/api/get-article-page-data";
+import { getLayoutData } from "@/features/pages/api/get-layout-data";
 import { t } from "@/i18n";
 import { buildCacheHeaders } from "@/lib/cache-tags";
 import { getPreloadLinkAttributes } from "@/lib/image-utils";
@@ -34,8 +36,9 @@ import {
 export const Route = createFileRoute("/_app/articles/$slug")({
   component: ArticleDetailPage,
   loader: async ({ params }) => {
-    const [data, i18n] = await Promise.all([
+    const [data, layout, i18n] = await Promise.all([
       getArticlePageData({ data: { slug: params.slug } }),
+      getLayoutData(),
       t(),
     ]);
 
@@ -43,9 +46,15 @@ export const Route = createFileRoute("/_app/articles/$slug")({
       throw notFound();
     }
 
+    const layoutData: LayoutData = {
+      profiles: layout.profiles,
+      socialNetworks: layout.socialNetworks,
+    };
+
     return {
       article: data.article,
       relatedArticles: data.relatedArticles,
+      layoutData,
       i18n,
     };
   },

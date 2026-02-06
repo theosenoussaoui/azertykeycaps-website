@@ -1,3 +1,4 @@
+import type { LayoutData } from "@/routes/_app";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRightIcon, LightbulbIcon } from "lucide-react";
 import { z } from "zod";
@@ -23,6 +24,7 @@ import {
 } from "@/components/ui/page-container";
 import { getArticleBySlug } from "@/features/articles/api/get-article-by-slug";
 import { getSuggestContent } from "@/features/globals/api/get-suggest-content";
+import { getLayoutData } from "@/features/pages/api/get-layout-data";
 import { getProfilesForForm } from "@/features/suggestions/api/get-profiles-for-form";
 import { SuggestionForm } from "@/features/suggestions/components/suggestion-form";
 import { defaultLocale, t } from "@/i18n";
@@ -43,13 +45,25 @@ export const Route = createFileRoute("/_app/suggest")({
   validateSearch: searchSchema,
   loaderDeps: ({ search }) => ({ slug: search.slug }),
   loader: async ({ deps }) => {
-    const [content, profiles, articleToEdit, i18n] = await Promise.all([
+    const [content, profiles, layout, articleToEdit, i18n] = await Promise.all([
       getSuggestContent(),
       getProfilesForForm(),
+      getLayoutData(),
       deps.slug ? getArticleBySlug({ data: { slug: deps.slug } }) : null,
       t(),
     ]);
-    return { content, profiles, articleToEdit, i18n, locale: defaultLocale };
+    const layoutData: LayoutData = {
+      profiles: layout.profiles,
+      socialNetworks: layout.socialNetworks,
+    };
+    return {
+      content,
+      profiles,
+      articleToEdit,
+      layoutData,
+      i18n,
+      locale: defaultLocale,
+    };
   },
   headers: () => buildCacheHeaders({ global: ["suggest"] }),
   staleTime: 60 * 60_000,

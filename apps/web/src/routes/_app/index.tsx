@@ -1,5 +1,5 @@
-import type { AppLoaderData } from "../_app";
-import { createFileRoute, Link, useMatch } from "@tanstack/react-router";
+import type { LayoutData } from "@/routes/_app";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { AlertCircleIcon, InboxIcon, ArrowRightIcon } from "lucide-react";
 
 import { PageError } from "@/components/errors/page-error";
@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/page-container";
 import { SectionDivider } from "@/components/ui/section-divider";
 import { ArticleCard } from "@/features/articles/components/article-card";
-import { getHomePageData } from "@/features/pages/api/get-home-page-data";
+import { getHomeWithLayoutData } from "@/features/pages/api/get-home-with-layout-data";
 import { t } from "@/i18n";
 import { buildCacheHeaders } from "@/lib/cache-tags";
 import { getPreloadLinkAttributes } from "@/lib/image-utils";
@@ -51,9 +51,9 @@ export const Route = createFileRoute("/_app/")({
     const [pageData, i18n] = await Promise.all([
       (async () => {
         const start = performance.now();
-        const data = await getHomePageData();
+        const data = await getHomeWithLayoutData();
         console.log(
-          `[route:/_app/] getHomePageData: ${(performance.now() - start).toFixed(1)}ms`,
+          `[route:/_app/] getHomeWithLayoutData: ${(performance.now() - start).toFixed(1)}ms`,
         );
         return data;
       })(),
@@ -71,9 +71,15 @@ export const Route = createFileRoute("/_app/")({
       `[route:/_app/] loader total: ${(performance.now() - loaderStart).toFixed(1)}ms`,
     );
 
+    const layoutData: LayoutData = {
+      profiles: pageData.profiles,
+      socialNetworks: pageData.socialNetworks,
+    };
+
     return {
       articles: pageData.articles,
       homepage: pageData.homepage,
+      layoutData,
       i18n,
     };
   },
@@ -85,10 +91,8 @@ export const Route = createFileRoute("/_app/")({
     const articles = loaderData?.articles?.docs ?? [];
     const homepage = loaderData?.homepage;
     const firstArticle = articles[0];
-    // Use enhanced preload with responsive hints for optimal LCP
     const preloadLink = getPreloadLinkAttributes(firstArticle?.img.url, "card");
 
-    // Use CMS content with i18n fallbacks
     const title = homepage?.title ?? i18n.home.title;
     const subtitle = homepage?.subtitle ?? i18n.home.subtitle;
 
@@ -114,12 +118,9 @@ export const Route = createFileRoute("/_app/")({
 });
 
 function HomeComponent() {
-  const { articles, homepage, i18n } = Route.useLoaderData();
-  const appMatch = useMatch({ from: "/_app", shouldThrow: false });
-  const appData = appMatch?.loaderData as AppLoaderData | undefined;
-  const profiles = appData?.profiles ?? [];
+  const { articles, homepage, layoutData, i18n } = Route.useLoaderData();
+  const profiles = layoutData.profiles;
 
-  // Use CMS content with i18n fallbacks
   const title = homepage?.title ?? i18n.home.title;
   const subtitle = homepage?.subtitle ?? i18n.home.subtitle;
 
@@ -171,13 +172,17 @@ function HomeComponent() {
             <>
               <SectionDivider />
               <CardGrid as="ul">
-                {articles.docs.map((article) => (
+                {articles.docs.map((article, index) => (
                   <GridCard
                     key={article.id}
                     as="li"
                     className="col-span-2 md:col-span-2"
                   >
-                    <ArticleCard article={article} variant="grid" />
+                    <ArticleCard
+                      article={article}
+                      variant="grid"
+                      priority={index === 0}
+                    />
                   </GridCard>
                 ))}
               </CardGrid>

@@ -32,6 +32,8 @@ interface ArticleCardProps {
   preload?: "intent" | "viewport" | "render" | false;
   /** Variant for grid layout - "grid" removes borders since CardGrid handles them */
   variant?: "default" | "grid";
+  /** Mark the image as priority (eager loading, high fetchPriority) for LCP */
+  priority?: boolean;
 }
 
 function DateDisplay({
@@ -48,6 +50,7 @@ export function ArticleCard({
   article,
   preload = "intent",
   variant = "default",
+  priority = false,
 }: ArticleCardProps) {
   const i18n = t();
   const [isIndicationsOpen, setIsIndicationsOpen] = useState(false);
@@ -80,6 +83,7 @@ export function ArticleCard({
               className="size-full object-cover grayscale-0 transition-[filter] duration-200 group-hover:grayscale motion-reduce:transition-none"
               width={768}
               height={432}
+              priority={priority}
             />
             {article.isNew && (
               <Badge variant="default" className="absolute top-2 right-2 z-20">

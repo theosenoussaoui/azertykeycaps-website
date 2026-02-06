@@ -9,7 +9,6 @@ import {
 } from "@tanstack/react-query";
 import { createRouter as createTanStackRouter } from "@tanstack/react-router";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
-import { toast } from "sonner";
 
 import Loader from "@/components/layout/loader";
 import { TRPCProvider } from "@/lib/trpc";
@@ -17,13 +16,8 @@ import { routeTree } from "@/routeTree.gen";
 
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
-    onError: (error, query) => {
-      toast.error(error.message, {
-        action: {
-          label: "retry",
-          onClick: query.invalidate,
-        },
-      });
+    onError: (error) => {
+      console.error("[query-cache]", error.message);
     },
   }),
   defaultOptions: { queries: { staleTime: 60 * 1000 } },

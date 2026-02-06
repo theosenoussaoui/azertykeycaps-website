@@ -48,7 +48,16 @@ export const Route = createRootRouteWithContext<RouterAppContext>()({
       { property: "og:locale", content: siteConfig.locale },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      {
+        rel: "preload",
+        href: "/fonts/BerkeleyMonoVariable.woff2",
+        as: "font",
+        type: "font/woff2",
+        crossOrigin: "anonymous",
+      },
+      { rel: "stylesheet", href: appCss },
+    ],
   }),
 
   component: RootDocument,

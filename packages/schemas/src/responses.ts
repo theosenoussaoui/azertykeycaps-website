@@ -72,6 +72,23 @@ export const profilePageDataResponseSchema = z.object({
 
 export type LayoutDataResponse = z.infer<typeof layoutDataResponseSchema>;
 export type HomePageDataResponse = z.infer<typeof homePageDataResponseSchema>;
+
+/**
+ * Combined homepage + layout data response.
+ * Merges layout data (socialNetworks, profiles) with homepage data (articles, homepage content)
+ * into a single endpoint to reduce service binding calls on the homepage route.
+ */
+export const homeWithLayoutDataResponseSchema = z.object({
+  socialNetworks: socialNetworksSchema.nullable(),
+  profiles: profileListResponseSchema,
+  articles: articleListResponseSchema,
+  homepage: homepageSchema.nullable(),
+});
+
+export type HomeWithLayoutDataResponse = z.infer<
+  typeof homeWithLayoutDataResponseSchema
+>;
+
 export type ArticlePageDataResponse = z.infer<
   typeof articlePageDataResponseSchema
 >;

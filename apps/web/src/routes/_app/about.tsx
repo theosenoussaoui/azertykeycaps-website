@@ -1,3 +1,4 @@
+import type { LayoutData } from "@/routes/_app";
 import { createFileRoute } from "@tanstack/react-router";
 
 import { PageError } from "@/components/errors/page-error";
@@ -10,6 +11,7 @@ import {
 } from "@/components/ui/page-container";
 import { getAboutContent } from "@/features/globals/api/get-about-content";
 import { RichTextContent } from "@/features/globals/components/rich-text-content";
+import { getLayoutData } from "@/features/pages/api/get-layout-data";
 import { t } from "@/i18n";
 import { buildCacheHeaders } from "@/lib/cache-tags";
 import {
@@ -22,8 +24,16 @@ import {
 export const Route = createFileRoute("/_app/about")({
   component: AboutPage,
   loader: async () => {
-    const [content, i18n] = await Promise.all([getAboutContent(), t()]);
-    return { content, i18n };
+    const [content, layout, i18n] = await Promise.all([
+      getAboutContent(),
+      getLayoutData(),
+      t(),
+    ]);
+    const layoutData: LayoutData = {
+      profiles: layout.profiles,
+      socialNetworks: layout.socialNetworks,
+    };
+    return { content, layoutData, i18n };
   },
   head: ({ loaderData }) => {
     const i18n = loaderData?.i18n ?? t();

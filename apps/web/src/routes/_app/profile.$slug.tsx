@@ -1,3 +1,4 @@
+import type { LayoutData } from "@/routes/_app";
 import {
   profilePageFiltersSchema,
   type ArticleMaterial,
@@ -35,6 +36,7 @@ import { SectionDivider } from "@/components/ui/section-divider";
 import { ArticleCard } from "@/features/articles/components/article-card";
 import { ArticleFilters } from "@/features/articles/components/article-filters";
 import { ArticlesPagination } from "@/features/articles/components/articles-pagination";
+import { getLayoutData } from "@/features/pages/api/get-layout-data";
 import { getProfilePageData } from "@/features/pages/api/get-profile-page-data";
 import { t } from "@/i18n";
 import { buildCacheHeaders } from "@/lib/cache-tags";
@@ -56,10 +58,11 @@ export const Route = createFileRoute("/_app/profile/$slug")({
     search: search.search,
   }),
   loader: async ({ params, deps }) => {
-    const [data, i18n] = await Promise.all([
+    const [data, layout, i18n] = await Promise.all([
       getProfilePageData({
         data: { slug: params.slug, ...deps },
       }),
+      getLayoutData(),
       t(),
     ]);
 
@@ -67,7 +70,12 @@ export const Route = createFileRoute("/_app/profile/$slug")({
       throw notFound();
     }
 
-    return { ...data, i18n };
+    const layoutData: LayoutData = {
+      profiles: layout.profiles,
+      socialNetworks: layout.socialNetworks,
+    };
+
+    return { ...data, layoutData, i18n };
   },
   headers: ({ loaderData }) =>
     buildCacheHeaders({
