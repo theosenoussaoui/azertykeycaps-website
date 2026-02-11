@@ -44,6 +44,7 @@
     "dev:native": "turbo run dev --filter=native",
     "dev:no-cms": "turbo run dev --filter=!@azertykeycaps-app/cms",
     "dev:server": "turbo run dev --filter=server",
+    "dev:email": "turbo run dev --filter=@azertykeycaps-app/email",
     "dev:web": "turbo run dev --filter=web",
     "ruler:apply": "bunx @intellectronica/ruler@latest apply --local-only"
   },
@@ -61,5 +62,5 @@
     "turbo": "^2.7.6",
     "typescript": "catalog:"
   },
-  "packageManager": "bun@1.3.7"
+  "packageManager": "bun@1.3.9"
 }

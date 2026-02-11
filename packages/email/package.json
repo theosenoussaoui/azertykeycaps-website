@@ -1,0 +1,29 @@
+{
+  "name": "@azertykeycaps-app/email",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    }
+  },
+  "scripts": {
+    "dev": "email dev -p 3100",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@azertykeycaps-app/schemas": "workspace:*",
+    "@react-email/components": "1.0.7",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@azertykeycaps-app/config": "workspace:*",
+    "@react-email/preview-server": "5.2.8",
+    "@types/react": "19.2.10",
+    "@types/react-dom": "19.2.3",
+    "react-email": "5.2.8",
+    "typescript": "catalog:"
+  }
+}

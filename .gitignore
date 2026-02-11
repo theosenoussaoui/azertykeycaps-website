@@ -36,6 +36,9 @@ lerna-debug.log*
 # Turbo
 .turbo
 
+# React Email
+.react-email
+
 # Better-T-Stack
 .alchemy
 
